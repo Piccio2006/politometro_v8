@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Politometro">
+<defs>
+  <radialGradient id="bg" cx="35%" cy="22%" r="82%">
+    <stop offset="0" stop-color="#18384a"/>
+    <stop offset=".48" stop-color="#10242f"/>
+    <stop offset="1" stop-color="#07131c"/>
+  </radialGradient>
+  <linearGradient id="needle" x1="176" y1="304" x2="344" y2="128" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#dce8ea"/>
+    <stop offset=".45" stop-color="#ffffff"/>
+    <stop offset="1" stop-color="#b8c6cf"/>
+  </linearGradient>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity=".38"/>
+  </filter>
+</defs>
+<rect width="512" height="512" rx="96" fill="url(#bg)"/>
+<circle cx="256" cy="236" r="162" fill="none" stroke="#dce8ea" stroke-opacity=".08" stroke-width="2"/>
+<path d="M102 236 A154 154 0 0 1 256 82" fill="none" stroke="#38a3a5" stroke-width="18" stroke-linecap="butt"/>
+<path d="M266 82 A154 154 0 0 1 365 123" fill="none" stroke="#38a3a5" stroke-width="18" stroke-linecap="butt"/>
+<path d="M374 132 A154 154 0 0 1 410 236" fill="none" stroke="#6d597a" stroke-width="18" stroke-linecap="butt"/>
+<path d="M410 248 A154 154 0 0 1 370 344" fill="none" stroke="#6d597a" stroke-width="18" stroke-linecap="butt"/>
+<path d="M360 354 A154 154 0 0 1 260 390" fill="none" stroke="#f2b880" stroke-width="18" stroke-linecap="butt"/>
+<path d="M248 390 A154 154 0 0 1 104 248" fill="none" stroke="#f2b880" stroke-width="18" stroke-linecap="butt"/>
+<circle cx="256" cy="236" r="112" fill="none" stroke="#dce8ea" stroke-opacity=".36" stroke-width="2" stroke-dasharray="8 10"/>
+<circle cx="256" cy="236" r="68" fill="none" stroke="#dce8ea" stroke-opacity=".22" stroke-width="2" stroke-dasharray="7 9"/>
+<path d="M256 58V414M78 236H434M130 110L382 362M382 110L130 362" stroke="#dce8ea" stroke-opacity=".28" stroke-width="2"/>
+<g filter="url(#soft)">
+  <path d="M256 236 344 120 286 257Z" fill="url(#needle)"/>
+  <path d="M256 236 168 352 226 215Z" fill="#edf4f5"/>
+  <path d="M256 236 344 120 286 257Z" fill="#ffffff" opacity=".42"/>
+</g>
+<circle cx="256" cy="236" r="24" fill="#07131c" stroke="#edf4f5" stroke-width="7"/>
+<circle cx="256" cy="82" r="13" fill="#38a3a5"/>
+<circle cx="365" cy="127" r="13" fill="#6d597a"/>
+<circle cx="410" cy="236" r="13" fill="#6d597a"/>
+<circle cx="365" cy="345" r="13" fill="#6d597a"/>
+<circle cx="256" cy="390" r="13" fill="#f2b880"/>
+<circle cx="147" cy="345" r="13" fill="#f2b880"/>
+<circle cx="102" cy="236" r="13" fill="#f2b880"/>
+<circle cx="147" cy="127" r="13" fill="#38a3a5"/>
+<path d="M142 444H370" stroke="#38a3a5" stroke-width="5" stroke-linecap="round"/>
+<path d="M198 444H314" stroke="#f2b880" stroke-width="5" stroke-linecap="round"/>
+<path d="M266 444H370" stroke="#6d597a" stroke-width="5" stroke-linecap="round"/>
+</svg>

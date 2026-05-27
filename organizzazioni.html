@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Per organizzazioni - Politometro</title>
+  <meta name="description" content="Politometro per media, scuole, fondazioni e organizzazioni: quiz politico multi-asse, dashboard aggregata, report e modalità elettorale con fonti.">
+  <style>
+    :root{--ink:#172026;--muted:#60707c;--line:#d9e1e7;--bg:#f6f8f8;--panel:#fff;--accent:#22577a;--accent2:#38a3a5;--warm:#f2b880}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 10% 0,rgba(56,163,165,.16),transparent 30%),radial-gradient(circle at 88% 8%,rgba(242,184,128,.24),transparent 28%),linear-gradient(180deg,#fbfcf7 0%,var(--bg) 48%,#eaf4f1 100%);color:var(--ink);line-height:1.6}
+    main{max-width:1100px;margin:0 auto;padding:34px 18px 56px}
+    a{color:var(--accent)}
+    h1{font-family:Georgia,serif;font-size:46px;line-height:1.04;margin:0 0 12px;letter-spacing:0}
+    h2{font-size:24px;margin:0 0 10px}
+    h3{font-size:18px;margin:0 0 8px}
+    p{margin:0 0 12px}
+    .muted{color:var(--muted)}
+    .hero{border:1px solid #b9ccd3;border-radius:8px;padding:30px;background:linear-gradient(135deg,rgba(56,163,165,.16),transparent 38%),linear-gradient(315deg,rgba(242,184,128,.24),transparent 42%),#fff;box-shadow:0 24px 70px rgba(16,36,47,.12);position:relative;overflow:hidden}
+    .hero::after{content:"";position:absolute;right:-46px;bottom:-52px;width:220px;height:220px;border-radius:50%;border:26px solid rgba(34,87,122,.08)}
+    .nav{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+    section,.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:8px;padding:20px;box-shadow:0 14px 36px rgba(16,36,47,.06)}
+    .card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+    .card:hover{transform:translateY(-2px);box-shadow:0 20px 52px rgba(16,36,47,.10);border-color:#b9ccd3}
+    .card strong{color:var(--accent)}
+    .kpi{font-size:30px;font-weight:900;color:var(--accent);display:block;line-height:1}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .pill{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;font-size:13px;font-weight:800;color:#24404c}
+    .proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+    .proof-card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:16px}
+    .proof-card strong{display:block;font-size:28px;color:var(--accent);line-height:1}
+    .proof-card span{display:block;margin-top:6px;color:var(--muted);font-size:13px;font-weight:750}
+    .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border-radius:8px;padding:11px 14px;text-decoration:none;font-weight:900;background:#e5ecef;color:var(--ink)}
+    .btn.primary{background:linear-gradient(135deg,var(--accent),#17384d);color:white}
+    .warning{border-left:4px solid var(--warm);background:rgba(242,184,128,.16);border-radius:8px;padding:14px;color:#4f3b22}
+    ul{padding-left:20px;margin:0}
+    li{margin:8px 0}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden}
+    th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}
+    th{background:#10242f;color:#fff}
+    .journey{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+    .journey-step{border:1px solid rgba(34,87,122,.16);border-radius:8px;background:linear-gradient(135deg,rgba(56,163,165,.08),rgba(242,184,128,.10)),#fff;padding:16px}
+    .journey-step b{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#10242f;color:#fff;margin-bottom:10px}
+    .journey-step strong{display:block;color:var(--accent);margin-bottom:6px}
+    @media(max-width:800px){h1{font-size:36px}.grid,.two,.proof,.journey{grid-template-columns:1fr}.hero{padding:20px}}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="nav">
+      <a href="./">← Torna al Politometro</a>
+      <span class="muted">Soluzioni per media, aziende, scuole e organizzazioni</span>
+    </div>
+
+    <div class="hero">
+      <h1>Una piattaforma di civic intelligence pronta per il pubblico.</h1>
+      <p class="muted">Politometro unisce un test politico mobile-first a report, card social e analytics aggregati. Per media, aziende e organizzazioni offre esperienze brandizzabili, dati consensuali e letture metodologicamente trasparenti.</p>
+      <div class="pillrow">
+        <span class="pill">Quiz multi-asse</span>
+        <span class="pill">PWA installabile</span>
+        <span class="pill">Report e card social</span>
+        <span class="pill">Dashboard aggregata</span>
+        <span class="pill">Modalità Elezioni 2027</span>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="mailto:piccioligiovanni@outlook.it?subject=Politometro%20-%20partnership">Parla di una partnership</a>
+        <a class="btn" href="metodo.html">Metodo e limiti</a>
+        <a class="btn" href="privacy.html">Privacy</a>
+      </div>
+    </div>
+
+    <div class="proof">
+      <div class="proof-card"><strong>8</strong><span>assi politici leggibili</span></div>
+      <div class="proof-card"><strong>3</strong><span>modalità di test</span></div>
+      <div class="proof-card"><strong>PDF</strong><span>report e card social</span></div>
+      <div class="proof-card"><strong>CSV</strong><span>dashboard ed export aggregati</span></div>
+    </div>
+
+    <div class="grid">
+      <div class="card"><span class="kpi">B2C</span><strong>Per utenti</strong><p class="muted">Esperienza rapida, identitaria, mobile-first: risultato, mondo politico, card social e spiegazioni.</p></div>
+      <div class="card"><span class="kpi">B2B</span><strong>Per media e organizzazioni</strong><p class="muted">Versioni brandizzate, dashboard aggregate, report editoriali e campagne tematiche.</p></div>
+      <div class="card"><span class="kpi">2027</span><strong>Per elezioni</strong><p class="muted">Modulo temporaneo con domande tratte da programmi ufficiali e posizioni documentate.</p></div>
+    </div>
+
+    <section>
+      <h2>Come si presenta al pubblico</h2>
+      <div class="journey">
+        <div class="journey-step"><b>1</b><strong>Test rapido</strong><p class="muted">L'utente entra, sceglie la modalità e completa il quiz da telefono.</p></div>
+        <div class="journey-step"><b>2</b><strong>Risultato visuale</strong><p class="muted">Archetipo, assi, coerenza interna, mappa e mondo politico.</p></div>
+        <div class="journey-step"><b>3</b><strong>Condivisione</strong><p class="muted">Card social, report PDF e link condivisibili.</p></div>
+        <div class="journey-step"><b>4</b><strong>Insight</strong><p class="muted">Dashboard aggregata per capire trend e segmenti, con consenso.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Soluzioni disponibili</h2>
+      <table>
+        <tr><th>Prodotto</th><th>Cliente possibile</th><th>Valore</th></tr>
+        <tr><td>Quiz editoriale brandizzato</td><td>Giornali, creator, media locali</td><td>Traffico, tempo di permanenza, card condivisibili, contenuti data-driven.</td></tr>
+        <tr><td>Dashboard aggregata</td><td>Fondazioni, associazioni, scuole, think tank</td><td>Distribuzioni per asse, segmenti demografici consensuali, trend nel tempo.</td></tr>
+        <tr><td>Modalità elettorale</td><td>Media e progetti civici</td><td>Confronto tra risposte utente e programmi, con fonti e criteri trasparenti.</td></tr>
+        <tr><td>Versione white-label</td><td>Organizzazioni e campagne informative</td><td>Interfaccia personalizzata, report PDF, export aggregato, pagine metodo/privacy dedicate.</td></tr>
+      </table>
+    </section>
+
+    <div class="two">
+      <section>
+      <h2>Per media e redazioni</h2>
+        <ul>
+          <li>Trasforma un tema politico astratto in esperienza interattiva.</li>
+          <li>Genera contenuti condivisibili senza sembrare un sondaggio vecchio stile.</li>
+          <li>Permette articoli su cluster, valori e fratture culturali, non solo intenzioni di voto.</li>
+          <li>La pagina metodo rende il progetto più difendibile pubblicamente.</li>
+        </ul>
+      </section>
+      <section>
+      <h2>Per aziende e organizzazioni</h2>
+        <ul>
+          <li>Aiuta a capire quali valori avvicinano o allontanano gruppi diversi.</li>
+          <li>Mostra correlazioni esplorative tra temi, istruzione, età e informazione politica.</li>
+          <li>Può diventare uno strumento educativo o di ascolto pubblico.</li>
+          <li>Funziona come PWA, quindi è semplice da distribuire da link o QR code.</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="warning">
+      <h2>Linea etica e privacy</h2>
+      <p>Politometro lavora su consenso, trasparenza e risultati aggregati. Le opinioni politiche sono dati sensibili: la piattaforma è pensata per insight collettivi, contenuti editoriali e strumenti educativi, non per vendere profili individuali o fare microtargeting opaco.</p>
+    </section>
+
+    <section>
+      <h2>Pacchetti</h2>
+      <table>
+        <tr><th>Pacchetto</th><th>A chi venderlo</th><th>Cosa include</th></tr>
+        <tr><td>Demo pubblica</td><td>Creator, scuole, community</td><td>PWA, quiz rapido/profondo, card social, report PDF, pagina metodo e privacy.</td></tr>
+        <tr><td>Editoriale</td><td>Giornali, media locali, newsletter</td><td>Pagina brandizzata, dashboard aggregata, export CSV, insight automatici e articolo di sintesi.</td></tr>
+        <tr><td>Research beta</td><td>Fondazioni, think tank, università, associazioni</td><td>Dataset consensuale, controlli qualità, correlazioni esplorative, soglie minime e report metodologico.</td></tr>
+        <tr><td>Elezioni 2027</td><td>Media e progetti civici</td><td>Domande basate su programmi ufficiali, fonti, revisione delle posizioni e confronto partiti/utente.</td></tr>
+      </table>
+    </section>
+
+    <div class="two">
+      <section>
+        <h2>Dashboard che puoi mostrare</h2>
+        <ul>
+          <li>Stato dataset: fase iniziale, beta, validazione o scala.</li>
+          <li>Trend giorno per giorno: test, feedback, confidenza e ideologie principali.</li>
+          <li>Correlazioni automatiche tra assi, domande e dati facoltativi.</li>
+          <li>Export CSV/JSON per analisi esterne e report professionali.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Soglie di lettura</h2>
+        <ul>
+          <li>30 risposte: primi segnali esplorativi.</li>
+          <li>100 risposte: primi report aggregati prudenti.</li>
+          <li>300 risposte: analisi più seria sugli assi e sugli item.</li>
+          <li>1.000 risposte: percentili, segmenti e calibrazione più credibili.</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
