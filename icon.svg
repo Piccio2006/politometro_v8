@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Politometro">
 <defs>
   <radialGradient id="bg" cx="35%" cy="22%" r="82%">
-    <stop offset="0" stop-color="#18384a"/>
-    <stop offset=".48" stop-color="#10242f"/>
-    <stop offset="1" stop-color="#07131c"/>
+    <stop offset="0" stop-color="#142635"/>
+    <stop offset=".48" stop-color="#0a141c"/>
+    <stop offset="1" stop-color="#030608"/>
   </radialGradient>
   <linearGradient id="needle" x1="176" y1="304" x2="344" y2="128" gradientUnits="userSpaceOnUse">
-    <stop stop-color="#dce8ea"/>
+    <stop stop-color="#e2f1f5"/>
     <stop offset=".45" stop-color="#ffffff"/>
-    <stop offset="1" stop-color="#b8c6cf"/>
+    <stop offset="1" stop-color="#b0c0cb"/>
   </linearGradient>
   <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-    <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity=".38"/>
+    <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity=".52"/>
   </filter>
 </defs>
 <rect width="512" height="512" rx="96" fill="url(#bg)"/>
@@ -30,7 +30,7 @@
   <path d="M256 236 168 352 226 215Z" fill="#edf4f5"/>
   <path d="M256 236 344 120 286 257Z" fill="#ffffff" opacity=".42"/>
 </g>
-<circle cx="256" cy="236" r="24" fill="#07131c" stroke="#edf4f5" stroke-width="7"/>
+<circle cx="256" cy="236" r="24" fill="#030608" stroke="#edf4f5" stroke-width="7"/>
 <circle cx="256" cy="82" r="13" fill="#38a3a5"/>
 <circle cx="365" cy="127" r="13" fill="#6d597a"/>
 <circle cx="410" cy="236" r="13" fill="#6d597a"/>
