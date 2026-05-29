@@ -7,17 +7,17 @@
   <title>Politometro</title>
 
   <meta name="description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <link rel="canonical" href="https://piccio2006.github.io/politometro-v6m2/">
-  <meta property="og:title" content="Politometro – Scopri il tuo profilo politico">
+  <link rel="canonical" href="https://politometro.example/">
+  <meta property="og:title" content="Politometro">
   <meta property="og:description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <meta property="og:image" content="https://piccio2006.github.io/politometro-v6m2/og-image.png">
-  <meta property="og:url" content="https://piccio2006.github.io/politometro-v6m2/">
+  <meta property="og:image" content="https://politometro.example/og-image.png">
+  <meta property="og:url" content="https://politometro.example/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Politometro">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Politometro – Scopri il tuo profilo politico">
+  <meta name="twitter:title" content="Politometro">
   <meta name="twitter:description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <meta name="twitter:image" content="https://piccio2006.github.io/politometro-v6m2/og-image.png">
+  <meta name="twitter:image" content="https://politometro.example/og-image.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#10242f" />
@@ -2367,6 +2367,196 @@
     .mode-card h4, .mode-card p, .mode-card .small {
       color: var(--ink) !important;
     }
+
+    /* ═══════════════════════════════════════
+       PANNELLO AI GEMINI
+    ═══════════════════════════════════════ */
+    .ai-panel-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .ai-setup-box {
+      background: linear-gradient(135deg, rgba(99,102,241,.10) 0%, rgba(139,92,246,.08) 100%);
+      border: 1.5px solid rgba(99,102,241,.30);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .ai-setup-box h3 {
+      margin: 0 0 6px;
+      font-size: 17px;
+      color: var(--ink);
+    }
+    .ai-setup-box p.small {
+      margin: 0 0 16px;
+      color: var(--ink-2, #64748b);
+    }
+    .ai-key-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .ai-key-row input {
+      flex: 1;
+      min-width: 200px;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(99,102,241,.35);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--ink);
+      font-family: monospace;
+      letter-spacing: .03em;
+    }
+    .ai-key-row input:focus {
+      outline: none;
+      border-color: #818cf8;
+      box-shadow: 0 0 0 3px rgba(129,140,248,.18);
+    }
+    .ai-key-hint {
+      font-size: 12px;
+      color: #818cf8;
+      text-decoration: none;
+      margin-top: 8px;
+      display: inline-block;
+      opacity: .85;
+    }
+    .ai-key-hint:hover { opacity: 1; text-decoration: underline; }
+    .ai-chat-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: rgba(0,0,0,.15);
+      border: 1.5px solid rgba(99,102,241,.18);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .ai-chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px;
+      max-height: 420px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .ai-bubble {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      animation: aiSlideIn .25s ease;
+    }
+    @keyframes aiSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ai-bubble .ai-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .ai-bubble.ai .ai-avatar  { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+    .ai-bubble.user .ai-avatar { background: rgba(255,255,255,.12); }
+    .ai-bubble .ai-text {
+      background: rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--ink);
+      max-width: calc(100% - 50px);
+      white-space: pre-wrap;
+    }
+    .ai-bubble.user .ai-text {
+      background: rgba(99,102,241,.18);
+      margin-left: auto;
+    }
+    .ai-bubble.user { flex-direction: row-reverse; }
+    .ai-typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      padding: 4px 0;
+    }
+    .ai-typing-dots span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #818cf8;
+      animation: aiDot 1.2s infinite ease-in-out;
+    }
+    .ai-typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .ai-typing-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes aiDot {
+      0%, 80%, 100% { transform: scale(.7); opacity: .5; }
+      40%            { transform: scale(1.1); opacity: 1; }
+    }
+    .ai-input-bar {
+      display: flex;
+      gap: 8px;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(99,102,241,.18);
+      background: rgba(0,0,0,.12);
+    }
+    .ai-input-bar textarea {
+      flex: 1;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(99,102,241,.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--ink);
+      resize: none;
+      min-height: 44px;
+      max-height: 110px;
+      font-family: inherit;
+      line-height: 1.5;
+      transition: border-color .2s;
+    }
+    .ai-input-bar textarea:focus {
+      outline: none;
+      border-color: #818cf8;
+    }
+    .ai-send-btn {
+      align-self: flex-end;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      background: linear-gradient(135deg,#6366f1,#8b5cf6);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+      white-space: nowrap;
+    }
+    .ai-send-btn:hover { opacity: .88; }
+    .ai-send-btn:active { transform: scale(.97); }
+    .ai-send-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .ai-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px 14px;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .ai-delete-key {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: .7;
+      padding: 0;
+    }
+    .ai-delete-key:hover { opacity: 1; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -4775,6 +4965,7 @@
           <button class="tab" data-tab="method" data-icon="∴">Metodo</button>
           <button class="tab" data-tab="audit" data-icon="◈">Audit</button>
           <button class="tab" data-tab="feedback" data-icon="◇">Feedback</button>
+          <button class="tab" data-tab="ai" data-icon="✦" style="background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(139,92,246,.12));color:#a5b4fc;font-weight:800;">✦ AI</button>
         </div>
         <div id="panel-summary" class="tab-panel active">
           ${engineNote}
@@ -4804,6 +4995,7 @@
                 <button class="btn" id="surfaceWorld">Il tuo mondo</button>
                 <button class="btn" id="surfaceMap">Apri mappa</button>
                 <button class="btn" id="surfaceDeep">Approfondisci</button>
+                <button class="btn" id="surfaceAI" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.18));border-color:rgba(99,102,241,.4);color:#a5b4fc;font-weight:800;">✦ Chiedi all'AI</button>
               </div>
             </div>
             <div class="block">
@@ -5023,6 +5215,35 @@
             </div>
           </div>
         </div>
+        <div id="panel-ai" class="tab-panel">
+          <div class="ai-panel-wrap" id="aiPanelWrap">
+            <div class="block" style="background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.06));border-color:rgba(99,102,241,.25);">
+              <span class="kicker" style="color:#818cf8;">Gemini AI</span>
+              <h3>Analisi AI del tuo profilo politico</h3>
+              <p class="small">L'AI legge il tuo profilo completo (8 assi, ideologia, partiti, coerenza V8) e lo commenta. Poi puoi farle tutte le domande che vuoi.</p>
+            </div>
+            <div id="aiSetupBox" class="ai-setup-box">
+              <h3>🔑 Inserisci la tua API key Gemini</h3>
+              <p class="small">La key viene salvata solo nel tuo browser (localStorage) e non viene mai inviata a nessun server tranne Google.</p>
+              <div class="ai-key-row">
+                <input type="password" id="geminiKeyInput" placeholder="AIza..." autocomplete="off" spellcheck="false" />
+                <button class="btn primary" id="geminiKeySaveBtn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;">Salva e analizza →</button>
+              </div>
+              <a class="ai-key-hint" href="https://ai.google.dev/" target="_blank" rel="noreferrer">Ottieni una API key gratuita su ai.google.dev →</a>
+            </div>
+            <div id="aiChatBox" class="ai-chat-wrap" style="display:none;">
+              <div class="ai-chat-messages" id="aiMessages"></div>
+              <div class="ai-input-bar">
+                <textarea id="aiUserInput" placeholder="Fai una domanda sul tuo risultato..." rows="1"></textarea>
+                <button class="ai-send-btn" id="aiSendBtn">Invia</button>
+              </div>
+              <div class="ai-footer-row">
+                <span>Modello: gemini-2.0-flash · Solo nel tuo browser</span>
+                <button class="ai-delete-key" id="aiDeleteKeyBtn">🗑 Cancella chiave</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div id="panel-share" class="tab-panel">
           <div class="result-grid">
             <div class="block">
@@ -5124,6 +5345,36 @@
       if (copyLinkButton) copyLinkButton.addEventListener("click", copyShareLink);
       const installResultButton = document.getElementById("installAppResult");
       if (installResultButton) installResultButton.addEventListener("click", requestInstallApp);
+      // AI panel bindings
+      const surfaceAIBtn = document.getElementById("surfaceAI");
+      if (surfaceAIBtn) surfaceAIBtn.addEventListener("click", () => { jumpToTab("ai"); initAIPanel(data); });
+      const geminiKeySaveBtn = document.getElementById("geminiKeySaveBtn");
+      if (geminiKeySaveBtn) geminiKeySaveBtn.addEventListener("click", () => {
+        const key = document.getElementById("geminiKeyInput")?.value?.trim();
+        if (!key) return;
+        saveGeminiKey(key);
+        initAIPanel(data);
+      });
+      const geminiKeyInput = document.getElementById("geminiKeyInput");
+      if (geminiKeyInput) geminiKeyInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("geminiKeySaveBtn")?.click();
+      });
+      const aiSendBtn = document.getElementById("aiSendBtn");
+      if (aiSendBtn) aiSendBtn.addEventListener("click", () => sendAIMessage(data));
+      const aiUserInput = document.getElementById("aiUserInput");
+      if (aiUserInput) aiUserInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendAIMessage(data); }
+      });
+      const aiDeleteKeyBtn = document.getElementById("aiDeleteKeyBtn");
+      if (aiDeleteKeyBtn) aiDeleteKeyBtn.addEventListener("click", () => {
+        localStorage.removeItem("politometro_gemini_key");
+        document.getElementById("aiChatBox").style.display = "none";
+        document.getElementById("aiSetupBox").style.display = "";
+        document.getElementById("geminiKeyInput").value = "";
+        document.getElementById("aiMessages").innerHTML = "";
+      });
+      // Auto-init if key already saved
+      if (loadGeminiKey()) initAIPanel(data);
       syncShareBox(data);
       bindSalienceSliders();
       setTimeout(() => drawVisuals(data), 60);
@@ -6275,6 +6526,209 @@
     checkAuthSession();
 
 
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+
+    /* ═══════════════════════════════════════════════════
+       GEMINI AI INTEGRATION
+       100% client-side — API key salvata in localStorage
+    ════════════════════════════════════════════════════ */
+
+    function saveGeminiKey(key) {
+      localStorage.setItem("politometro_gemini_key", key);
+    }
+
+    function loadGeminiKey() {
+      return localStorage.getItem("politometro_gemini_key") || "";
+    }
+
+    function buildGeminiContext(data) {
+      const axes = (data.axes || []).map(a =>
+        `  • ${a.name}: ${a.value >= 0 ? "+" : ""}${Number(a.value).toFixed(2)}  (${a.explanation || ""})`
+      ).join("\n");
+      const parties = (data.parties || []).slice(0, 5).map(p =>
+        `  • ${p.name}: ${Number(p.affinity || 0).toFixed(1)}% affinità`
+      ).join("\n");
+      const historical = (data.historical || []).slice(0, 3).map(h =>
+        `  • ${h.name}: ${Number(h.affinity || 0).toFixed(1)}% affinità`
+      ).join("\n");
+      const world = data.political_world || {};
+      const ideology = world.ideology?.name || data.interpretation?.family || "n/d";
+      const coherence = data.self_coherence ? `${data.self_coherence.score}% (${data.self_coherence.label})` : "n/d";
+      const reliability = data.reliability?.label || "n/d";
+      const engine = data.engine || "v6";
+      const syncretism = (data.self_coherence?.syncretism || []).map(s => s.title).join(", ") || "nessuno rilevato";
+      const topContribs = (data.top_contributions || []).slice(0, 5).map(c =>
+        `  • "${c.question || c.question_id}": risposta ${c.answer}, impatto ${Number(c.contribution ?? c.impact ?? 0).toFixed(3)}`
+      ).join("\n");
+
+      return `Sei un analista politico esperto e curioso che aiuta gli utenti a comprendere il proprio profilo del Politometro, un test politico italiano a 8 assi basato su modelli psicometrici.
+
+Rispondi SEMPRE in italiano. Sii preciso ma accessibile. Non fare diagnosi politiche definitive. Incoraggia la riflessione critica. Quando parli degli assi, usa valori numerici. Non inventare informazioni che non hai. Sii conciso (max 250 parole per risposta, salvo richiesta esplicita di approfondimento).
+
+━━━ PROFILO UTENTE ━━━
+Motore di calcolo: ${engine.toUpperCase()} (${engine === "v8" ? "IRT Graded Response Model + Fused Consensus 2.0" : engine === "v7" ? "Fused Consensus con salienza adattiva" : "modello multi-asse ponderato"})
+Confidenza globale: ${data.confidence || "n/d"}%
+Coerenza interna: ${coherence}
+Affidabilità: ${reliability}
+Sincretismo politico V8: ${syncretism}
+
+━━━ ASSI POLITICI (da -1.0 polo sinistro/libertario/verde a +1.0 polo destro/autoritario/industriale) ━━━
+${axes}
+
+━━━ IDEOLOGIA PIÙ VICINA ━━━
+${ideology}
+
+━━━ PARTITI PIÙ VICINI ━━━
+${parties}
+
+━━━ FIGURE STORICHE PIÙ VICINE ━━━
+${historical}
+
+━━━ RISPOSTE CON MAGGIORE IMPATTO ━━━
+${topContribs || "  (dati non disponibili)"}
+
+Basati su questi dati per commentare e rispondere alle domande dell'utente.`;
+    }
+
+    async function callGemini(systemPrompt, messages) {
+      const key = loadGeminiKey();
+      if (!key) throw new Error("API key non trovata.");
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`;
+      const contents = messages.map(m => ({
+        role: m.role === "ai" ? "model" : "user",
+        parts: [{ text: m.text }]
+      }));
+      const body = {
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+      };
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const msg = err?.error?.message || `Errore HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      const json = await res.json();
+      return json?.candidates?.[0]?.content?.parts?.[0]?.text || "(risposta vuota)";
+    }
+
+    function aiAppendMessage(role, text) {
+      const container = document.getElementById("aiMessages");
+      if (!container) return null;
+      const bubble = document.createElement("div");
+      bubble.className = `ai-bubble ${role}`;
+      const avatar = document.createElement("div");
+      avatar.className = "ai-avatar";
+      avatar.textContent = role === "ai" ? "✦" : "👤";
+      const textEl = document.createElement("div");
+      textEl.className = "ai-text";
+      textEl.textContent = text;
+      bubble.appendChild(avatar);
+      bubble.appendChild(textEl);
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+      return textEl;
+    }
+
+    function aiShowTyping() {
+      const container = document.getElementById("aiMessages");
+      if (!container) return null;
+      const bubble = document.createElement("div");
+      bubble.className = "ai-bubble ai";
+      bubble.id = "aiTypingBubble";
+      bubble.innerHTML = `<div class="ai-avatar">✦</div><div class="ai-text"><div class="ai-typing-dots"><span></span><span></span><span></span></div></div>`;
+      container.appendChild(bubble);
+      container.scrollTop = container.scrollHeight;
+      return bubble;
+    }
+
+    function aiRemoveTyping() {
+      document.getElementById("aiTypingBubble")?.remove();
+    }
+
+    // Cronologia messaggi per la sessione corrente
+    let _aiHistory = [];
+    let _aiSystemPrompt = "";
+
+    async function initAIPanel(data) {
+      const key = loadGeminiKey();
+      const setupBox = document.getElementById("aiSetupBox");
+      const chatBox = document.getElementById("aiChatBox");
+      if (!key) {
+        if (setupBox) setupBox.style.display = "";
+        if (chatBox) chatBox.style.display = "none";
+        return;
+      }
+      if (setupBox) setupBox.style.display = "none";
+      if (chatBox) chatBox.style.display = "";
+
+      // Se già inizializzato per questo profilo, non ripartire
+      if (_aiHistory.length > 0) return;
+
+      _aiSystemPrompt = buildGeminiContext(data);
+      _aiHistory = [];
+
+      const typing = aiShowTyping();
+      const sendBtn = document.getElementById("aiSendBtn");
+      if (sendBtn) sendBtn.disabled = true;
+
+      const firstMessage = "Analizza il mio profilo politico e fornisci un commento sintetico e interessante: cosa mi caratterizza, cosa è insolito, e cosa potrebbe sorprendermi nel confronto con partiti e ideologie.";
+      _aiHistory.push({ role: "user", text: firstMessage });
+
+      try {
+        const reply = await callGemini(_aiSystemPrompt, _aiHistory);
+        aiRemoveTyping();
+        _aiHistory.push({ role: "ai", text: reply });
+        aiAppendMessage("ai", reply);
+      } catch (err) {
+        aiRemoveTyping();
+        aiAppendMessage("ai", `⚠️ Errore: ${err.message}\n\nVerifica che la API key sia corretta (deve iniziare con AIza...). Puoi ottenerne una gratuita su ai.google.dev`);
+      } finally {
+        if (sendBtn) sendBtn.disabled = false;
+      }
+    }
+
+    async function sendAIMessage(data) {
+      const input = document.getElementById("aiUserInput");
+      const sendBtn = document.getElementById("aiSendBtn");
+      if (!input || !sendBtn) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const key = loadGeminiKey();
+      if (!key) { jumpToTab("ai"); return; }
+
+      input.value = "";
+      input.style.height = "";
+      aiAppendMessage("user", text);
+      _aiHistory.push({ role: "user", text });
+
+      if (!_aiSystemPrompt) _aiSystemPrompt = buildGeminiContext(data);
+
+      const typing = aiShowTyping();
+      sendBtn.disabled = true;
+
+      try {
+        const reply = await callGemini(_aiSystemPrompt, _aiHistory);
+        aiRemoveTyping();
+        _aiHistory.push({ role: "ai", text: reply });
+        aiAppendMessage("ai", reply);
+      } catch (err) {
+        aiRemoveTyping();
+        aiAppendMessage("ai", `⚠️ Errore: ${err.message}`);
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
 
     if ("serviceWorker" in navigator && location.protocol !== "file:") {
       navigator.serviceWorker.register("sw.js").catch(() => {});
