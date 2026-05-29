@@ -2777,7 +2777,14 @@
 
         if (engine === "v8") {
           const a = Number(q.discrimination || 0.7);
-          const b = Number(q.difficulty || 0.5);
+          let b = 0.0;
+          if (q.thresholds && q.thresholds.length >= 6) {
+            b = q.thresholds.reduce((sum, val) => sum + val, 0) / q.thresholds.length;
+          } else {
+            // b = (diff - 0.5) * 2.0;
+            // Setting b to 0.0 to prevent cognitive difficulty metric from shifting the political origin
+            b = 0.0;
+          }
           let rawLogit = a * (response - b);
           rawLogit = Math.max(-12.0, Math.min(12.0, rawLogit));
           response = 2.0 / (1.0 + Math.exp(-rawLogit)) - 1.0;
