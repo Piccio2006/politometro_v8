@@ -2787,7 +2787,9 @@
           }
           let rawLogit = a * (response - b);
           rawLogit = Math.max(-12.0, Math.min(12.0, rawLogit));
-          response = 2.0 / (1.0 + Math.exp(-rawLogit)) - 1.0;
+          const sig = 2.0 / (1.0 + Math.exp(-rawLogit)) - 1.0;
+          const maxSig = 2.0 / (1.0 + Math.exp(-a)) - 1.0;
+          response = maxSig > 0 ? sig / maxSig : sig;
         }
 
         for (let i = 0; i < axisCount; i++) {
