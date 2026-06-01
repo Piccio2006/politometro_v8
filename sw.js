@@ -1,5 +1,6 @@
-const CACHE = "politometro-public-1780313538";
-	const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png", "./privacy.html", "./metodo.html", "./supporto.html", "./organizzazioni.html", "./og-image.png"];
+const CACHE = "politometro-public-20260601-125756";
+const HTML_PATHS = new Set(["/", "/index.html", "/privacy.html", "/metodo.html", "/supporto.html", "/organizzazioni.html"]);
+const CORE = ["./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png", "./og-image.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
   self.skipWaiting();
@@ -13,6 +14,10 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/") || url.pathname === "/admin" || url.pathname.startsWith("/admin/") || url.pathname === "/login" || url.pathname.startsWith("/login/")) return;
+  if (request.mode === "navigate" || HTML_PATHS.has(url.pathname)) {
+    event.respondWith(fetch(request, { cache: "no-store" }).catch(() => caches.match("./index.html")));
+    return;
+  }
   event.respondWith(fetch(request).then(response => {
     if (!response || !response.ok || response.type === "opaque") return response;
     const copy = response.clone();
