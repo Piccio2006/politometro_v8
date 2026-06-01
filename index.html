@@ -2725,7 +2725,7 @@
         </div>
     
         <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260601-162320 · IA v5.3</span>
+        <span class="engine-pill" id="releasePill">Aggiornato 20260601-165609 · IA v5.3</span>
       </div>
     </aside>
     <main>
@@ -4559,6 +4559,9 @@
       if (name === "ai" && state.lastResult) {
         initAIPanel(state.lastResult);
       }
+      if (name === "coalitions" && state.lastResult) {
+        initCoalitionSimulator(state.lastResult);
+      }
     }
 
     function selectQuestionSet() {
@@ -4845,6 +4848,104 @@
         }
       });
       canvas.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
+      
+      canvas.addEventListener("click", (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const hit = state.mapPoints.find((p) => Math.hypot(p.screenX - x, p.screenY - y) < 12);
+        if (hit) {
+          openMapDrawer(data, hit.name);
+        }
+      });
+
+      document.getElementById("closeMapDrawer")?.addEventListener("click", () => {
+        const drawer = document.getElementById("mapDetailDrawer");
+        if (drawer) drawer.style.display = "none";
+      });
+    }
+
+    function openMapDrawer(userData, name) {
+      const drawer = document.getElementById("mapDetailDrawer");
+      const nameEl = document.getElementById("drawerEntityName");
+      const catEl = document.getElementById("drawerEntityCategory");
+      const briefEl = document.getElementById("drawerEntityBrief");
+      const affinityValEl = document.getElementById("drawerAffinityVal");
+      const barsEl = document.getElementById("drawerComparisonBars");
+      const insightsEl = document.getElementById("drawerInsights");
+      
+      if (!drawer || !nameEl) return;
+      
+      const proto = STANDALONE_DATA.prototypes[name];
+      if (!proto) return;
+      
+      nameEl.textContent = name;
+      drawer.style.display = "block";
+      
+      const meta = standaloneEntityMetadata(name);
+      const catName = category(name);
+      catEl.textContent = catName.toUpperCase();
+      if (catName === "partito") {
+        catEl.style.background = "#e74c3c";
+      } else if (catName === "ideologia") {
+        catEl.style.background = "#38a3a5";
+      } else {
+        catEl.style.background = "#9b59b6";
+      }
+      
+      briefEl.textContent = meta.brief || "";
+      
+      let affinity = 0;
+      if (userData.profile) {
+        const dist = standaloneDistance(userData.profile, proto, "fused_consensus", userData.axes);
+        affinity = standaloneAffinityFromDistance(dist, "fused_consensus", 8);
+        affinityValEl.textContent = `${Math.round(affinity)}%`;
+      }
+      
+      let barsHtml = "";
+      const comparisons = STANDALONE_DATA.axis_short.map((axisName, idx) => {
+        const userVal = userData.profile ? userData.profile[idx] : 0;
+        const entityVal = proto[idx];
+        const delta = Math.abs(userVal - entityVal);
+        
+        const userPct = Math.round((userVal + 1) * 50);
+        const entityPct = Math.round((entityVal + 1) * 50);
+        
+        return { axisName, userVal, entityVal, delta, userPct, entityPct, idx };
+      });
+      
+      comparisons.forEach(c => {
+        barsHtml += `
+          <div style="font-size:12px; display:flex; flex-direction:column; gap:3px;">
+            <div style="display:flex; justify-content:space-between; font-weight:600; color:var(--ink);">
+              <span>${c.axisName}</span>
+              <span style="font-size:10.5px; color:var(--muted);">Tua: ${c.userVal >= 0 ? '+' : ''}${c.userVal.toFixed(2)} · Sua: ${c.entityVal >= 0 ? '+' : ''}${c.entityVal.toFixed(2)}</span>
+            </div>
+            <div style="position:relative; height:12px; background:rgba(0,0,0,0.15); border-radius:999px; overflow:hidden;">
+              <div style="position:absolute; left:0; top:0; height:100%; width:${c.userPct}%; background:var(--accent-2); opacity:0.35; border-radius:999px;"></div>
+              <div style="position:absolute; left:0; top:0; height:100%; width:${c.entityPct}%; background:var(--accent); border-radius:999px;"></div>
+              <div style="position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(255,255,255,0.25);"></div>
+            </div>
+          </div>
+        `;
+      });
+      barsEl.innerHTML = barsHtml;
+      
+      const sortedByDelta = [...comparisons].sort((a, b) => a.delta - b.delta);
+      const agreements = sortedByDelta.slice(0, 2);
+      const disagreements = [...sortedByDelta].reverse().slice(0, 2);
+      
+      let insightsHtml = `
+        <div style="margin-bottom:8px; border-left:3px solid #2ecc71; padding-left:8px;">
+          <strong style="color:#2ecc71; font-size:11px;">✅ MASSIMA SINTONIA:</strong><br>
+          ${agreements.map(a => `• <strong>${a.axisName}</strong>: quasi identici (${a.userVal >= 0 ? '+' : ''}${a.userVal.toFixed(1)} vs ${a.entityVal >= 0 ? '+' : ''}${a.entityVal.toFixed(1)})`).join("<br>")}
+        </div>
+        <div style="border-left:3px solid #e74c3c; padding-left:8px;">
+          <strong style="color:#e74c3c; font-size:11px;">⚠️ MAGGIOR DISTANZA:</strong><br>
+          ${disagreements.map(d => `• <strong>${d.axisName}</strong>: idee opposte (${d.userVal >= 0 ? '+' : ''}${d.userVal.toFixed(1)} vs ${d.entityVal >= 0 ? '+' : ''}${d.entityVal.toFixed(1)})`).join("<br>")}
+        </div>
+      `;
+      insightsEl.innerHTML = insightsHtml;
     }
 
     function renderPoster(data) {
@@ -5202,6 +5303,7 @@
         <div class="tabs">
           <button class="tab active" data-tab="summary" data-icon="◎">Sintesi</button>
           <button class="tab" data-tab="ai" data-icon="🤖">Analisi IA</button>
+          <button class="tab" data-tab="coalitions" data-icon="🗳️">Coalizioni</button>
           <button class="tab" data-tab="world" data-icon="✦">Mondo</button>
           <button class="tab" data-tab="share" data-icon="□">Condividi</button>
           <button class="tab" data-tab="charts" data-icon="▥">Grafici</button>
@@ -5317,6 +5419,75 @@
             </div>
           </div>
         </div>
+        <div id="panel-coalitions" class="tab-panel">
+          <div class="block">
+            <h2>🗳️ Simulatore di Coalizioni di Governo (Italia)</h2>
+            <p class="small text-muted" style="margin-bottom: 20px;">
+              Seleziona i partiti per provare a formare una coalizione di governo. Il simulatore calcolerà la maggioranza parlamentare stimata (400 seggi alla Camera), la coesione interna sui temi chiave e quanto saresti rappresentato da questa alleanza!
+            </p>
+            
+            <div class="coalition-layout" style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:20px;">
+              <!-- PARTY SELECTOR -->
+              <div class="block" style="padding:20px; border-color:var(--line);">
+                <h3>Seleziona i Partiti</h3>
+                <p class="small text-muted" style="margin-bottom: 12px;">Clicca sui partiti per aggiungerli o rimuoverli dalla coalizione simulata.</p>
+                <div id="coalitionPartyList" style="display:grid; grid-template-columns: 1fr; gap:8px; max-height:480px; overflow-y:auto; padding-right:5px;">
+                  <!-- Parties will be rendered here dynamically -->
+                </div>
+              </div>
+              
+              <!-- COALITION STATS -->
+              <div class="block" style="padding:20px; border-color:var(--line); display:flex; flex-direction:column; gap:16px;">
+                <h3>Stato della Coalizione</h3>
+                
+                <!-- SEATS PROGRESS BAR -->
+                <div style="background:rgba(0,0,0,0.03); padding:12px; border-radius:8px; border:1px solid var(--line);">
+                  <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:6px;">
+                    <span>Seggi Camera (su 400)</span>
+                    <span id="coalitionSeatsCount">0 / 400</span>
+                  </div>
+                  <div class="track" style="height:16px; background:rgba(0,0,0,0.15);">
+                    <div id="coalitionSeatsProgress" class="fill" style="width:0%; background:linear-gradient(90deg, #b84a62, var(--accent-2));"></div>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px;">
+                    <span>Opposizione</span>
+                    <span style="color:var(--accent-2); font-weight:bold;">Soglia Maggioranza (201 seggi)</span>
+                  </div>
+                  <div id="coalitionMajorityLabel" style="text-align:center; font-size:14px; font-weight:bold; margin-top:8px; color:var(--danger);">
+                    ❌ Senza Maggioranza
+                  </div>
+                </div>
+
+                <!-- COALITION COHESION -->
+                <div style="background:rgba(0,0,0,0.03); padding:12px; border-radius:8px; border:1px solid var(--line);">
+                  <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
+                    <span>Coesione Programmatica</span>
+                    <span id="coalitionCohesionVal">N/A</span>
+                  </div>
+                  <div id="coalitionCohesionText" class="small text-muted">
+                    Seleziona almeno due partiti per calcolare la coerenza del programma comune.
+                  </div>
+                </div>
+
+                <!-- COALITION USER AFFINITY -->
+                <div style="background:rgba(0,0,0,0.03); padding:12px; border-radius:8px; border:1px solid var(--line);">
+                  <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
+                    <span>Tua Rappresentanza Teorica</span>
+                    <span id="coalitionUserAffinity">N/A</span>
+                  </div>
+                  <div id="coalitionUserAffinityText" class="small text-muted">
+                    Calcola quanto le posizioni medie di questa alleanza rispecchiano le tue risposte sui 60 temi del quiz.
+                  </div>
+                </div>
+
+                <!-- SIMULATOR NARRATIVE COMMENT -->
+                <div id="coalitionCommentBox" class="ethics-note" style="margin:0; border-left-color:var(--accent-2); background:rgba(56,163,165,0.06); color:var(--ink);">
+                  <strong>Analisi dello Scenario:</strong> Seleziona i partiti per avviare la simulazione e ricevere un'analisi editoriale geopolitica.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div id="panel-world" class="tab-panel">
           ${renderPoliticalWorld(data)}
         </div>
@@ -5371,11 +5542,39 @@
                 <option value="storico">Solo storici</option>
               </select>
             </div>
-            <div class="map-wrap">
-              <canvas id="mapCanvas" class="viz-canvas"></canvas>
+            <div class="map-wrap" style="position:relative; display:flex; gap:16px; flex-wrap:wrap; align-items:stretch;">
+              <canvas id="mapCanvas" class="viz-canvas" style="flex:1; min-width:320px;"></canvas>
               <div id="mapTooltip" class="tooltip"></div>
+              
+              <!-- COMPARISON DRAWER -->
+              <div id="mapDetailDrawer" class="block" style="display:none; width:340px; flex-shrink:0; background:var(--panel); border:1.5px solid var(--line); border-radius:12px; padding:18px; box-shadow:var(--shadow-soft); overflow-y:auto; max-height:480px; animation: rise .24s ease both; margin:0;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:12px;">
+                  <h4 id="drawerEntityName" style="margin:0; font-size:17px; color:var(--accent-2);">Nome</h4>
+                  <button id="closeMapDrawer" class="btn small" style="min-height:28px; padding:3px 8px; font-size:11px; background:rgba(255,255,255,0.08); border:1px solid var(--line); color:var(--ink);">Chiudi</button>
+                </div>
+                
+                <span id="drawerEntityCategory" class="badge" style="background:var(--accent); margin:0 0 10px; color:#fff; font-size:10px; display:inline-block; border-radius:999px; padding:3px 8px;"></span>
+                <p id="drawerEntityBrief" style="font-size:13px; color:var(--muted); line-height:1.45; margin-bottom:14px;"></p>
+                
+                <!-- AFFINITY BADGE -->
+                <div style="background:rgba(56,163,165,.08); border:1px solid rgba(56,163,165,.20); border-radius:10px; padding:12px; text-align:center; margin-bottom:14px;">
+                  <span style="font-size:12px; color:var(--muted); display:block; margin-bottom:2px;">Tua Affinità Geometrica</span>
+                  <strong id="drawerAffinityVal" style="font-size:24px; color:var(--accent-2);">0%</strong>
+                </div>
+
+                <!-- 1-ON-1 AXIS COMPARISON -->
+                <h5 style="margin:0 0 10px; font-size:13px; font-weight:bold; letter-spacing:0.02em; text-transform:uppercase;">Confronto Assi</h5>
+                <div id="drawerComparisonBars" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+                  <!-- Axis bars will be rendered here dynamically -->
+                </div>
+                
+                <!-- AGREEMENTS AND DISAGREEMENTS -->
+                <div id="drawerInsights" style="font-size:12.5px; line-height:1.45; color:var(--ink);">
+                  <!-- Agreements and disagreements will be populated here -->
+                </div>
+              </div>
             </div>
-            <p class="small">Rotella: zoom. Trascina: spostamento. Passa sui punti: dettagli.</p>
+            <p class="small">Rotella: zoom. Trascina: spostamento. Clicca sui punti: confronta profilo ed esplora accordi/disaccordi.</p>
           </div>
           <div class="block">
             <h3>Come leggere la mappa</h3>
@@ -7109,6 +7308,234 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         jumpToTab("ai");
       }
     });
+
+    // --- 4. LOGICA SIMULATORE DI COALIZIONI ---
+    const SIMULATOR_PARTIES = [
+      { name: "Fratelli d'Italia", seats: 118, percentage: 28.5, color: "#003366" },
+      { name: "PD", seats: 95, percentage: 20.2, color: "#e3182b" },
+      { name: "Movimento 5 Stelle", seats: 52, percentage: 11.5, color: "#f1c40f" },
+      { name: "Forza Italia", seats: 44, percentage: 9.2, color: "#0054a5" },
+      { name: "Lega", seats: 39, percentage: 8.5, color: "#009246" },
+      { name: "Alleanza Verdi e Sinistra", seats: 28, percentage: 6.8, color: "#2ecc71" },
+      { name: "Azione", seats: 12, percentage: 3.8, color: "#1f3a52" },
+      { name: "Italia Viva", seats: 8, percentage: 3.0, color: "#ff6600" },
+      { name: "+Europa", seats: 4, percentage: 2.2, color: "#f39c12" }
+    ];
+
+    let _selectedCoalitionParties = new Set();
+
+    function initCoalitionSimulator(data) {
+      const container = document.getElementById("coalitionPartyList");
+      if (!container) return;
+      
+      _selectedCoalitionParties.clear();
+      
+      let html = "";
+      SIMULATOR_PARTIES.forEach((party, idx) => {
+        const proto = STANDALONE_DATA.prototypes[party.name];
+        let affinityText = "N/A";
+        if (proto && data.profile) {
+          const dist = standaloneDistance(data.profile, proto, "fused_consensus", data.axes);
+          const aff = standaloneAffinityFromDistance(dist, "fused_consensus", 8);
+          affinityText = `${Math.round(aff)}%`;
+        }
+        
+        html += `
+          <div class="coalition-party-card option" data-name="${party.name}" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; margin:0; cursor:pointer;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="width:14px; height:14px; border-radius:50%; background:${party.color}; display:inline-block; border:1px solid rgba(255,255,255,0.2);"></span>
+              <div>
+                <strong style="font-size:14.5px; color:var(--ink);">${party.name}</strong>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">
+                  Sondaggio: ${party.percentage}% · Seggi Camera: <strong>${party.seats}</strong>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px; color:var(--muted);">Tua Affinità</div>
+              <strong style="font-size:13px; color:var(--accent-2);">${affinityText}</strong>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      
+      container.querySelectorAll(".coalition-party-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const name = card.getAttribute("data-name");
+          if (_selectedCoalitionParties.has(name)) {
+            _selectedCoalitionParties.delete(name);
+            card.classList.remove("selected");
+          } else {
+            _selectedCoalitionParties.add(name);
+            card.classList.add("selected");
+          }
+          runCoalitionSimulation(data);
+        });
+      });
+      
+      runCoalitionSimulation(data);
+    }
+
+    function runCoalitionSimulation(userData) {
+      const seatsCountEl = document.getElementById("coalitionSeatsCount");
+      const progressEl = document.getElementById("coalitionSeatsProgress");
+      const majorityEl = document.getElementById("coalitionMajorityLabel");
+      const cohesionValEl = document.getElementById("coalitionCohesionVal");
+      const cohesionTextEl = document.getElementById("coalitionCohesionText");
+      const userAffinityEl = document.getElementById("coalitionUserAffinity");
+      const userAffinityTextEl = document.getElementById("coalitionUserAffinityText");
+      const commentBoxEl = document.getElementById("coalitionCommentBox");
+      
+      if (!_selectedCoalitionParties.size) {
+        if (seatsCountEl) seatsCountEl.textContent = "0 / 400";
+        if (progressEl) progressEl.style.width = "0%";
+        if (majorityEl) {
+          majorityEl.textContent = "❌ Seleziona i partiti per simulare il governo";
+          majorityEl.style.color = "var(--danger)";
+        }
+        if (cohesionValEl) cohesionValEl.textContent = "N/A";
+        if (cohesionTextEl) cohesionTextEl.textContent = "Seleziona almeno due partiti per calcolare la coerenza del programma comune.";
+        if (userAffinityEl) userAffinityEl.textContent = "N/A";
+        if (userAffinityTextEl) userAffinityTextEl.textContent = "Calcola quanto le posizioni medie di questa alleanza rispecchiano le tue risposte.";
+        if (commentBoxEl) {
+          commentBoxEl.innerHTML = "<strong>Analisi dello Scenario:</strong> Seleziona i partiti per avviare la simulazione e ricevere un'analisi editoriale geopolitica.";
+        }
+        return;
+      }
+      
+      let totalSeats = 0;
+      let totalPercent = 0;
+      const selectedList = [];
+      SIMULATOR_PARTIES.forEach(p => {
+        if (_selectedCoalitionParties.has(p.name)) {
+          totalSeats += p.seats;
+          totalPercent += p.percentage;
+          selectedList.push(p);
+        }
+      });
+      
+      if (seatsCountEl) seatsCountEl.textContent = `${totalSeats} / 400 seggi (${totalPercent.toFixed(1)}%)`;
+      const seatPct = Math.min(100, (totalSeats / 400) * 100);
+      if (progressEl) {
+        progressEl.style.width = `${seatPct}%`;
+        if (totalSeats >= 201) {
+          progressEl.style.background = "linear-gradient(90deg, var(--accent-2), #2ecc71)";
+        } else {
+          progressEl.style.background = "linear-gradient(90deg, #e74c3c, #f1c40f)";
+        }
+      }
+      
+      let hasMajority = totalSeats >= 201;
+      if (majorityEl) {
+        if (hasMajority) {
+          majorityEl.textContent = `🟢 MAGGIORANZA RAGGIUNTA! (Controlla il ${Math.round(totalSeats/400*100)}% della Camera)`;
+          majorityEl.style.color = "#2ecc71";
+        } else {
+          majorityEl.textContent = `❌ SENZA MAGGIORANZA (Mancano ${201 - totalSeats} seggi per governare)`;
+          majorityEl.style.color = "#e74c3c";
+        }
+      }
+      
+      let cohesion = 100;
+      let worseAxisName = "";
+      let coalitionProfile = Array(8).fill(0);
+      
+      if (_selectedCoalitionParties.size >= 2) {
+        let stdSum = 0;
+        let maxStd = -1;
+        let maxStdIdx = 0;
+        
+        for (let aIdx = 0; aIdx < 8; aIdx++) {
+          const values = [];
+          selectedList.forEach(party => {
+            const proto = STANDALONE_DATA.prototypes[party.name];
+            if (proto) values.push(proto[aIdx]);
+          });
+          
+          const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
+          const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
+          const std = Math.sqrt(variance);
+          
+          stdSum += std;
+          if (std > maxStd) {
+            maxStd = std;
+            maxStdIdx = aIdx;
+          }
+        }
+        
+        const avgStd = stdSum / 8;
+        cohesion = Math.max(10, Math.min(100, Math.round(100 - (avgStd * 105))));
+        worseAxisName = STANDALONE_DATA.axis_short[maxStdIdx];
+        
+        if (cohesionValEl) cohesionValEl.textContent = `${cohesion}%`;
+        if (cohesionTextEl) {
+          if (cohesion >= 80) {
+            cohesionTextEl.innerHTML = `🟢 **Altissima coesione.** I partiti concordano in modo solido su tutti i temi chiave.`;
+          } else if (cohesion >= 60) {
+            cohesionTextEl.innerHTML = `🟡 **Coesione discreta.** Ci sono alcune spaccature (specie su **${worseAxisName}**), ma l'accordo è possibile.`;
+          } else {
+            cohesionTextEl.innerHTML = `🔴 **Forte frammentazione.** La coalizione soffre di gravissime spaccature interne, soprattutto sul tema **${worseAxisName}**.`;
+          }
+        }
+      } else {
+        if (cohesionValEl) cohesionValEl.textContent = "100%";
+        if (cohesionTextEl) cohesionTextEl.textContent = "Un solo partito ha una coesione programmatica del 100% per definizione.";
+      }
+      
+      for (let aIdx = 0; aIdx < 8; aIdx++) {
+        let sum = 0;
+        selectedList.forEach(party => {
+          const proto = STANDALONE_DATA.prototypes[party.name];
+          if (proto) sum += proto[aIdx];
+        });
+        coalitionProfile[aIdx] = sum / selectedList.length;
+      }
+      
+      let userAffinity = 100;
+      if (userData.profile) {
+        const dist = standaloneDistance(userData.profile, coalitionProfile, "fused_consensus", userData.axes);
+        userAffinity = standaloneAffinityFromDistance(dist, "fused_consensus", 8);
+        
+        if (userAffinityEl) userAffinityEl.textContent = `${Math.round(userAffinity)}%`;
+        if (userAffinityTextEl) {
+          userAffinityTextEl.innerHTML = `Compatibilità media ponderata del tuo profilo politico con le idee della coalizione.`;
+        }
+      }
+      
+      if (commentBoxEl) {
+        let comment = "";
+        if (_selectedCoalitionParties.size === 1) {
+          const party = selectedList[0];
+          comment = `<strong>Analisi dello Scenario:</strong> Hai selezionato solo **${party.name}**. Questo partito rappresenta il **${party.percentage}%** degli elettori nei sondaggi e controlla **${party.seats} seggi**. Non può governare da solo e avrebbe bisogno di formare un'alleanza con altre forze politiche per superare la soglia di maggioranza di 201 seggi.`;
+        } else {
+          comment = `<strong>Analisi dello Scenario:</strong> `;
+          if (hasMajority) {
+            comment += `Questa coalizione controlla una maggioranza parlamentare solida di **${totalSeats} seggi** (il **${Math.round(totalSeats/400*100)}%** della Camera). `;
+            if (cohesion >= 78) {
+              comment += `Dal punto di vista della stabilità di governo, questo scenario è **molto favorevole**. I partiti che compongono l'alleanza hanno programmi estremamente affini su Economia, Diritti Civili e Geopolitica, garantendo un'azione legislativa fluida ed efficace. `;
+            } else if (cohesion >= 58) {
+              comment += `Il governo sarebbe operativo, ma con **rischi di frizione moderati**. Il terreno di scontro principale all'interno della maggioranza si concentrerà sull'asse di **${worseAxisName}**, dove i partiti manifestano idee visibilmente distanti. Sarà necessaria una forte opera di mediazione programmatica. `;
+            } else {
+              comment += `⚠️ **ATTENZIONE: Rischio altissimo di crisi di governo lampo!** Sebbene i numeri alla Camera ci siano, la coalizione è programmaticamente spaccata e frammentata. Le posizioni contrastanti sull'asse di **${worseAxisName}** renderebbero quasi impossibile formulare una legge di bilancio o una linea comune senza continue minacce di rottura. `;
+            }
+          } else {
+            comment += `Questa coalizione controlla solo **${totalSeats} seggi** e **non ha la maggioranza parlamentare** alla Camera. Per poter governare e dare fiducia a un esecutivo, questa alleanza dovrebbe cercare l'appoggio esterno di altri gruppi minori o tentare un "contratto di governo" più ampio, esponendosi a un'elevata instabilità. `;
+          }
+          
+          if (userData.profile) {
+            if (userAffinity >= 75) {
+              comment += `<br><br>👉 **La tua rappresentanza:** Saresti **molto ben rappresentato** da questo esecutivo (affinità **${Math.round(userAffinity)}%**). La linea politica media della coalizione rispecchia pienamente le tue risposte sui temi caldi.`;
+            } else if (userAffinity >= 50) {
+              comment += `<br><br>👉 **La tua rappresentanza:** Ti sentiresti rappresentato solo **parzialmente** (affinità **${Math.round(userAffinity)}%**). Questo governo attuerebbe alcune misure in linea con le tue idee, ma prenderebbe decisioni contrarie su altri temi importanti.`;
+            } else {
+              comment += `<br><br>👉 **La tua rappresentanza:** Saresti **molto distante** da questo governo (affinità **${Math.round(userAffinity)}%**). Le sue politiche programmatiche risulterebbero in netto contrasto con i tuoi valori personali.`;
+            }
+          }
+        }
+        commentBoxEl.innerHTML = comment;
+      }
+    }
 
     document.addEventListener("keydown", (e) => {
       if (e.target.id === "aiUserInput" && e.key === "Enter" && !e.shiftKey) {

@@ -1,4 +1,4 @@
-const CACHE = "politometro-public-20260601-162320";
+const CACHE = "politometro-public-20260601-165609";
 const HTML_PATHS = new Set(["/", "/index.html", "/privacy.html", "/metodo.html", "/supporto.html", "/organizzazioni.html"]);
 const CORE = ["./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png", "./og-image.png"];
 self.addEventListener("install", event => {
