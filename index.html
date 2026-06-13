@@ -1,4 +1,14 @@
-
+<!-- 
+  ========================================================================
+  DIRETTIVA CRITICA PER GLI ASSISTENTI AI (AI ASSISTANTS DIRECTIVE):
+  - Qualsiasi modifica a HTML, CSS, JS o UI DEVE essere fatta direttamente in questo file:
+    "politometro_standalone.html" (che funge da sorgente principale/master).
+  - NON modificare direttamente "dist/index.html" o "SITO_GITHUB/index.html" perché verrebbero sovrascritti.
+  - Per compilare e sincronizzare le modifiche nelle cartelle pubbliche dist/ e SITO_GITHUB/,
+    DEVI eseguire il comando: `.venv-politometro/bin/python build_public_site.py`.
+  - NON eseguire "build_standalone_app.py" altrimenti sovrascriverà questo file master!
+  ========================================================================
+-->
 <!doctype html>
 <html lang="it">
 <head>
@@ -2725,7 +2735,7 @@
         </div>
     
         <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260601-165609 · IA v5.3</span>
+        <span class="engine-pill" id="releasePill">Aggiornato 20260613-103605 · IA v5.3</span>
       </div>
     </aside>
     <main>
@@ -4022,11 +4032,13 @@
       sessionId: `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       user: null,
       mode: "quick",
+      activeOverlays: [], // IDs dei profili locali da sovrapporre nei grafici
       selectedQuestions: [],
       quickQuestionIds: [],
       socialQuestionIds: [],
 	      deferredInstallPrompt: null,
 	      mapView: { scale: 1, offsetX: 0, offsetY: 0, hover: null },
+	      map3d: { pitch: -0.4, yaw: 0.5, zoom: 1.0, is3D: false, idxX: 0, idxY: 2, idxZ: 1, autoRotate: true },
 	      mapPoints: [],
 	      mapPulseTimer: null,
 	      identity: { nickname: "", avatarMode: "generated", photoDataUrl: "" },
@@ -4599,12 +4611,16 @@
       const { ctx, width, height } = setupCanvas(canvas);
       const axes = data.axes;
       const cx = width / 2;
-      const cy = height / 2 + 10;
-      const radius = Math.min(width, height) * 0.34;
+      const cy = height / 2 + 15;
+      const radius = Math.min(width, height) * 0.32;
       ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = "#d9e1e7";
-      ctx.fillStyle = "#60707c";
+
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.12)" : "#d9e1e7";
+      ctx.fillStyle = isDark ? "#60707c" : "#60707c";
       ctx.font = "12px system-ui";
+
+      // Disegna i cerchi concentrici (anelli)
       for (let ring = 1; ring <= 4; ring++) {
         ctx.beginPath();
         for (let i = 0; i < axes.length; i++) {
@@ -4617,33 +4633,108 @@
         ctx.closePath();
         ctx.stroke();
       }
+
+      // Recupera gli overlays attivi
+      const overlays = [];
+      if (state.activeOverlays && state.activeOverlays.length > 0) {
+        const rawLocal = localStorage.getItem("politometro_local_tests");
+        if (rawLocal) {
+          try {
+            const list = JSON.parse(rawLocal);
+            state.activeOverlays.forEach((id) => {
+              const item = list.find((x) => x.id === id);
+              if (item) overlays.push(item);
+            });
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+
+      const overlayColors = [
+        { stroke: "#e040fb", fill: "rgba(224, 64, 251, 0.12)" }, // Fuchsia
+        { stroke: "#00e5ff", fill: "rgba(0, 229, 255, 0.12)" }, // Ciano
+        { stroke: "#ff9100", fill: "rgba(255, 145, 0, 0.12)" }, // Arancione
+        { stroke: "#00e676", fill: "rgba(0, 230, 118, 0.12)" }, // Verde Neon
+        { stroke: "#651fff", fill: "rgba(101, 31, 255, 0.12)" }  // Viola
+      ];
+
+      // Disegna poligoni di overlay prima del profilo principale (per non coprirlo)
+      overlays.forEach((ov, idx) => {
+        const color = overlayColors[idx % overlayColors.length];
+        const points = axes.map((axis, i) => {
+          const angle = -Math.PI / 2 + i * Math.PI * 2 / axes.length;
+          // Trova il valore dell'asse corrispondente nell'overlay
+          const ovAxis = ov.data.axes.find(a => a.name === axis.name) || axis;
+          const r = radius * (ovAxis.value + 1) / 2;
+          return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r };
+        });
+
+        ctx.beginPath();
+        points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fillStyle = color.fill;
+        ctx.strokeStyle = color.stroke;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]); // Linea tratteggiata per gli overlay
+        ctx.fill();
+        ctx.stroke();
+        ctx.setLineDash([]); // Ripristina
+      });
+
+      // Disegna il profilo utente principale
       const points = axes.map((axis, i) => {
         const angle = -Math.PI / 2 + i * Math.PI * 2 / axes.length;
         const r = radius * (axis.value + 1) / 2;
-        return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, angle };
+        return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r };
       });
       ctx.beginPath();
       points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
       ctx.closePath();
-      ctx.fillStyle = "rgba(34, 87, 122, .22)";
-      ctx.strokeStyle = "#22577a";
+      ctx.fillStyle = isDark ? "rgba(56, 163, 165, .25)" : "rgba(34, 87, 122, .22)";
+      ctx.strokeStyle = isDark ? "#38a3a5" : "#22577a";
       ctx.lineWidth = 3;
       ctx.fill();
       ctx.stroke();
+
+      // Disegna le linee degli assi e i testi delle etichette
       axes.forEach((axis, i) => {
         const angle = -Math.PI / 2 + i * Math.PI * 2 / axes.length;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
-        ctx.strokeStyle = "#e5ecef";
+        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "#e5ecef";
         ctx.lineWidth = 1;
         ctx.stroke();
-        const lx = cx + Math.cos(angle) * (radius + 34);
-        const ly = cy + Math.sin(angle) * (radius + 34);
-        ctx.fillStyle = "#172026";
+        const lx = cx + Math.cos(angle) * (radius + 28);
+        const ly = cy + Math.sin(angle) * (radius + 28);
+        ctx.fillStyle = isDark ? "#e2edf2" : "#172026";
         ctx.textAlign = lx < cx - 10 ? "right" : lx > cx + 10 ? "left" : "center";
         ctx.fillText(axis.name, lx, ly);
       });
+
+      // Disegna la legenda degli overlays in alto a sinistra
+      if (overlays.length > 0) {
+        ctx.font = "bold 11px system-ui";
+        ctx.textAlign = "left";
+        ctx.fillStyle = isDark ? "#e2edf2" : "#172026";
+        ctx.fillText("LEGENDA CONFRONTO:", 12, 20);
+
+        // Profilo principale
+        ctx.fillStyle = isDark ? "#38a3a5" : "#22577a";
+        ctx.fillRect(12, 28, 12, 6);
+        ctx.fillStyle = isDark ? "#e2edf2" : "#172026";
+        ctx.font = "11px system-ui";
+        ctx.fillText("Tu (Corrente)", 30, 34);
+
+        overlays.forEach((ov, idx) => {
+          const color = overlayColors[idx % overlayColors.length];
+          ctx.fillStyle = color.stroke;
+          ctx.fillRect(12, 42 + idx * 14, 12, 6);
+          ctx.fillStyle = isDark ? "#e2edf2" : "#172026";
+          ctx.fillText(ov.name.length > 18 ? ov.name.slice(0, 16) + "..." : ov.name, 30, 48 + idx * 14);
+        });
+      }
     }
 
     function drawBars(data) {
@@ -4656,169 +4747,470 @@
       const right = width - 30;
       const mid = (left + right) / 2;
       const rowH = (height - 40) / axes.length;
+
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+
+      // Carica overlays per tracciare i pallini di confronto
+      const overlays = [];
+      if (state.activeOverlays && state.activeOverlays.length > 0) {
+        const rawLocal = localStorage.getItem("politometro_local_tests");
+        if (rawLocal) {
+          try {
+            const list = JSON.parse(rawLocal);
+            state.activeOverlays.forEach((id) => {
+              const item = list.find((x) => x.id === id);
+              if (item) overlays.push(item);
+            });
+          } catch (e) {}
+        }
+      }
+
+      const overlayColors = ["#e040fb", "#00e5ff", "#ff9100", "#00e676", "#651fff"];
+
       ctx.font = "13px system-ui";
       axes.forEach((axis, i) => {
         const y = 24 + i * rowH;
-        ctx.fillStyle = "#172026";
+        ctx.fillStyle = isDark ? "#e2edf2" : "#172026";
         ctx.textAlign = "left";
         ctx.fillText(axis.name, 12, y + 5);
-        ctx.fillStyle = "#edf3f4";
+
+        // Barra di sfondo
+        ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.05)" : "#edf3f4";
         ctx.fillRect(left, y - 8, right - left, 16);
-        ctx.fillStyle = axis.value >= 0 ? "#be6d4f" : "#3579a8";
+
+        // Barra di riempimento utente
+        ctx.fillStyle = axis.value >= 0 ? (isDark ? "#d9825e" : "#be6d4f") : (isDark ? "#509bc9" : "#3579a8");
         const barW = Math.abs(axis.value) * (right - left) / 2;
         if (axis.value >= 0) ctx.fillRect(mid, y - 8, barW, 16);
         else ctx.fillRect(mid - barW, y - 8, barW, 16);
-        ctx.strokeStyle = "#172026";
+
+        // Asse dello zero centrale
+        ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.3)" : "#172026";
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(mid, y - 12);
         ctx.lineTo(mid, y + 12);
         ctx.stroke();
-        ctx.fillStyle = "#60707c";
+
+        // Disegna pallini colorati per ciascun overlay attivo
+        overlays.forEach((ov, oIdx) => {
+          const ovAxis = ov.data.axes.find(a => a.name === axis.name);
+          if (ovAxis) {
+            const ovX = mid + ovAxis.value * (right - left) / 2;
+            const ovColor = overlayColors[oIdx % overlayColors.length];
+            ctx.beginPath();
+            ctx.arc(ovX, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = ovColor;
+            ctx.strokeStyle = isDark ? "#0b1e28" : "#fff";
+            ctx.lineWidth = 1.5;
+            ctx.fill();
+            ctx.stroke();
+          }
+        });
+
+        // Testo del valore utente corrente
+        ctx.fillStyle = isDark ? "#a0b0bd" : "#60707c";
         ctx.textAlign = "right";
         ctx.fillText(`${axis.value >= 0 ? "+" : ""}${axis.value.toFixed(2)}`, width - 8, y + 5);
       });
     }
 
-    function drawMap(data, filter = "all") {
+        function drawMap(data, filter = "all") {
       const canvas = document.getElementById("mapCanvas");
       if (!canvas) return;
       const { ctx, width, height } = setupCanvas(canvas);
-      const pca = data.visuals.pca;
-      const visible = pca.points.filter((p) => filter === "all" || p.category === filter);
-      const points = [...visible, { ...pca.user, category: "user", name: "TU" }];
-      const xs = points.map((p) => p.x);
-      const ys = points.map((p) => p.y);
-      const minX = Math.min(...xs), maxX = Math.max(...xs);
-      const minY = Math.min(...ys), maxY = Math.max(...ys);
-      const pad = 36;
-      const sx0 = (x) => pad + (x - minX) / Math.max(.001, maxX - minX) * (width - pad * 2);
-      const sy0 = (y) => height - pad - (y - minY) / Math.max(.001, maxY - minY) * (height - pad * 2);
-	      const sx = (x) => (sx0(x) - width / 2) * state.mapView.scale + width / 2 + state.mapView.offsetX;
-	      const sy = (y) => (sy0(y) - height / 2) * state.mapView.scale + height / 2 + state.mapView.offsetY;
-	      const colors = { partito: "#22577a", ideologia: "#38a3a5", storico: "#b84a62", user: "#f2b880" };
-	      ctx.clearRect(0, 0, width, height);
-	      const bg = ctx.createLinearGradient(0, 0, width, height);
-	      bg.addColorStop(0, "#f8fbfa");
-	      bg.addColorStop(.44, "#eef8f6");
-	      bg.addColorStop(1, "#fff4df");
-	      ctx.fillStyle = bg;
-	      ctx.fillRect(0, 0, width, height);
-	      ctx.save();
-	      ctx.globalAlpha = .55;
-	      ctx.strokeStyle = "rgba(34,87,122,.13)";
-	      ctx.lineWidth = 1;
-	      for (let i = 1; i < 6; i++) {
-	        const gx = pad + (width - pad * 2) * i / 6;
-	        const gy = pad + (height - pad * 2) * i / 6;
-	        ctx.beginPath();
-	        ctx.moveTo(gx, pad);
-	        ctx.lineTo(gx, height - pad);
-	        ctx.moveTo(pad, gy);
-	        ctx.lineTo(width - pad, gy);
-	        ctx.stroke();
-	      }
-	      ctx.restore();
-	      ctx.strokeStyle = "rgba(16,36,47,.26)";
-	      ctx.lineWidth = 1.4;
-	      ctx.beginPath();
-	      ctx.moveTo(width / 2, pad);
-	      ctx.lineTo(width / 2, height - pad);
-	      ctx.moveTo(pad, height / 2);
-	      ctx.lineTo(width - pad, height / 2);
-	      ctx.stroke();
-	      ctx.fillStyle = "rgba(16,36,47,.58)";
-	      ctx.font = "700 11px system-ui";
-	      ctx.fillText("PC1", width - pad - 22, height / 2 - 9);
-	      ctx.fillText("PC2", width / 2 + 9, pad + 14);
-	      const userPoint = { x: sx(pca.user.x), y: sy(pca.user.y) };
-	      const nearest = visible
-	        .map((p) => ({ ...p, screenX: sx(p.x), screenY: sy(p.y), d: Math.hypot(p.x - pca.user.x, p.y - pca.user.y) }))
-	        .sort((a, b) => a.d - b.d)
-	        .slice(0, 8);
-	      nearest.forEach((p, i) => {
-	        ctx.beginPath();
-	        ctx.moveTo(userPoint.x, userPoint.y);
-	        ctx.lineTo(p.screenX, p.screenY);
-	        ctx.strokeStyle = i < 3 ? "rgba(242,184,128,.45)" : "rgba(34,87,122,.14)";
-	        ctx.lineWidth = i < 3 ? 1.8 : 1;
-	        ctx.stroke();
-	      });
-	      ctx.font = "11px system-ui";
-	      state.mapPoints = [];
-	      visible.forEach((p) => {
-	        const x = sx(p.x), y = sy(p.y);
-	        const radius = p.category === "storico" ? 4.3 : 5.4;
-	        ctx.beginPath();
-	        ctx.arc(x, y, radius + 3, 0, Math.PI * 2);
-	        ctx.fillStyle = p.high_risk ? "rgba(154,164,170,.20)" : `${colors[p.category]}24`;
-	        ctx.fill();
-	        ctx.beginPath();
-	        ctx.arc(x, y, radius, 0, Math.PI * 2);
-	        ctx.fillStyle = p.high_risk ? "#9aa4aa" : colors[p.category];
-	        ctx.fill();
-	        ctx.strokeStyle = "rgba(255,255,255,.78)";
-	        ctx.lineWidth = 1.5;
-	        ctx.stroke();
-	        state.mapPoints.push({ ...p, screenX: x, screenY: y });
-	        if (filter !== "all" || p.category !== "storico") {
-	          ctx.fillStyle = "#172026";
-	          ctx.fillText(p.name.slice(0, 24), x + 7, y + 4);
-	        }
-	      });
-	      const ux = userPoint.x, uy = userPoint.y;
-	      state.mapPoints.push({ name: "TU", category: "user", screenX: ux, screenY: uy });
-	      const pulse = 15 + Math.sin(Date.now() / 420) * 2;
-	      ctx.beginPath();
-	      ctx.arc(ux, uy, pulse, 0, Math.PI * 2);
-	      ctx.fillStyle = "rgba(242,184,128,.24)";
-	      ctx.fill();
-	      ctx.beginPath();
-	      ctx.arc(ux, uy, 11, 0, Math.PI * 2);
-	      ctx.fillStyle = colors.user;
-	      ctx.fill();
-	      ctx.strokeStyle = "#172026";
-	      ctx.lineWidth = 2;
-	      ctx.stroke();
-	      ctx.fillStyle = "#172026";
-	      ctx.font = "bold 13px system-ui";
-	      ctx.fillText("TU", ux + 14, uy + 4);
-	      const legend = [
-	        ["partiti", colors.partito],
-	        ["ideologie", colors.ideologia],
-	        ["storici", colors.storico],
-	        ["tu", colors.user],
-	      ];
-	      let lx = 14;
-	      const ly = height - 16;
-	      ctx.font = "700 11px system-ui";
-	      legend.forEach(([label, color]) => {
-	        ctx.beginPath();
-	        ctx.arc(lx, ly - 3, 4, 0, Math.PI * 2);
-	        ctx.fillStyle = color;
-	        ctx.fill();
-	        ctx.fillStyle = "rgba(16,36,47,.72)";
-	        ctx.fillText(label, lx + 8, ly);
-	        lx += ctx.measureText(label).width + 32;
-	      });
-	    }
+      ctx.clearRect(0, 0, width, height);
 
-	    function setupMapInteractions(data) {
-	      const canvas = document.getElementById("mapCanvas");
-	      const tooltip = document.getElementById("mapTooltip");
-	      if (!canvas || !tooltip || canvas.dataset.ready) return;
-	      canvas.dataset.ready = "1";
-	      if (state.mapPulseTimer) window.clearInterval(state.mapPulseTimer);
-	      state.mapPulseTimer = window.setInterval(() => {
-	        if (document.getElementById("panel-map")?.classList.contains("active")) {
-	          drawMap(data, document.getElementById("mapFilter")?.value || "all");
-	        }
-	      }, 900);
-	      canvas.addEventListener("wheel", (event) => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      const colors = { partito: "#22577a", ideologia: "#38a3a5", storico: "#b84a62", user: "#f2b880" };
+      if (isDark) {
+        colors.partito = "#509bc9";
+        colors.ideologia = "#38a3a5";
+        colors.storico = "#d95f76";
+      }
+
+      // Sfondo gradiente
+      const bg = ctx.createLinearGradient(0, 0, width, height);
+      if (isDark) {
+        bg.addColorStop(0, "#0b1a23");
+        bg.addColorStop(0.5, "#0d2230");
+        bg.addColorStop(1, "#18212e");
+      } else {
+        bg.addColorStop(0, "#f8fbfa");
+        bg.addColorStop(0.44, "#eef8f6");
+        bg.addColorStop(1, "#fff4df");
+      }
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const cy = height / 2;
+
+      if (state.map3d.is3D) {
+        // --- CODICE VISTA 3D ---
+        const idxX = state.map3d.idxX;
+        const idxY = state.map3d.idxY;
+        const idxZ = state.map3d.idxZ;
+        const theta = state.map3d.pitch;
+        const phi = state.map3d.yaw;
+
+        const AXIS_INFO = [
+          { name: "Economia", neg: "-Redistr.", pos: "+Mercato" },
+          { name: "Autorità", neg: "-Libertà", pos: "+Ordine" },
+          { name: "Cultura", neg: "-Plur.", pos: "+Tradiz." },
+          { name: "Geopolitica", neg: "-Coop.", pos: "+Sovran." },
+          { name: "Ambiente", neg: "-Verde", pos: "+Industr." },
+          { name: "Tecnologia", neg: "-Regol.", pos: "+Innovaz." },
+          { name: "Uguaglianza", neg: "-Pari", pos: "+Gerarch." },
+          { name: "Giustizia", neg: "-Recup.", pos: "+Deterren." }
+        ];
+
+        // Proiezione prospettica 3D
+        const boxSize = Math.min(width, height) * 0.28;
+        const d = 500 * state.map3d.zoom;
+
+        const project3D = (x, y, z) => {
+          let x1 = x * Math.cos(phi) - z * Math.sin(phi);
+          let z1 = x * Math.sin(phi) + z * Math.cos(phi);
+          let y2 = y * Math.cos(theta) - z1 * Math.sin(theta);
+          let z2 = y * Math.sin(theta) + z1 * Math.cos(theta);
+
+          const scale = d / (d + z2);
+          return {
+            x: cx + x1 * boxSize * scale,
+            y: cy + y2 * boxSize * scale,
+            z: z2,
+            scale: scale
+          };
+        };
+
+        // Disegna assi cartesiani 3D
+        const axes3d = [
+          { p0: {x:-1.1, y:0, z:0}, p1: {x:1.1, y:0, z:0}, color: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.15)", info: AXIS_INFO[idxX], name: "X" },
+          { p0: {x:0, y:-1.1, z:0}, p1: {x:0, y:1.1, z:0}, color: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.15)", info: AXIS_INFO[idxY], name: "Y" },
+          { p0: {x:0, y:0, z:-1.1}, p1: {x:0, y:0, z:1.1}, color: isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.15)", info: AXIS_INFO[idxZ], name: "Z" }
+        ];
+
+        axes3d.forEach(ax => {
+          const pt0 = project3D(ax.p0.x, ax.p0.y, ax.p0.z);
+          const pt1 = project3D(ax.p1.x, ax.p1.y, ax.p1.z);
+          ctx.beginPath();
+          ctx.moveTo(pt0.x, pt0.y);
+          ctx.lineTo(pt1.x, pt1.y);
+          ctx.strokeStyle = ax.color;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.font = "bold 10px system-ui";
+          ctx.fillStyle = isDark ? "#c5d5dc" : "#60707c";
+          ctx.textAlign = "center";
+          ctx.fillText(`${ax.name} (${ax.info.neg})`, pt0.x, pt0.y - 6);
+          ctx.fillText(`${ax.name} (${ax.info.pos})`, pt1.x, pt1.y - 6);
+        });
+
+        // Raccolta punti
+        const pca = data.visuals.pca;
+        const visible = pca.points.filter((p) => filter === "all" || p.category === filter);
+        const listToDraw = [];
+
+        visible.forEach((p) => {
+          const profile = STANDALONE_DATA.prototypes[p.name];
+          if (profile) {
+            const pt = project3D(profile[idxX], profile[idxY], profile[idxZ]);
+            listToDraw.push({
+              name: p.name,
+              category: p.category,
+              high_risk: p.high_risk,
+              screenX: pt.x,
+              screenY: pt.y,
+              zDepth: pt.z,
+              scale: pt.scale
+            });
+          }
+        });
+
+        // Utente TU
+        const userProfile = data.profile;
+        if (userProfile) {
+          const uPt = project3D(userProfile[idxX], userProfile[idxY], userProfile[idxZ]);
+          listToDraw.push({
+            name: "TU",
+            category: "user",
+            screenX: uPt.x,
+            screenY: uPt.y,
+            zDepth: uPt.z,
+            scale: uPt.scale
+          });
+        }
+
+        // depth sorting
+        listToDraw.sort((a, b) => b.zDepth - a.zDepth);
+
+        state.mapPoints = [];
+
+        listToDraw.forEach((p) => {
+          const radius = p.category === "user" ? 10 : (p.category === "storico" ? 4.3 : 5.4);
+          const rScaled = radius * p.scale;
+          
+          if (p.category === "user") {
+            const pulse = rScaled + Math.sin(Date.now() / 420) * 2;
+            ctx.beginPath();
+            ctx.arc(p.screenX, p.screenY, pulse, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(242,184,128,.28)";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(p.screenX, p.screenY, rScaled, 0, Math.PI * 2);
+            ctx.fillStyle = colors.user;
+            ctx.fill();
+            ctx.strokeStyle = isDark ? "#fff" : "#172026";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.fillStyle = isDark ? "#fff" : "#172026";
+            ctx.font = "bold 13px system-ui";
+            ctx.textAlign = "left";
+            ctx.fillText("TU", p.screenX + rScaled + 5, p.screenY + 4);
+          } else {
+            ctx.beginPath();
+            ctx.arc(p.screenX, p.screenY, rScaled + 3, 0, Math.PI * 2);
+            ctx.fillStyle = p.high_risk ? "rgba(154,164,170,.20)" : `${colors[p.category]}24`;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(p.screenX, p.screenY, rScaled, 0, Math.PI * 2);
+            ctx.fillStyle = p.high_risk ? "#9aa4aa" : colors[p.category];
+            ctx.fill();
+
+            ctx.strokeStyle = isDark ? "#0b1a23" : "rgba(255,255,255,.82)";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            if (filter !== "all" || p.category !== "storico") {
+              ctx.fillStyle = isDark ? "#c5d5dc" : "#172026";
+              ctx.font = `${Math.max(9, Math.round(11 * p.scale))}px system-ui`;
+              ctx.textAlign = "left";
+              ctx.fillText(p.name.slice(0, 20), p.screenX + rScaled + 5, p.screenY + 4);
+            }
+          }
+
+          state.mapPoints.push({
+            name: p.name,
+            category: p.category,
+            screenX: p.screenX,
+            screenY: p.screenY
+          });
+        });
+
+      } else {
+        // --- CODICE 2D ---
+        const pca = data.visuals.pca;
+        const visible = pca.points.filter((p) => filter === "all" || p.category === filter);
+        const points = [...visible, { ...pca.user, category: "user", name: "TU" }];
+        const xs = points.map((p) => p.x);
+        const ys = points.map((p) => p.y);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = Math.min(...ys), maxY = Math.max(...ys);
+        const pad = 36;
+        const sx0 = (x) => pad + (x - minX) / Math.max(.001, maxX - minX) * (width - pad * 2);
+        const sy0 = (y) => height - pad - (y - minY) / Math.max(.001, maxY - minY) * (height - pad * 2);
+        const sx = (x) => (sx0(x) - width / 2) * state.mapView.scale + width / 2 + state.mapView.offsetX;
+        const sy = (y) => (sy0(y) - height / 2) * state.mapView.scale + height / 2 + state.mapView.offsetY;
+
+        ctx.save();
+        ctx.globalAlpha = isDark ? 0.08 : 0.55;
+        ctx.strokeStyle = isDark ? "rgba(255,255,255,0.4)" : "rgba(34,87,122,.13)";
+        ctx.lineWidth = 1;
+        for (let i = 1; i < 6; i++) {
+          const gx = pad + (width - pad * 2) * i / 6;
+          const gy = pad + (height - pad * 2) * i / 6;
+          ctx.beginPath();
+          ctx.moveTo(gx, pad);
+          ctx.lineTo(gx, height - pad);
+          ctx.moveTo(pad, gy);
+          ctx.lineTo(width - pad, gy);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        ctx.strokeStyle = isDark ? "rgba(255,255,255,0.22)" : "rgba(16,36,47,.26)";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(width / 2, pad);
+        ctx.lineTo(width / 2, height - pad);
+        ctx.moveTo(pad, height / 2);
+        ctx.lineTo(width - pad, height / 2);
+        ctx.stroke();
+
+        ctx.fillStyle = isDark ? "#c5d5dc" : "rgba(16,36,47,.58)";
+        ctx.font = "700 11px system-ui";
+        ctx.fillText("PC1 (Economico / Geopolitico)", width - pad - 165, height / 2 - 9);
+        ctx.fillText("PC2 (Culturale / Statale)", width / 2 + 9, pad + 14);
+
+        const userPoint = { x: sx(pca.user.x), y: sy(pca.user.y) };
+        const nearest = visible
+          .map((p) => ({ ...p, screenX: sx(p.x), screenY: sy(p.y), d: Math.hypot(p.x - pca.user.x, p.y - pca.user.y) }))
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 8);
+        nearest.forEach((p, i) => {
+          ctx.beginPath();
+          ctx.moveTo(userPoint.x, userPoint.y);
+          ctx.lineTo(p.screenX, p.screenY);
+          ctx.strokeStyle = i < 3 ? "rgba(242,184,128,.45)" : (isDark ? "rgba(255,255,255,.08)" : "rgba(34,87,122,.14)");
+          ctx.lineWidth = i < 3 ? 1.8 : 1;
+          ctx.stroke();
+        });
+
+        ctx.font = "11px system-ui";
+        state.mapPoints = [];
+        visible.forEach((p) => {
+          const x = sx(p.x), y = sy(p.y);
+          const radius = p.category === "storico" ? 4.3 : 5.4;
+          ctx.beginPath();
+          ctx.arc(x, y, radius + 3, 0, Math.PI * 2);
+          ctx.fillStyle = p.high_risk ? "rgba(154,164,170,.20)" : `${colors[p.category]}24`;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.high_risk ? "#9aa4aa" : colors[p.category];
+          ctx.fill();
+          ctx.strokeStyle = isDark ? "#0b1a23" : "rgba(255,255,255,.78)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          state.mapPoints.push({ ...p, screenX: x, screenY: y });
+          if (filter !== "all" || p.category !== "storico") {
+            ctx.fillStyle = isDark ? "#c5d5dc" : "#172026";
+            ctx.fillText(p.name.slice(0, 24), x + 7, y + 4);
+          }
+        });
+
+        const ux = userPoint.x, uy = userPoint.y;
+        state.mapPoints.push({ name: "TU", category: "user", screenX: ux, screenY: uy });
+        const pulse = 15 + Math.sin(Date.now() / 420) * 2;
+        ctx.beginPath();
+        ctx.arc(ux, uy, pulse, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(242,184,128,.24)";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(ux, uy, 11, 0, Math.PI * 2);
+        ctx.fillStyle = colors.user;
+        ctx.fill();
+        ctx.strokeStyle = isDark ? "#fff" : "#172026";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = isDark ? "#fff" : "#172026";
+        ctx.font = "bold 13px system-ui";
+        ctx.fillText("TU", ux + 14, uy + 4);
+      }
+
+      // Legenda comune
+      const legend = [
+        ["partiti", colors.partito],
+        ["ideologie", colors.ideologia],
+        ["storici", colors.storico],
+        ["tu", colors.user],
+      ];
+      let lx = 14;
+      const ly = height - 16;
+      ctx.font = "700 11px system-ui";
+      ctx.textAlign = "left";
+      legend.forEach(([label, color]) => {
+        ctx.beginPath();
+        ctx.arc(lx, ly - 3, 4, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.fillStyle = isDark ? "#a0b0bd" : "rgba(16,36,47,.72)";
+        ctx.fillText(label, lx + 8, ly);
+        lx += ctx.measureText(label).width + 32;
+      });
+    }
+
+	        function setupMapInteractions(data) {
+      const canvas = document.getElementById("mapCanvas");
+      const tooltip = document.getElementById("mapTooltip");
+      if (!canvas || !tooltip || canvas.dataset.ready) return;
+      canvas.dataset.ready = "1";
+
+      if (state.mapPulseTimer) window.clearInterval(state.mapPulseTimer);
+      state.mapPulseTimer = window.setInterval(() => {
+        if (document.getElementById("panel-map")?.classList.contains("active") && !state.map3d.is3D) {
+          drawMap(data, document.getElementById("mapFilter")?.value || "all");
+        }
+      }, 900);
+
+      // requestAnimationFrame per l'auto-rotazione fluida a 60fps
+      function animate3D() {
+        if (state.map3d.is3D && state.map3d.autoRotate && document.getElementById("panel-map")?.classList.contains("active")) {
+          state.map3d.yaw += 0.005;
+          drawMap(data, document.getElementById("mapFilter")?.value || "all");
+        }
+        requestAnimationFrame(animate3D);
+      }
+      animate3D();
+
+      // Controllo del Toggle 3D
+      const btn3D = document.getElementById("btnToggle3D");
+      const ctrl3D = document.getElementById("map3dControls");
+      const subtext = document.getElementById("mapPcaSubtext");
+      if (btn3D && ctrl3D) {
+        btn3D.addEventListener("click", () => {
+          state.map3d.is3D = !state.map3d.is3D;
+          if (state.map3d.is3D) {
+            btn3D.textContent = "🌐 Vista 3D: ON";
+            btn3D.style.background = "var(--accent)";
+            btn3D.style.color = "#fff";
+            ctrl3D.style.display = "flex";
+            if (subtext) subtext.textContent = "Spazio 3D interattivo: trascina per ruotare, usa la rotella per lo zoom.";
+          } else {
+            btn3D.textContent = "🌐 Vista 3D: OFF";
+            btn3D.style.background = "rgba(34,87,122,0.06)";
+            btn3D.style.color = "var(--accent)";
+            ctrl3D.style.display = "none";
+            if (subtext) {
+              const ev = data.visuals.pca.explained_variance;
+              subtext.textContent = `Varianza spiegata: PC1 ${(ev[0] * 100).toFixed(1)}%, PC2 ${(ev[1] * 100).toFixed(1)}%.`;
+            }
+          }
+          drawMap(data, document.getElementById("mapFilter")?.value || "all");
+        });
+      }
+
+      // Selettori Assi 3D
+      const selectX = document.getElementById("map3dAxisX");
+      const selectY = document.getElementById("map3dAxisY");
+      const selectZ = document.getElementById("map3dAxisZ");
+      if (selectX) selectX.addEventListener("change", (e) => { state.map3d.idxX = Number(e.target.value); drawMap(data, document.getElementById("mapFilter")?.value || "all"); });
+      if (selectY) selectY.addEventListener("change", (e) => { state.map3d.idxY = Number(e.target.value); drawMap(data, document.getElementById("mapFilter")?.value || "all"); });
+      if (selectZ) selectZ.addEventListener("change", (e) => { state.map3d.idxZ = Number(e.target.value); drawMap(data, document.getElementById("mapFilter")?.value || "all"); });
+
+      // Toggle auto-rotazione
+      const btnAutoRotate = document.getElementById("btnToggleAutoRotate");
+      if (btnAutoRotate) {
+        btnAutoRotate.addEventListener("click", () => {
+          state.map3d.autoRotate = !state.map3d.autoRotate;
+          btnAutoRotate.textContent = state.map3d.autoRotate ? "🔄 Auto-rotazione: ON" : "🔄 Auto-rotazione: OFF";
+          if (!state.map3d.autoRotate) {
+            btnAutoRotate.style.background = "rgba(128,128,128,0.06)";
+            btnAutoRotate.style.color = "var(--ink)";
+          } else {
+            btnAutoRotate.style.background = "rgba(56,163,165,0.08)";
+            btnAutoRotate.style.color = "var(--accent2)";
+          }
+        });
+      }
+
+      canvas.addEventListener("wheel", (event) => {
         event.preventDefault();
-        const delta = event.deltaY < 0 ? 1.12 : 0.88;
-        state.mapView.scale = Math.max(0.7, Math.min(4, state.mapView.scale * delta));
+        if (state.map3d.is3D) {
+          const delta = event.deltaY < 0 ? 1.08 : 0.92;
+          state.map3d.zoom = Math.max(0.4, Math.min(3, state.map3d.zoom * delta));
+        } else {
+          const delta = event.deltaY < 0 ? 1.12 : 0.88;
+          state.mapView.scale = Math.max(0.7, Math.min(4, state.mapView.scale * delta));
+        }
         drawMap(data, document.getElementById("mapFilter")?.value || "all");
       });
+
       let dragging = false;
       let last = null;
       canvas.addEventListener("mousedown", (event) => {
@@ -4826,15 +5218,28 @@
         last = { x: event.clientX, y: event.clientY };
       });
       window.addEventListener("mouseup", () => { dragging = false; last = null; });
+
       canvas.addEventListener("mousemove", (event) => {
         const rect = canvas.getBoundingClientRect();
         if (dragging && last) {
-          state.mapView.offsetX += event.clientX - last.x;
-          state.mapView.offsetY += event.clientY - last.y;
+          if (state.map3d.is3D) {
+            state.map3d.yaw += (event.clientX - last.x) * 0.007;
+            state.map3d.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, state.map3d.pitch + (event.clientY - last.y) * 0.007));
+            state.map3d.autoRotate = false;
+            if (btnAutoRotate) {
+              btnAutoRotate.textContent = "🔄 Auto-rotazione: OFF";
+              btnAutoRotate.style.background = "rgba(128,128,128,0.06)";
+              btnAutoRotate.style.color = "var(--ink)";
+            }
+          } else {
+            state.mapView.offsetX += event.clientX - last.x;
+            state.mapView.offsetY += event.clientY - last.y;
+          }
           last = { x: event.clientX, y: event.clientY };
           drawMap(data, document.getElementById("mapFilter")?.value || "all");
           return;
         }
+
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         const hit = state.mapPoints.find((p) => Math.hypot(p.screenX - x, p.screenY - y) < 12);
@@ -4847,6 +5252,7 @@
           tooltip.style.display = "none";
         }
       });
+
       canvas.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
       
       canvas.addEventListener("click", (event) => {
@@ -5343,6 +5749,7 @@
                 <button class="btn primary" id="surfaceShare">Condividi</button>
                 <button class="btn" id="surfaceWorld">Il tuo mondo</button>
                 <button class="btn" id="surfaceAI" style="background: linear-gradient(135deg, rgba(99,102,241,.14) 0%, rgba(139,92,246,.10) 100%); border: 1px solid rgba(99,102,241,.25);">🤖 Chiedi all'IA</button>
+                <button class="btn" id="surfaceSaveLocal" style="background: rgba(56,163,165,.08); border: 1px solid rgba(56,163,165,.25); color: var(--accent2);">💾 Salva nei miei test</button>
                 <button class="btn" id="surfaceMap">Apri mappa</button>
                 <button class="btn" id="surfaceDeep">Approfondisci</button>
               </div>
@@ -5530,19 +5937,67 @@
         </div>
         <div id="panel-map" class="tab-panel">
           <div class="block">
-            <div class="topbar">
+            <div class="topbar" style="flex-wrap:wrap; gap:12px;">
               <div>
                 <h3>Mappa PCA interattiva</h3>
-                <p class="small">Varianza spiegata: PC1 ${(data.visuals.pca.explained_variance[0] * 100).toFixed(1)}%, PC2 ${(data.visuals.pca.explained_variance[1] * 100).toFixed(1)}%.</p>
+                <p class="small" id="mapPcaSubtext">Varianza spiegata: PC1 ${(data.visuals.pca.explained_variance[0] * 100).toFixed(1)}%, PC2 ${(data.visuals.pca.explained_variance[1] * 100).toFixed(1)}%.</p>
               </div>
-              <select id="mapFilter">
-                <option value="all">Tutti</option>
-                <option value="partito">Solo partiti</option>
-                <option value="ideologia">Solo ideologie</option>
-                <option value="storico">Solo storici</option>
-              </select>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <select id="mapFilter" style="min-height:36px;">
+                  <option value="all">Tutti</option>
+                  <option value="partito">Solo partiti</option>
+                  <option value="ideologia">Solo ideologie</option>
+                  <option value="storico">Solo storici</option>
+                </select>
+                <button id="btnToggle3D" class="btn" style="min-height:36px; padding:6px 14px; font-weight:bold; background:rgba(34,87,122,0.06); border:1.5px solid var(--accent); color:var(--accent); display:inline-flex; align-items:center; gap:6px;">🌐 Vista 3D: OFF</button>
+              </div>
             </div>
-            <div class="map-wrap" style="position:relative; display:flex; gap:16px; flex-wrap:wrap; align-items:stretch;">
+            
+            <!-- CONTROLLI SPAZIO 3D -->
+            <div id="map3dControls" style="display:none; gap:14px; margin-top:12px; padding:12px; background:rgba(128,128,128,0.04); border:1px solid var(--line); border-radius:10px; flex-wrap:wrap; align-items:center;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <label class="small" style="font-weight:bold; font-size:12px;">Asse X (Orizzontale):</label>
+                <select id="map3dAxisX" class="input" style="min-height:30px; padding:2px 6px; font-size:12px; background:var(--panel); color:var(--ink); border:1px solid var(--line);">
+                  <option value="0" selected>Economia</option>
+                  <option value="1">Autorità</option>
+                  <option value="2">Cultura</option>
+                  <option value="3">Geopolitica</option>
+                  <option value="4">Ambiente</option>
+                  <option value="5">Tecnologia</option>
+                  <option value="6">Uguaglianza</option>
+                  <option value="7">Giustizia</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <label class="small" style="font-weight:bold; font-size:12px;">Asse Y (Verticale):</label>
+                <select id="map3dAxisY" class="input" style="min-height:30px; padding:2px 6px; font-size:12px; background:var(--panel); color:var(--ink); border:1px solid var(--line);">
+                  <option value="0">Economia</option>
+                  <option value="1">Autorità</option>
+                  <option value="2" selected>Cultura</option>
+                  <option value="3">Geopolitica</option>
+                  <option value="4">Ambiente</option>
+                  <option value="5">Tecnologia</option>
+                  <option value="6">Uguaglianza</option>
+                  <option value="7">Giustizia</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <label class="small" style="font-weight:bold; font-size:12px;">Asse Z (Profondità):</label>
+                <select id="map3dAxisZ" class="input" style="min-height:30px; padding:2px 6px; font-size:12px; background:var(--panel); color:var(--ink); border:1px solid var(--line);">
+                  <option value="0">Economia</option>
+                  <option value="1" selected>Autorità</option>
+                  <option value="2">Cultura</option>
+                  <option value="3">Geopolitica</option>
+                  <option value="4">Ambiente</option>
+                  <option value="5">Tecnologia</option>
+                  <option value="6">Uguaglianza</option>
+                  <option value="7">Giustizia</option>
+                </select>
+              </div>
+              <button id="btnToggleAutoRotate" class="btn small" style="min-height:30px; font-size:12px; background:rgba(56,163,165,0.08); border:1px solid rgba(56,163,165,0.25); color:var(--accent2);">🔄 Auto-rotazione: ON</button>
+            </div>
+
+            <div class="map-wrap" style="position:relative; display:flex; gap:16px; flex-wrap:wrap; align-items:stretch; margin-top:14px;">
               <canvas id="mapCanvas" class="viz-canvas" style="flex:1; min-width:320px;"></canvas>
               <div id="mapTooltip" class="tooltip"></div>
               
@@ -6876,108 +7331,269 @@
       showAppNotice("Impossibile disconnettersi. Riprova.");
     }
 
+    function saveLocalProfile(name) {
+      if (!state.lastResult) {
+        showAppNotice("Nessun risultato da salvare!");
+        return;
+      }
+      const cleanName = name ? name.trim() : "";
+      if (!cleanName) {
+        showAppNotice("Inserisci un nome valido.");
+        return;
+      }
+      const rawLocal = localStorage.getItem("politometro_local_tests");
+      let list = [];
+      if (rawLocal) {
+        try { list = JSON.parse(rawLocal); } catch(e) {}
+      }
+      const id = `local-test-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+      const archetype = resultArchetype(state.lastResult);
+      const party = state.lastResult.parties && state.lastResult.parties[0] ? state.lastResult.parties[0].name : "N/D";
+      list.push({
+        id,
+        name: cleanName,
+        timestamp_utc: new Date().toISOString(),
+        ideology_name: archetype.name,
+        top_party_name: party,
+        mode: state.lastResult.mode || state.mode,
+        data: state.lastResult
+      });
+      localStorage.setItem("politometro_local_tests", JSON.stringify(list));
+      showAppNotice(`Profilo "${cleanName}" salvato in locale!`);
+      loadPersonalHistory();
+    }
+
+    function deleteLocalProfile(id) {
+      const rawLocal = localStorage.getItem("politometro_local_tests");
+      if (!rawLocal) return;
+      try {
+        let list = JSON.parse(rawLocal);
+        list = list.filter(x => x.id !== id);
+        localStorage.setItem("politometro_local_tests", JSON.stringify(list));
+        state.activeOverlays = state.activeOverlays.filter(x => x !== id);
+        showAppNotice("Profilo locale eliminato.");
+        loadPersonalHistory();
+        drawVisuals(state.lastResult);
+      } catch (e) {}
+    }
+
+    function renameLocalProfile(id) {
+      const rawLocal = localStorage.getItem("politometro_local_tests");
+      if (!rawLocal) return;
+      try {
+        let list = JSON.parse(rawLocal);
+        const item = list.find(x => x.id === id);
+        if (!item) return;
+        const newName = prompt("Rinomina il profilo in:", item.name);
+        if (newName && newName.trim()) {
+          item.name = newName.trim();
+          localStorage.setItem("politometro_local_tests", JSON.stringify(list));
+          showAppNotice("Profilo rinominato con successo.");
+          loadPersonalHistory();
+          drawVisuals(state.lastResult);
+        }
+      } catch (e) {}
+    }
+
+    function toggleLocalOverlay(id, isChecked) {
+      if (isChecked) {
+        if (!state.activeOverlays.includes(id)) {
+          // Limita a 5 overlays al massimo per non intasare il grafico
+          if (state.activeOverlays.length >= 5) {
+            showAppNotice("Puoi sovrapporre al massimo 5 profili simultaneamente.");
+            const chk = document.getElementById(`chk-ov-${id}`);
+            if (chk) chk.checked = false;
+            return;
+          }
+          state.activeOverlays.push(id);
+        }
+      } else {
+        state.activeOverlays = state.activeOverlays.filter(x => x !== id);
+      }
+      drawVisuals(state.lastResult);
+    }
+
     async function loadPersonalHistory() {
       const box = document.getElementById("personal-history-content");
       if (!box) return;
-      
-      if (!state.user) {
-        box.innerHTML = `
-          <div class="guest-timeline-box">
-            <div class="welcome-sigil">⌛</div>
-            <h3>Timeline dei tuoi risultati</h3>
-            <p>Registrati o accedi per tracciare e confrontare la tua evoluzione politica nel tempo e visualizzare i tuoi quiz passati.</p>
-            <button class="btn primary" onclick="openAuthModal()">Accedi / Registrati</button>
+
+      const rawLocal = localStorage.getItem("politometro_local_tests");
+      let localList = [];
+      if (rawLocal) {
+        try { localList = JSON.parse(rawLocal); } catch(e) {}
+      }
+
+      let html = "";
+
+      // Sezione 1: Salva Risultato Corrente
+      if (state.lastResult) {
+        const defaultName = `Test ${new Date().toLocaleDateString("it-IT")} ${new Date().toLocaleTimeString("it-IT", {hour:'2-digit', minute:'2-digit'})}`;
+        html += `
+          <div class="block" style="border-left: 4px solid var(--accent2); margin-bottom: 24px;">
+            <h3>💾 Salva il tuo posizionamento corrente</h3>
+            <p class="small">Assegna un nome (es: "Mio Profilo", "Profilo Amico", "Persona X") per memorizzarlo offline e poterlo confrontare graficamente in tempo reale.</p>
+            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+              <input type="text" id="localSaveName" class="input" style="flex:1; min-width:200px; padding:8px 12px; min-height: 38px;" value="${defaultName}" placeholder="Nome del profilo..." />
+              <button class="btn primary" onclick="saveLocalProfile(document.getElementById('localSaveName').value)" style="min-height:38px;">Salva in Locale</button>
+            </div>
           </div>
         `;
-        return;
       }
-      
-      box.innerHTML = `<div class="muted" style="text-align:center; padding:30px;">Caricamento in corso...</div>`;
-      
+
+      // Sezione 2: Test Salvati Localmente
+      html += `
+        <div class="block" style="margin-bottom: 24px;">
+          <h3>📂 Cronologia Locale e Stanza di Confronto</h3>
+          <p class="small" style="margin-bottom: 15px;">
+            Tutti i profili salvati offline nel tuo browser. Puoi selezionare <strong>"Sovrapponi"</strong> per visualizzare i diversi tracciati contemporaneamente nei grafici (radar e barre).
+          </p>
+      `;
+
+      if (localList.length === 0) {
+        html += `
+          <div class="guest-timeline-box" style="border-style: dashed; padding: 24px;">
+            <div class="welcome-sigil">✓</div>
+            <h3>Nessun profilo locale salvato</h3>
+            <p>Salva il tuo test corrente usando il box in alto o rifai il quiz per salvare i tuoi risultati in locale.</p>
+          </div>
+        `;
+      } else {
+        html += `<div class="timeline-container">`;
+        localList.forEach((item, idx) => {
+          const date = new Date(item.timestamp_utc).toLocaleString("it-IT", {
+            day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+          });
+          const ideology = escapeHtml(item.ideology_name || "Sconosciuta");
+          const party = escapeHtml(item.top_party_name || "Sconosciuto");
+          const isOverlaid = state.activeOverlays.includes(item.id);
+          
+          html += `
+            <div class="timeline-item" style="border-left: 4px solid ${isOverlaid ? '#e040fb' : 'var(--line)'};">
+              <div class="timeline-header">
+                <span class="timeline-date">Profilo #${idx + 1} · ${date}</span>
+                <span class="timeline-badge">${escapeHtml(item.mode === "deep" ? "Profondo" : item.mode === "quick" ? "Rapido" : "Social")}</span>
+              </div>
+              <div class="timeline-body">
+                <h4 style="margin: 0 0 8px 0; color: var(--ink); font-size:16px;">${escapeHtml(item.name)}</h4>
+                <div class="timeline-body-grid" style="display:flex; gap:16px; flex-wrap:wrap; font-size: 13px;">
+                  <div><span class="muted">Ideologia:</span> <strong>${ideology}</strong></div>
+                  <div><span class="muted">Partito:</span> <strong>${party}</strong></div>
+                </div>
+              </div>
+              <div class="timeline-actions" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);">
+                <label style="display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; cursor:pointer;">
+                  <input type="checkbox" id="chk-ov-${item.id}" onchange="toggleLocalOverlay('${item.id}', this.checked)" ${isOverlaid ? 'checked' : ''} />
+                  <span>Sovrapponi nei grafici</span>
+                </label>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn small" onclick="renameLocalProfile('${item.id}')" style="padding:4px 8px; font-size:12px; min-height: 28px;">Rinomina</button>
+                  <button class="btn small primary" onclick="renderLocalAsMain('${item.id}')" style="padding:4px 8px; font-size:12px; min-height: 28px;">Carica</button>
+                  <button class="btn small warn" onclick="deleteLocalProfile('${item.id}')" style="padding:4px 8px; font-size:12px; min-height: 28px; background:rgba(239, 68, 68, 0.1); border:1px solid rgba(239, 68, 68, 0.2); color:#ef4444;">Elimina</button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+      html += `</div>`;
+
+      // Sezione 3: Cronologia Cloud (Server)
+      html += `
+        <div class="block">
+          <h3>☁️ Cronologia Cloud (Account Online)</h3>
+          <p class="small" style="margin-bottom: 15px;">Salva in modo permanente i tuoi risultati sul server per potervi accedere da qualsiasi dispositivo.</p>
+          <div id="cloud-history-box">
+      `;
+
+      if (!state.user) {
+        html += `
+          <div class="guest-timeline-box" style="padding: 20px;">
+            <p>Registrati o accedi per sincronizzare la tua cronologia nel cloud e tracciare la tua evoluzione politica.</p>
+            <button class="btn" onclick="openAuthModal()" style="margin-top:8px;">Accedi / Registrati</button>
+          </div>
+        `;
+      } else {
+        html += `<div class="muted" style="text-align:center; padding:15px;">Caricamento cronologia cloud...</div>`;
+      }
+      html += `</div></div>`;
+
+      box.innerHTML = html;
+
+      // Se l'utente è loggato, carica la cronologia cloud e inseriscila nel contenitore apposito
+      if (state.user) {
+        fetchCloudHistory();
+      }
+    }
+
+    function renderLocalAsMain(id) {
+      const rawLocal = localStorage.getItem("politometro_local_tests");
+      if (!rawLocal) return;
+      try {
+        const list = JSON.parse(rawLocal);
+        const item = list.find(x => x.id === id);
+        if (item) {
+          renderResults(item.data);
+          activateTab("summary");
+          setTimeout(() => drawVisuals(item.data), 30);
+          showAppNotice(`Profilo "${item.name}" caricato come principale.`);
+        }
+      } catch(e) {}
+    }
+
+    async function fetchCloudHistory() {
+      const cloudBox = document.getElementById("cloud-history-box");
+      if (!cloudBox) return;
       try {
         const response = await fetch("/api/auth/history", { cache: "no-store" });
         if (response.ok) {
           const res = await response.json();
           const list = res.history || [];
           if (!list.length) {
-            box.innerHTML = `
-              <div class="guest-timeline-box" style="border-style: solid;">
-                <div class="welcome-sigil">✓</div>
-                <h3>La tua cronologia è vuota</h3>
-                <p>Non hai ancora salvato nessun quiz sul tuo account. Completa il test attuale e le tue risposte verranno automaticamente salvate qui!</p>
-              </div>
-            `;
+            cloudBox.innerHTML = `<p class="small muted">Nessun risultato salvato sul cloud.</p>`;
             return;
           }
-          
-          let timelineHtml = `
-            <div class="block">
-              <h3>La tua Evoluzione Politica</h3>
-              <p class="small" style="margin-bottom: 20px;">
-                Di seguito trovi i test completati in ordine cronologico. Fai clic su <strong>"Visualizza Grafici"</strong> per caricare quel posizionamento storico su tutti i grafici interattivi (radar, barre, mappa PCA).
-              </p>
-              <div class="timeline-container">
-          `;
-          
+          let cHtml = `<div class="timeline-container" style="gap:12px;">`;
           list.forEach((item, idx) => {
             const date = new Date(item.timestamp_utc).toLocaleString("it-IT", {
-              day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit"
+              day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
             });
             const ideology = escapeHtml(item.ideology_name || "Sconosciuta");
-            const party = escapeHtml(item.top_party_name || "Sconosciuto");
             const index = list.length - idx;
-            
             const rawJsonEscaped = escapeHtml(JSON.stringify(item.raw_result));
-            
-            timelineHtml += `
-              <div class="timeline-item">
-                <div class="timeline-header">
-                  <span class="timeline-date">Test #${index} · ${date}</span>
-                  <span class="timeline-badge">${escapeHtml(item.mode === "deep" ? "Profondo" : item.mode === "quick" ? "Rapido" : "Social")}</span>
+            cHtml += `
+              <div class="timeline-item" style="padding:12px 16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+                  <span class="muted">Test #${index} · ${date}</span>
+                  <strong>${ideology}</strong>
                 </div>
-                <div class="timeline-body">
-                  <div class="timeline-stat">
-                    <span class="label">Ideologia Affine</span>
-                    <span class="value">${ideology}</span>
-                  </div>
-                  <div class="timeline-stat">
-                    <span class="label">Partito più vicino</span>
-                    <span class="value">${party}</span>
-                  </div>
-                </div>
-                <div class="timeline-actions">
-                  <button class="timeline-btn primary view-test-btn" data-result="${rawJsonEscaped}">Visualizza Grafici</button>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+                  <button class="btn small primary view-test-btn" data-result="${rawJsonEscaped}" style="padding:2px 6px; font-size:11px; min-height:22px;">Visualizza</button>
                 </div>
               </div>
             `;
           });
-          
-          timelineHtml += `
-              </div>
-            </div>
-          `;
-          box.innerHTML = timelineHtml;
-          
-          box.querySelectorAll(".view-test-btn").forEach((btn) => {
+          cHtml += `</div>`;
+          cloudBox.innerHTML = cHtml;
+
+          cloudBox.querySelectorAll(".view-test-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
               try {
                 const rawData = JSON.parse(btn.getAttribute("data-result"));
                 renderResults(rawData);
                 activateTab("summary");
                 setTimeout(() => drawVisuals(rawData), 30);
-                showAppNotice("Test storico caricato correttamente!");
+                showAppNotice("Test cloud caricato con successo!");
               } catch (err) {
-                console.error("Errore caricamento test storico:", err);
-                showAppNotice("Errore durante il caricamento del test storico.");
+                showAppNotice("Errore durante il caricamento del test.");
               }
             });
           });
-          
         } else {
-          box.innerHTML = `<div class="warning">Errore nel caricamento della cronologia. Riprova.</div>`;
+          cloudBox.innerHTML = `<p class="small warn">Impossibile caricare la cronologia cloud.</p>`;
         }
-      } catch (err) {
-        box.innerHTML = `<div class="warning">Errore di connessione.</div>`;
+      } catch(err) {
+        cloudBox.innerHTML = `<p class="small warn">Errore di rete per la cronologia cloud.</p>`;
       }
     }
 
@@ -7306,6 +7922,16 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       }
       if (target.id === "surfaceAI") {
         jumpToTab("ai");
+      }
+      if (target.id === "surfaceSaveLocal") {
+        jumpToTab("personal-history");
+        setTimeout(() => {
+          const input = document.getElementById("localSaveName");
+          if (input) {
+            input.focus();
+            input.select();
+          }
+        }, 150);
       }
     });
 
