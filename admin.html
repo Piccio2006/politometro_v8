@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard - Politometro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --paper: #ffffff;
+      --panel: #f8fafc;
+      --accent: #0f766e;
+      --accent-2: #0d9488;
+      --warm: #ea580c;
+      --purple: #6d28d9;
+      --danger: #ef4444;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      font-family: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 10%, rgba(13, 148, 136, 0.04), transparent 40%),
+                  radial-gradient(circle at 90% 90%, rgba(234, 88, 12, 0.03), transparent 45%),
+                  #f1f5f9;
+      color: var(--ink);
+    }
+    header {
+      padding: 20px 30px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    header h1 { font-family: 'Outfit', sans-serif; margin: 0; font-size: 24px; }
+    header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    main { padding: 30px; max-width: 1280px; margin: 0 auto; display: grid; gap: 24px; }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+    }
+
+    .grid-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--warm), var(--purple));
+    }
+    
+    .metric-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .metric-value { font-size: 32px; font-weight: 800; color: var(--accent); margin-top: 8px; font-family: 'Outfit', sans-serif; }
+    
+    h2, h3 { font-family: 'Outfit', sans-serif; margin: 0 0 16px; color: var(--ink); }
+    .muted { color: var(--muted); font-size: 13px; }
+    
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 30px 20px;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(13, 148, 136, 0.04);
+    }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 12px 10px; }
+    th { color: var(--muted); font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+    
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: #ffffff;
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn.primary { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+    .btn.primary:hover { background: var(--accent-2); }
+    
+    .input-field {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: var(--ink);
+      font-size: 13.5px;
+      outline: none;
+      transition: border 0.15s;
+    }
+    .input-field:focus { border-color: var(--accent); background: #ffffff; }
+
+    .tag { display: inline-block; padding: 3px 8px; border-radius: 999px; font-weight: 700; font-size: 11px; background: #f1f5f9; border: 1px solid var(--line); }
+    
+    .guide-box { background: #f8fafc; border-left: 4px solid var(--accent); padding: 16px; border-radius: 8px; margin-top: 12px; font-size: 13px; line-height: 1.5; }
+    .guide-box code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+
+    .layout-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .layout-split { grid-template-columns: 1fr; }
+    }
+    
+    .bar-container { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12.5px; }
+    .bar-label { width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+    .bar-track { flex: 1; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); border-radius: 999px; width: 0%; transition: width 0.5s ease-out; }
+    .bar-value { width: 45px; text-align: right; font-weight: 700; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Politometro Admin Dashboard</h1>
+      <p>Pannello di analisi dei campioni, setup chiave API e istruzioni di deploy.</p>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <span style="width:8px; height:8px; border-radius:50%; background:#94a3b8; display:inline-block;"></span> Verifico connessione...
+    </div>
+  </header>
+  
+  <main>
+    <!-- TOP CONTROL SECTION -->
+    <div class="layout-split">
+      <div class="card">
+        <h2>📂 Importazione Campioni di Ricerca</h2>
+        <p class="muted" style="margin-top:-8px; margin-bottom:18px;">Se sei in modalità offline, trascina qui il file <code>research_samples.jsonl</code> dal tuo server per analizzarlo.</p>
+        <div class="drop-zone" id="dropZone">
+          <span style="font-size:24px;">📥</span><br>
+          <strong style="display:block; margin:8px 0 4px;">Trascina qui il file .jsonl</strong>
+          <span class="muted">oppure clicca per sfogliare i file</span>
+          <input type="file" id="fileInput" accept=".jsonl" style="display:none;">
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🔑 Chiave API Gemini</h2>
+        <p class="muted" style="margin-top:-8px; margin-bottom:16px;">Configura la chiave API di Gemini. Verrà salvata in questo browser e condivisa con la pagina del test pubblico.</p>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="password" id="geminiApiKey" class="input-field" placeholder="Inserisci chiave API Gemini...">
+          <button class="btn primary" id="btnSaveApiKey" style="white-space:nowrap;">Salva Chiave</button>
+        </div>
+        <p class="muted" style="margin-top:8px;" id="keySaveStatus"></p>
+      </div>
+    </div>
+    
+    <!-- METRICS GRID -->
+    <div class="grid-metrics">
+      <div class="card">
+        <div class="metric-title">Campioni Totali</div>
+        <div class="metric-value" id="valTotal">0</div>
+      </div>
+      <div class="card">
+        <div class="metric-title">Affidabilità Media</div>
+        <div class="metric-value" id="valConfidence">0%</div>
+      </div>
+      <div class="card">
+        <div class="metric-title">Modalità più Usata</div>
+        <div class="metric-value" id="valMode">N/D</div>
+      </div>
+      <div class="card">
+        <div class="metric-title">Ideologia Dominante</div>
+        <div class="metric-value" id="valIdeology">N/D</div>
+      </div>
+    </div>
+    
+    <!-- SPLIT ANALYSIS & DEMOGRAPHICS -->
+    <div class="layout-split">
+      <div class="card">
+        <h2>📊 Distribuzione delle Ideologie</h2>
+        <div id="ideologyBars" style="margin-top:10px;">
+          <p class="muted">Nessun dato caricato. trascina un file per visualizzare le ideologie.</p>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>👥 Demografia Utenti</h2>
+        <h3>Genere</h3>
+        <div id="demographicsGender" style="margin-bottom:20px;"></div>
+        <h3>Istruzione</h3>
+        <div id="demographicsEducation"></div>
+      </div>
+    </div>
+    
+    <!-- SESSIONS LOG -->
+    <div class="card" style="max-height: 400px; overflow-y: auto;">
+      <h2>📜 Registro Sessioni Recenti</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp (UTC)</th>
+            <th>ID Sessione</th>
+            <th>Modalità</th>
+            <th>Ideologia Top</th>
+            <th>Affinità Partito</th>
+            <th>Azione</th>
+          </tr>
+        </thead>
+        <tbody id="sessionTableBody">
+          <tr>
+            <td colspan="6" style="text-align:center;" class="muted">Trascina un file o connettiti al server per caricare le sessioni.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- HOSTINGER VPS GUIDE -->
+    <div class="card">
+      <h2>🚀 Deploy e Messa Online su Hostinger VPS</h2>
+      <p class="muted">Per ospitare il Politometro con salvataggio dati attivo sul tuo server VPS KVM 1 di Hostinger, segui questi passi:</p>
+      
+      <div class="guide-box">
+        <strong>1. Variabili d'Ambiente:</strong><br>
+        Configura le variabili d'ambiente nel file <code>.env</code> o direttamente nel terminale per blindare l'accesso admin:<br>
+        <code>POLITOMETRO_ADMIN_EMAIL=tua_mail@dominio.com</code><br>
+        <code>POLITOMETRO_ADMIN_PASSWORD_HASH=hash_della_tua_password</code> (crealo usando lo script apposito in backend).
+      </div>
+      
+      <div class="guide-box">
+        <strong>2. Lancio del Server FastAPI backend:</strong><br>
+        Avvia il backend di produzione tramite gunicorn/uvicorn sulla porta 8000:<br>
+        <code>.venv-politometro/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8000</code>
+      </div>
+
+      <div class="guide-box">
+        <strong>3. Configurazione Nginx/Caddy proxy:</strong><br>
+        Imposta il web server in modo che le richieste sotto <code>/api</code> e <code>/admin</code> vengano inoltrate al backend FastAPI (porta 8000), mentre le richieste statiche servano i file presenti in <code>dist/</code>.
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    // Configurazione chiavi API Gemini
+    const keyInput = document.getElementById("geminiApiKey");
+    const saveBtn = document.getElementById("btnSaveApiKey");
+    const statusMsg = document.getElementById("keySaveStatus");
+    
+    // Carica chiave esistente
+    if (keyInput) {
+      keyInput.value = localStorage.getItem("politometro_gemini_key") || "";
+    }
+    
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        const key = keyInput.value.trim();
+        if (key) {
+          localStorage.setItem("politometro_gemini_key", key);
+          statusMsg.textContent = "🟢 Chiave API salvata con successo!";
+          statusMsg.style.color = "var(--accent)";
+        } else {
+          localStorage.removeItem("politometro_gemini_key");
+          statusMsg.textContent = "⚪ Chiave API rimossa.";
+          statusMsg.style.color = "var(--muted)";
+        }
+        setTimeout(() => { statusMsg.textContent = ""; }, 3000);
+      };
+    }
+
+    // Drag and drop setup
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("fileInput");
+    
+    if (dropZone) {
+      dropZone.onclick = () => fileInput.click();
+      dropZone.ondragover = (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      };
+      dropZone.ondragleave = () => {
+        dropZone.classList.remove("dragover");
+      };
+      dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (e.dataTransfer.files.length) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      };
+    }
+    
+    if (fileInput) {
+      fileInput.onchange = () => {
+        if (fileInput.files.length) {
+          handleFile(fileInput.files[0]);
+        }
+      };
+    }
+    
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const lines = text.split("\n");
+        const parsed = [];
+        lines.forEach(line => {
+          if (line.trim()) {
+            try {
+              parsed.push(JSON.parse(line));
+            } catch(err) {}
+          }
+        });
+        updateDashboard(parsed);
+      };
+      reader.readAsText(file);
+    }
+    
+    function updateDashboard(data) {
+      if (!data || !data.length) return;
+      
+      document.getElementById("valTotal").textContent = data.length;
+      
+      let sumConf = 0;
+      let countConf = 0;
+      const modes = {};
+      const ideologies = {};
+      const genders = { "Maschio": 0, "Femmina": 0, "Altro": 0, "N/D": 0 };
+      const education = {};
+      
+      const tbody = document.getElementById("sessionTableBody");
+      let tableHtml = "";
+      
+      data.sort((a,b) => new Date(b.timestamp_utc || 0) - new Date(a.timestamp_utc || 0));
+      
+      data.forEach((session, index) => {
+        // Confidenza media
+        if (session.confidence !== undefined) {
+          sumConf += parseFloat(session.confidence);
+          countConf++;
+        }
+        
+        // Modalità
+        if (session.mode) {
+          modes[session.mode] = (modes[session.mode] || 0) + 1;
+        }
+        
+        // Ideologia
+        const ideoName = (session.ideology && session.ideology.name) || "N/D";
+        ideologies[ideoName] = (ideologies[ideoName] || 0) + 1;
+        
+        // Demografia
+        const demo = session.demographics || {};
+        const genderVal = demo.gender || "N/D";
+        genders[genderVal] = (genders[genderVal] || 0) + 1;
+        
+        const eduVal = demo.education || "N/D";
+        education[eduVal] = (education[eduVal] || 0) + 1;
+        
+        // Registro
+        if (index < 50) {
+          const dateStr = session.timestamp_utc ? new Date(session.timestamp_utc).toLocaleString("it-IT") : "N/D";
+          const ideo = (session.ideology && session.ideology.name) || "N/D";
+          const topParty = (session.parties && session.parties[0] && session.parties[0].name) || "N/D";
+          const topPartyPct = (session.parties && session.parties[0] && session.parties[0].affinity) ? Math.round(session.parties[0].affinity) + '%' : 'N/D';
+          tableHtml += `
+            <tr>
+              <td>${dateStr}</td>
+              <td style="font-family:monospace; font-size:11.5px;">${(session.session_id || "").substring(0,8)}...</td>
+              <td><span class="tag">${session.mode || 'N/D'}</span></td>
+              <td><strong>${ideo}</strong></td>
+              <td>${topParty} (${topPartyPct})</td>
+              <td><button class="btn" onclick="viewSessionDetails('${session.session_id || ''}')">🔍 Dettagli</button></td>
+            </tr>
+          `;
+        }
+      });
+      
+      if (tbody) tbody.innerHTML = tableHtml || `<tr><td colspan="6" style="text-align:center;">Nessuna sessione trovata.</td></tr>`;
+      
+      if (countConf > 0) {
+        document.getElementById("valConfidence").textContent = Math.round((sumConf / countConf) * 100) + '%';
+      }
+      
+      // Calcola top mode
+      let topMode = "N/D";
+      let maxModeVal = -1;
+      for (const m in modes) {
+        if (modes[m] > maxModeVal) {
+          maxModeVal = modes[m];
+          topMode = m;
+        }
+      }
+      document.getElementById("valMode").textContent = topMode;
+      
+      // Calcola top ideologia
+      let topIdeo = "N/D";
+      let maxIdeoVal = -1;
+      for (const ideo in ideologies) {
+        if (ideo !== "N/D" && ideologies[ideo] > maxIdeoVal) {
+          maxIdeoVal = ideologies[ideo];
+          topIdeo = ideo;
+        }
+      }
+      document.getElementById("valIdeology").textContent = topIdeo;
+      
+      // Disegna barre ideologie
+      const barContainer = document.getElementById("ideologyBars");
+      let barHtml = "";
+      const sortedIdeologies = Object.keys(ideologies).map(name => ({
+        name,
+        count: ideologies[name]
+      })).sort((a,b) => b.count - a.count);
+      
+      sortedIdeologies.forEach(item => {
+        const pct = Math.round((item.count / data.length) * 100);
+        barHtml += `
+          <div class="bar-container">
+            <span class="bar-label">${item.name}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: ${pct}%"></div>
+            </div>
+            <span class="bar-value">${pct}%</span>
+          </div>
+        `;
+      });
+      if (barContainer) barContainer.innerHTML = barHtml || "<p class='muted'>Nessun dato.</p>";
+      
+      // Disegna demografia Genere
+      const genderBox = document.getElementById("demographicsGender");
+      let genHtml = "";
+      for (const g in genders) {
+        const pct = Math.round((genders[g] / data.length) * 100);
+        genHtml += `
+          <div class="bar-container">
+            <span class="bar-label">${g}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: ${pct}%; background:var(--warm);"></div>
+            </div>
+            <span class="bar-value">${pct}%</span>
+          </div>
+        `;
+      }
+      if (genderBox) genderBox.innerHTML = genHtml;
+      
+      // Disegna demografia Istruzione
+      const eduBox = document.getElementById("demographicsEducation");
+      let eduHtml = "";
+      for (const e in education) {
+        const pct = Math.round((education[e] / data.length) * 100);
+        eduHtml += `
+          <div class="bar-container">
+            <span class="bar-label">${e}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: ${pct}%; background:var(--purple);"></div>
+            </div>
+            <span class="bar-value">${pct}%</span>
+          </div>
+        `;
+      }
+      if (eduBox) eduBox.innerHTML = eduHtml;
+
+      // Mantieni in memoria per visualizzare dettagli
+      window._activeSessions = data;
+    }
+    
+    function viewSessionDetails(sid) {
+      if (!window._activeSessions) return;
+      const sess = window._activeSessions.find(s => s.session_id === sid);
+      if (sess) {
+        alert(JSON.stringify(sess, null, 2));
+      }
+    }
+
+    // Auto-check backend connection
+    fetch("/api/admin/sessions")
+      .then(res => {
+        if (res.ok) {
+          document.getElementById("statusBadge").innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:#2ecc71; display:inline-block;"></span> Connesso a Hostinger API`;
+          // Carica i dati in automatico
+          fetch("/api/admin/export/json")
+            .then(r => r.json())
+            .then(jsonObj => {
+              if (jsonObj && jsonObj.samples) {
+                updateDashboard(jsonObj.samples);
+              }
+            }).catch(() => {});
+        } else {
+          document.getElementById("statusBadge").innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:#e67e22; display:inline-block;"></span> Offline (Usa Drag & Drop)`;
+        }
+      })
+      .catch(() => {
+        document.getElementById("statusBadge").innerHTML = `<span style="width:8px; height:8px; border-radius:50%; background:#e67e22; display:inline-block;"></span> Offline (Usa Drag & Drop)`;
+      });
+  </script>
+</body>
+</html>

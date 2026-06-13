@@ -2420,152 +2420,8 @@
     }
 
     /* ==========================================================================
-       🌙 TEMPLATE PREMIUM DARK MODE & LIVE IA (STILI)
+       💬 PANNELLO AI GEMINI (STILI GENERALI)
        ========================================================================== */
-    html[data-theme="dark"] {
-      color-scheme: dark;
-      --ink: #e5ecef;
-      --muted: #95a5b0;
-      --line: rgba(255, 255, 255, .11);
-      --paper: #0b1a23;
-      --panel: #112633;
-      --accent-2: #48b8ba;
-      --shadow: 0 18px 45px rgba(0, 0, 0, .45);
-      --shadow-soft: 0 10px 26px rgba(0, 0, 0, .35);
-      --sky-soft: rgba(78, 168, 222, .10);
-      --mint-soft: rgba(56, 163, 165, .10);
-      --gold-soft: rgba(242, 184, 128, .10);
-      --rose-soft: rgba(184, 74, 98, .10);
-    }
-
-    html[data-theme="dark"] body {
-      background:
-        linear-gradient(120deg, rgba(56,163,165,.09), transparent 26%),
-        linear-gradient(240deg, rgba(242,184,128,.11), transparent 34%),
-        linear-gradient(315deg, rgba(184,74,98,.05), transparent 38%),
-        linear-gradient(180deg, #07151e 0%, var(--paper) 42%, #050e14 100%) !important;
-      color: var(--ink) !important;
-    }
-
-    html[data-theme="dark"] aside {
-      border-right: 1px solid rgba(255,255,255,.05) !important;
-      background:
-        radial-gradient(circle at 18% 8%, rgba(56,163,165,.20), transparent 32%),
-        linear-gradient(180deg, rgba(5, 12, 18, 0.9), rgba(2, 4, 6, 0.98)) !important;
-    }
-
-    html[data-theme="dark"] .question-panel {
-      background: linear-gradient(135deg, rgba(56,163,165,.06), rgba(255,255,255,0) 34%),
-                  linear-gradient(315deg, rgba(242,184,128,.08), rgba(255,255,255,0) 38%),
-                  var(--panel) !important;
-      color: var(--ink) !important;
-      border-color: var(--line) !important;
-      box-shadow: var(--shadow) !important;
-    }
-    
-    html[data-theme="dark"] .question-text {
-      color: var(--ink) !important;
-    }
-
-    html[data-theme="dark"] .option {
-      border-color: var(--line) !important;
-      background: linear-gradient(90deg, rgba(17, 38, 51, 0.95), rgba(11, 26, 35, 0.95)) !important;
-      color: var(--ink) !important;
-      box-shadow: var(--shadow-soft) !important;
-    }
-
-    html[data-theme="dark"] .option:hover {
-      border-color: var(--accent-2) !important;
-      background: linear-gradient(90deg, rgba(56, 163, 165, 0.20), rgba(242, 184, 128, 0.10)) !important;
-    }
-
-    html[data-theme="dark"] .option.selected {
-      border-color: var(--accent-2) !important;
-      background: linear-gradient(90deg, rgba(56, 163, 165, 0.26), rgba(242, 184, 128, 0.20)) !important;
-      color: var(--ink) !important;
-    }
-
-    html[data-theme="dark"] .welcome-card h3,
-    html[data-theme="dark"] .welcome-card p,
-    html[data-theme="dark"] .experience-panel h4,
-    html[data-theme="dark"] .experience-panel p,
-    html[data-theme="dark"] .experience-step,
-    html[data-theme="dark"] .trust-chip strong,
-    html[data-theme="dark"] .trust-chip span,
-    html[data-theme="dark"] .mode-card h4,
-    html[data-theme="dark"] .mode-card p,
-    html[data-theme="dark"] .mode-card .small {
-      color: var(--ink) !important;
-    }
-
-    html[data-theme="dark"] .mode-card {
-      background: rgba(17, 38, 51, 0.85) !important;
-      border-color: var(--line) !important;
-    }
-
-    html[data-theme="dark"] .mode-card.mode-social { background: linear-gradient(135deg, rgba(78, 168, 222, 0.12), rgba(17, 38, 51, 0.85)) !important; }
-    html[data-theme="dark"] .mode-card.mode-quick { background: linear-gradient(135deg, rgba(56, 163, 165, 0.12), rgba(17, 38, 51, 0.85)) !important; }
-    html[data-theme="dark"] .mode-card.mode-deep { background: linear-gradient(135deg, rgba(242, 184, 128, 0.12), rgba(17, 38, 51, 0.85)) !important; }
-    html[data-theme="dark"] .mode-card.mode-election { background: linear-gradient(135deg, rgba(184, 74, 98, 0.12), rgba(23, 15, 20, 0.85)) !important; }
-
-    html[data-theme="dark"] .block {
-      background: var(--panel) !important;
-      border-color: var(--line) !important;
-      color: var(--ink) !important;
-    }
-
-    html[data-theme="dark"] .tabs {
-      background: rgba(11, 26, 35, 0.88) !important;
-    }
-
-    html[data-theme="dark"] .tab {
-      background: rgba(17, 38, 51, 0.85) !important;
-      border-color: var(--line) !important;
-      color: var(--ink) !important;
-    }
-
-    html[data-theme="dark"] .tab.active {
-      background: linear-gradient(135deg, var(--accent-2), #1f5b5c) !important;
-      color: #fff !important;
-    }
-
-    html[data-theme="dark"] .trust-chip {
-      background: linear-gradient(180deg, rgba(17, 38, 51, 0.85), rgba(11, 26, 35, 0.85)) !important;
-      border-color: var(--line) !important;
-    }
-
-    html[data-theme="dark"] .partner-card,
-    html[data-theme="dark"] .startup-card,
-    html[data-theme="dark"] .experience-panel,
-    html[data-theme="dark"] .experience-step,
-    html[data-theme="dark"] .dominant-axis,
-    html[data-theme="dark"] .world-card {
-      background: rgba(17, 38, 51, 0.85) !important;
-      border-color: var(--line) !important;
-    }
-
-    html[data-theme="dark"] input[type="text"],
-    html[data-theme="dark"] input[type="password"],
-    html[data-theme="dark"] textarea,
-    html[data-theme="dark"] select {
-      background: rgba(0, 0, 0, 0.25) !important;
-      color: var(--ink) !important;
-      border-color: var(--line) !important;
-    }
-
-    html[data-theme="dark"] .btn {
-      background: rgba(255, 255, 255, 0.08) !important;
-      color: var(--ink) !important;
-    }
-    
-    html[data-theme="dark"] .btn.primary {
-      background: linear-gradient(135deg, var(--accent-2), #1f5b5c) !important;
-      color: #ffffff !important;
-    }
-
-    /* ═══════════════════════════════════════
-       PANNELLO AI GEMINI (STILI)
-       ═══════════════════════════════════════ */
     .ai-panel-wrap {
       display: flex;
       flex-direction: column;
@@ -2576,10 +2432,6 @@
       border: 1.5px solid rgba(99,102,241,.25);
       border-radius: 16px;
       padding: 24px;
-    }
-    html[data-theme="dark"] .ai-setup-box {
-      background: linear-gradient(135deg, rgba(99,102,241,.12) 0%, rgba(139,92,246,.08) 100%) !important;
-      border-color: rgba(99,102,241,.35) !important;
     }
     .ai-setup-box h3 {
       margin: 0 0 6px;
@@ -2632,10 +2484,6 @@
       border-radius: 16px;
       overflow: hidden;
     }
-    html[data-theme="dark"] .ai-chat-wrap {
-      border-color: rgba(99,102,241,.25) !important;
-      background: rgba(0,0,0,.20) !important;
-    }
     
     .ai-message {
       padding: 10px 14px;
@@ -2651,21 +2499,12 @@
       color: #fff;
       border-bottom-right-radius: 2px;
     }
-    html[data-theme="dark"] .ai-message.user {
-      background: var(--accent-2) !important;
-      color: #0b1a23 !important;
-      font-weight: 500;
-    }
     .ai-message.ai {
       align-self: flex-start;
       background: rgba(0,0,0,.03);
       border: 1px solid var(--line);
       color: var(--ink);
       border-bottom-left-radius: 2px;
-    }
-    html[data-theme="dark"] .ai-message.ai {
-      background: rgba(255,255,255,.04) !important;
-      border-color: rgba(255,255,255,.06) !important;
     }
     
     .ai-typing {
@@ -2702,9 +2541,6 @@
       <div class="brand">
         <h1>Politometro</h1>
         <p>Test politico multi-asse con modello di confidenza e confronto ideologico.</p>
-        <button id="themeToggle" class="btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; cursor: pointer; border-radius: 8px; font-size: 13px; padding: 6px 12px; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; width: fit-content;">
-          <span id="themeToggleIcon">🌙</span> <span id="themeToggleText">Tema Scuro</span>
-        </button>
       </div>
       <div class="meter">
         <div class="meter-top">
@@ -2735,7 +2571,7 @@
         </div>
     
         <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260613-103605 · IA v5.3</span>
+        <span class="engine-pill" id="releasePill">Aggiornato 20260613-105825 · IA v5.3</span>
       </div>
     </aside>
     <main>
@@ -5828,15 +5664,21 @@
         </div>
         <div id="panel-coalitions" class="tab-panel">
           <div class="block">
-            <h2>🗳️ Simulatore di Coalizioni di Governo (Italia)</h2>
+            <h2>🗳️ Simulatore di Coalizioni di Governo</h2>
             <p class="small text-muted" style="margin-bottom: 20px;">
-              Seleziona i partiti per provare a formare una coalizione di governo. Il simulatore calcolerà la maggioranza parlamentare stimata (400 seggi alla Camera), la coesione interna sui temi chiave e quanto saresti rappresentato da questa alleanza!
+              Seleziona i partiti per simulare una coalizione di governo. Il simulatore calcola la maggioranza parlamentare, la coesione interna e la tua affinità.
             </p>
+
+            <!-- TABS PER SCELTA CAMERA / SENATO -->
+            <div style="display:flex; gap:12px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:12px;">
+              <button class="btn primary" id="btnChamberCamera" style="flex:1; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; transition:all 0.2s;">🏛️ Camera dei Deputati (400 seggi)</button>
+              <button class="btn" id="btnChamberSenato" style="flex:1; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; transition:all 0.2s;">🏛️ Senato della Repubblica (205 seggi)</button>
+            </div>
             
             <div class="coalition-layout" style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:20px;">
               <!-- PARTY SELECTOR -->
               <div class="block" style="padding:20px; border-color:var(--line);">
-                <h3>Seleziona i Partiti</h3>
+                <h3 id="coalitionChamberTitle">Seleziona i Partiti (Camera)</h3>
                 <p class="small text-muted" style="margin-bottom: 12px;">Clicca sui partiti per aggiungerli o rimuoverli dalla coalizione simulata.</p>
                 <div id="coalitionPartyList" style="display:grid; grid-template-columns: 1fr; gap:8px; max-height:480px; overflow-y:auto; padding-right:5px;">
                   <!-- Parties will be rendered here dynamically -->
@@ -5850,7 +5692,7 @@
                 <!-- SEATS PROGRESS BAR -->
                 <div style="background:rgba(0,0,0,0.03); padding:12px; border-radius:8px; border:1px solid var(--line);">
                   <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:6px;">
-                    <span>Seggi Camera (su 400)</span>
+                    <span id="coalitionChamberLabel">Seggi Camera (su 400)</span>
                     <span id="coalitionSeatsCount">0 / 400</span>
                   </div>
                   <div class="track" style="height:16px; background:rgba(0,0,0,0.15);">
@@ -5858,7 +5700,7 @@
                   </div>
                   <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px;">
                     <span>Opposizione</span>
-                    <span style="color:var(--accent-2); font-weight:bold;">Soglia Maggioranza (201 seggi)</span>
+                    <span id="coalitionMajorityThresh" style="color:var(--accent-2); font-weight:bold;">Soglia Maggioranza (201 seggi)</span>
                   </div>
                   <div id="coalitionMajorityLabel" style="text-align:center; font-size:14px; font-weight:bold; margin-top:8px; color:var(--danger);">
                     ❌ Senza Maggioranza
@@ -7608,37 +7450,10 @@
        🌙 PREMIUM DARK MODE, URL SHAREABLE & LIVE IA (LOGICA JS)
        ========================================================================== */
     
-    // --- 1. LOGICA DARK MODE ---
+    // --- 1. FORZA TEMA CHIARO PULITO ---
     function initDarkMode() {
-      const themeToggle = document.getElementById("themeToggle");
-      const iconSpan = document.getElementById("themeToggleIcon");
-      const textSpan = document.getElementById("themeToggleText");
-      
-      function applyTheme(theme) {
-        if (theme === "dark") {
-          document.documentElement.setAttribute("data-theme", "dark");
-          if (iconSpan) iconSpan.textContent = "☀️";
-          if (textSpan) textSpan.textContent = "Tema Chiaro";
-        } else {
-          document.documentElement.removeAttribute("data-theme");
-          if (iconSpan) iconSpan.textContent = "🌙";
-          if (textSpan) textSpan.textContent = "Tema Scuro";
-        }
-      }
-
-      const savedTheme = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      let currentTheme = savedTheme || (prefersDark ? "dark" : "light");
-      
-      applyTheme(currentTheme);
-
-      if (themeToggle) {
-        themeToggle.addEventListener("click", () => {
-          currentTheme = currentTheme === "dark" ? "light" : "dark";
-          localStorage.setItem("theme", currentTheme);
-          applyTheme(currentTheme);
-        });
-      }
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("theme", "light");
     }
     initDarkMode();
 
@@ -7935,71 +7750,119 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       }
     });
 
-    // --- 4. LOGICA SIMULATORE DI COALIZIONI ---
+    // --- 4. LOGICA SIMULATORE DI COALIZIONI (CAMERA E SENATO GIUGNO 2026) ---
     const SIMULATOR_PARTIES = [
-      { name: "Fratelli d'Italia", seats: 118, percentage: 28.5, color: "#003366" },
-      { name: "PD", seats: 95, percentage: 20.2, color: "#e3182b" },
-      { name: "Movimento 5 Stelle", seats: 52, percentage: 11.5, color: "#f1c40f" },
-      { name: "Forza Italia", seats: 44, percentage: 9.2, color: "#0054a5" },
-      { name: "Lega", seats: 39, percentage: 8.5, color: "#009246" },
-      { name: "Alleanza Verdi e Sinistra", seats: 28, percentage: 6.8, color: "#2ecc71" },
-      { name: "Azione", seats: 12, percentage: 3.8, color: "#1f3a52" },
-      { name: "Italia Viva", seats: 8, percentage: 3.0, color: "#ff6600" },
-      { name: "+Europa", seats: 4, percentage: 2.2, color: "#f39c12" }
+      { name: "Fratelli d'Italia", cameraSeats: 117, senatoSeats: 63, percentage: 28.5, color: "#003366", protoKey: "Fratelli d'Italia" },
+      { name: "Partito Democratico", cameraSeats: 69, senatoSeats: 36, percentage: 21.4, color: "#e3182b", protoKey: "PD" },
+      { name: "Movimento 5 Stelle", cameraSeats: 48, senatoSeats: 26, percentage: 13.0, color: "#f1c40f", protoKey: "Movimento 5 Stelle" },
+      { name: "Lega", cameraSeats: 57, senatoSeats: 29, percentage: 7.2, color: "#009246", protoKey: "Lega" },
+      { name: "Forza Italia", cameraSeats: 52, senatoSeats: 20, percentage: 8.2, color: "#0054a5", protoKey: "Forza Italia" },
+      { name: "Alleanza Verdi e Sinistra", cameraSeats: 10, senatoSeats: 4, percentage: 6.2, color: "#2ecc71", protoKey: "Alleanza Verdi e Sinistra" },
+      { name: "Futuro Nazionale (Vannacci)", cameraSeats: 2, senatoSeats: 1, percentage: 4.6, color: "#8e44ad", protoKey: "Lega" },
+      { name: "Azione", cameraSeats: 10, senatoSeats: 0, percentage: 3.0, color: "#1f3a52", protoKey: "Azione / Italia Viva" },
+      { name: "Italia Viva", cameraSeats: 7, senatoSeats: 8, percentage: 2.4, color: "#ff6600", protoKey: "Azione / Italia Viva" },
+      { name: "+Europa", cameraSeats: 3, senatoSeats: 0, percentage: 2.2, color: "#f39c12", protoKey: "PD" },
+      { name: "Noi Moderati - Civici", cameraSeats: 8, senatoSeats: 8, percentage: 1.5, color: "#3498db", protoKey: "Forza Italia" },
+      { name: "Autonomie e Minoranze", cameraSeats: 4, senatoSeats: 5, percentage: 1.0, color: "#95a5a6", protoKey: "Centrismo pragmatico" },
+      { name: "Senatori a Vita (Apartitici)", cameraSeats: 0, senatoSeats: 5, percentage: 0.0, color: "#7f8c8d", protoKey: "Centrismo pragmatico" },
+      { name: "Altri / Gruppo Misto Residuo", cameraSeats: 13, senatoSeats: 8, percentage: 1.8, color: "#bdc3c7", protoKey: "Centrismo pragmatico" }
     ];
 
     let _selectedCoalitionParties = new Set();
+    let _coalitionChamber = "camera";
 
     function initCoalitionSimulator(data) {
       const container = document.getElementById("coalitionPartyList");
       if (!container) return;
-      
-      _selectedCoalitionParties.clear();
-      
-      let html = "";
-      SIMULATOR_PARTIES.forEach((party, idx) => {
-        const proto = STANDALONE_DATA.prototypes[party.name];
-        let affinityText = "N/A";
-        if (proto && data.profile) {
-          const dist = standaloneDistance(data.profile, proto, "fused_consensus", data.axes);
-          const aff = standaloneAffinityFromDistance(dist, "fused_consensus", 8);
-          affinityText = `${Math.round(aff)}%`;
-        }
-        
-        html += `
-          <div class="coalition-party-card option" data-name="${party.name}" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; margin:0; cursor:pointer;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <span style="width:14px; height:14px; border-radius:50%; background:${party.color}; display:inline-block; border:1px solid rgba(255,255,255,0.2);"></span>
-              <div>
-                <strong style="font-size:14.5px; color:var(--ink);">${party.name}</strong>
-                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">
-                  Sondaggio: ${party.percentage}% · Seggi Camera: <strong>${party.seats}</strong>
+
+      // Setup Chamber Selector Buttons
+      const btnCamera = document.getElementById("btnChamberCamera");
+      const btnSenato = document.getElementById("btnChamberSenato");
+      const titleEl = document.getElementById("coalitionChamberTitle");
+      const labelEl = document.getElementById("coalitionChamberLabel");
+      const threshEl = document.getElementById("coalitionMajorityThresh");
+
+      if (btnCamera && btnSenato) {
+        btnCamera.onclick = () => {
+          _coalitionChamber = "camera";
+          btnCamera.classList.add("primary");
+          btnSenato.classList.remove("primary");
+          if (titleEl) titleEl.textContent = "Seleziona i Partiti (Camera)";
+          if (labelEl) labelEl.textContent = "Seggi Camera (su 400)";
+          if (threshEl) threshEl.textContent = "Soglia Maggioranza (201 seggi)";
+          renderParties();
+          runCoalitionSimulation(data);
+        };
+        btnSenato.onclick = () => {
+          _coalitionChamber = "senato";
+          btnSenato.classList.add("primary");
+          btnCamera.classList.remove("primary");
+          if (titleEl) titleEl.textContent = "Seleziona i Partiti (Senato)";
+          if (labelEl) labelEl.textContent = "Seggi Senato (su 205)";
+          if (threshEl) threshEl.textContent = "Soglia Maggioranza (103 seggi)";
+          renderParties();
+          runCoalitionSimulation(data);
+        };
+      }
+
+      function renderParties() {
+        let html = "";
+        SIMULATOR_PARTIES.forEach((party) => {
+          const seats = _coalitionChamber === "camera" ? party.cameraSeats : party.senatoSeats;
+          const isSelected = _selectedCoalitionParties.has(party.name);
+          
+          // Se stiamo al Senato e parliamo di Senatori a vita, forniamo una descrizione chiara
+          let extraDesc = "";
+          if (_coalitionChamber === "senato" && party.name === "Senatori a Vita (Apartitici)") {
+            extraDesc = " · Cinque membri nominati o di diritto (Segre, Monti, Cattaneo, Piano, Rubbia)";
+          }
+
+          const protoKey = party.protoKey;
+          const proto = STANDALONE_DATA.prototypes[protoKey];
+          let affinityText = "N/A";
+          if (proto && data.profile) {
+            const dist = standaloneDistance(data.profile, proto, "fused_consensus", data.axes);
+            const aff = standaloneAffinityFromDistance(dist, "fused_consensus", 8);
+            affinityText = `${Math.round(aff)}%`;
+          }
+
+          html += `
+            <div class="coalition-party-card option ${isSelected ? 'selected' : ''}" data-name="${party.name}" style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; margin:0; cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="width:14px; height:14px; border-radius:50%; background:${party.color}; display:inline-block; border:1px solid rgba(0,0,0,0.12);"></span>
+                <div>
+                  <strong style="font-size:14.5px; color:var(--ink);">${party.name}</strong>
+                  <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">
+                    Sondaggio: ${party.percentage > 0 ? party.percentage + '%' : 'N/A'} · Seggi: <strong>${seats}</strong>${extraDesc}
+                  </div>
                 </div>
               </div>
+              <div style="text-align:right;">
+                <div style="font-size:11px; color:var(--muted);">Tua Affinità</div>
+                <strong style="font-size:13px; color:var(--accent-2);">${affinityText}</strong>
+              </div>
             </div>
-            <div style="text-align:right;">
-              <div style="font-size:11px; color:var(--muted);">Tua Affinità</div>
-              <strong style="font-size:13px; color:var(--accent-2);">${affinityText}</strong>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-      
-      container.querySelectorAll(".coalition-party-card").forEach((card) => {
-        card.addEventListener("click", () => {
-          const name = card.getAttribute("data-name");
-          if (_selectedCoalitionParties.has(name)) {
-            _selectedCoalitionParties.delete(name);
-            card.classList.remove("selected");
-          } else {
-            _selectedCoalitionParties.add(name);
-            card.classList.add("selected");
-          }
-          runCoalitionSimulation(data);
+          `;
         });
-      });
-      
+        container.innerHTML = html;
+
+        container.querySelectorAll(".coalition-party-card").forEach((card) => {
+          card.onclick = () => {
+            const name = card.getAttribute("data-name");
+            if (_selectedCoalitionParties.has(name)) {
+              _selectedCoalitionParties.delete(name);
+              card.classList.remove("selected");
+            } else {
+              _selectedCoalitionParties.add(name);
+              card.classList.add("selected");
+            }
+            runCoalitionSimulation(data);
+          };
+        });
+      }
+
+      _selectedCoalitionParties.clear();
+      renderParties();
       runCoalitionSimulation(data);
     }
 
@@ -8013,8 +7876,11 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       const userAffinityTextEl = document.getElementById("coalitionUserAffinityText");
       const commentBoxEl = document.getElementById("coalitionCommentBox");
       
+      const totalChamberSeats = _coalitionChamber === "camera" ? 400 : 205;
+      const majorityThreshold = _coalitionChamber === "camera" ? 201 : 103;
+
       if (!_selectedCoalitionParties.size) {
-        if (seatsCountEl) seatsCountEl.textContent = "0 / 400";
+        if (seatsCountEl) seatsCountEl.textContent = `0 / ${totalChamberSeats}`;
         if (progressEl) progressEl.style.width = "0%";
         if (majorityEl) {
           majorityEl.textContent = "❌ Seleziona i partiti per simulare il governo";
@@ -8035,30 +7901,31 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       const selectedList = [];
       SIMULATOR_PARTIES.forEach(p => {
         if (_selectedCoalitionParties.has(p.name)) {
-          totalSeats += p.seats;
+          totalSeats += _coalitionChamber === "camera" ? p.cameraSeats : p.senatoSeats;
           totalPercent += p.percentage;
           selectedList.push(p);
         }
       });
       
-      if (seatsCountEl) seatsCountEl.textContent = `${totalSeats} / 400 seggi (${totalPercent.toFixed(1)}%)`;
-      const seatPct = Math.min(100, (totalSeats / 400) * 100);
+      if (seatsCountEl) seatsCountEl.textContent = `${totalSeats} / ${totalChamberSeats} seggi (${totalPercent > 0 ? totalPercent.toFixed(1) + '%' : 'N/A'})`;
+      const seatPct = Math.min(100, (totalSeats / totalChamberSeats) * 100);
       if (progressEl) {
         progressEl.style.width = `${seatPct}%`;
-        if (totalSeats >= 201) {
+        if (totalSeats >= majorityThreshold) {
           progressEl.style.background = "linear-gradient(90deg, var(--accent-2), #2ecc71)";
         } else {
           progressEl.style.background = "linear-gradient(90deg, #e74c3c, #f1c40f)";
         }
       }
       
-      let hasMajority = totalSeats >= 201;
+      let hasMajority = totalSeats >= majorityThreshold;
+      const chamberName = _coalitionChamber === "camera" ? "Camera" : "Senato";
       if (majorityEl) {
         if (hasMajority) {
-          majorityEl.textContent = `🟢 MAGGIORANZA RAGGIUNTA! (Controlla il ${Math.round(totalSeats/400*100)}% della Camera)`;
+          majorityEl.textContent = `🟢 MAGGIORANZA RAGGIUNTA! (Controlla il ${Math.round(totalSeats/totalChamberSeats*100)}% del ${chamberName})`;
           majorityEl.style.color = "#2ecc71";
         } else {
-          majorityEl.textContent = `❌ SENZA MAGGIORANZA (Mancano ${201 - totalSeats} seggi per governare)`;
+          majorityEl.textContent = `❌ SENZA MAGGIORANZA (Mancano ${majorityThreshold - totalSeats} seggi per governare)`;
           majorityEl.style.color = "#e74c3c";
         }
       }
@@ -8075,18 +7942,21 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         for (let aIdx = 0; aIdx < 8; aIdx++) {
           const values = [];
           selectedList.forEach(party => {
-            const proto = STANDALONE_DATA.prototypes[party.name];
+            const protoKey = party.protoKey;
+            const proto = STANDALONE_DATA.prototypes[protoKey];
             if (proto) values.push(proto[aIdx]);
           });
           
-          const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
-          const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
-          const std = Math.sqrt(variance);
-          
-          stdSum += std;
-          if (std > maxStd) {
-            maxStd = std;
-            maxStdIdx = aIdx;
+          if (values.length > 0) {
+            const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
+            const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
+            const std = Math.sqrt(variance);
+            
+            stdSum += std;
+            if (std > maxStd) {
+              maxStd = std;
+              maxStdIdx = aIdx;
+            }
           }
         }
         
@@ -8111,11 +7981,16 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       for (let aIdx = 0; aIdx < 8; aIdx++) {
         let sum = 0;
+        let validCount = 0;
         selectedList.forEach(party => {
-          const proto = STANDALONE_DATA.prototypes[party.name];
-          if (proto) sum += proto[aIdx];
+          const protoKey = party.protoKey;
+          const proto = STANDALONE_DATA.prototypes[protoKey];
+          if (proto) {
+            sum += proto[aIdx];
+            validCount++;
+          }
         });
-        coalitionProfile[aIdx] = sum / selectedList.length;
+        coalitionProfile[aIdx] = validCount > 0 ? sum / validCount : 0;
       }
       
       let userAffinity = 100;
@@ -8133,34 +8008,36 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         let comment = "";
         if (_selectedCoalitionParties.size === 1) {
           const party = selectedList[0];
-          comment = `<strong>Analisi dello Scenario:</strong> Hai selezionato solo **${party.name}**. Questo partito rappresenta il **${party.percentage}%** degli elettori nei sondaggi e controlla **${party.seats} seggi**. Non può governare da solo e avrebbe bisogno di formare un'alleanza con altre forze politiche per superare la soglia di maggioranza di 201 seggi.`;
+          const seats = _coalitionChamber === "camera" ? party.cameraSeats : party.senatoSeats;
+          comment = `<strong>Analisi dello Scenario:</strong> Hai selezionato solo **${party.name}**. Questo gruppo controlla **${seats} seggi** al ${chamberName}. Non può governare da solo e avrebbe bisogno di formare un'alleanza con altre forze politiche per superare la soglia di maggioranza di ${majorityThreshold} seggi.`;
         } else {
           comment = `<strong>Analisi dello Scenario:</strong> `;
           if (hasMajority) {
-            comment += `Questa coalizione controlla una maggioranza parlamentare solida di **${totalSeats} seggi** (il **${Math.round(totalSeats/400*100)}%** della Camera). `;
+            comment += `Questa coalizione controlla una maggioranza parlamentare solida di **${totalSeats} seggi** (il **${Math.round(totalSeats/totalChamberSeats*100)}%** del ${chamberName}). `;
             if (cohesion >= 78) {
-              comment += `Dal punto di vista della stabilità di governo, questo scenario è **molto favorevole**. I partiti che compongono l'alleanza hanno programmi estremamente affini su Economia, Diritti Civili e Geopolitica, garantendo un'azione legislativa fluida ed efficace. `;
+              comment += `Dal punto di vista della stabilità di governo, questo scenario è **molto favorevole**. I partiti che compongono l'alleanza hanno programmi estremamente affini, garantendo un'azione legislativa fluida ed efficace. `;
             } else if (cohesion >= 58) {
-              comment += `Il governo sarebbe operativo, ma con **rischi di frizione moderati**. Il terreno di scontro principale all'interno della maggioranza si concentrerà sull'asse di **${worseAxisName}**, dove i partiti manifestano idee visibilmente distanti. Sarà necessaria una forte opera di mediazione programmatica. `;
+              comment += `Il governo sarebbe operativo, ma con **rischi di frizione moderati**. Il terreno di scontro principale all'interno della maggioranza si concentrerà sull'asse di **${worseAxisName}**, dove i partiti manifestano idee visibilmente distanti. Sarà necessaria una mediazione programmatica. `;
             } else {
-              comment += `⚠️ **ATTENZIONE: Rischio altissimo di crisi di governo lampo!** Sebbene i numeri alla Camera ci siano, la coalizione è programmaticamente spaccata e frammentata. Le posizioni contrastanti sull'asse di **${worseAxisName}** renderebbero quasi impossibile formulare una legge di bilancio o una linea comune senza continue minacce di rottura. `;
+              comment += `⚠️ **ATTENZIONE: Rischio altissimo di crisi di governo lampo!** Sebbene i numeri al ${chamberName} ci siano, la coalizione è programmaticamente spaccata e frammentata. Le posizioni contrastanti sull'asse di **${worseAxisName}** renderebbero quasi impossibile formulare una linea comune senza continue minacce di rottura. `;
             }
           } else {
-            comment += `Questa coalizione controlla solo **${totalSeats} seggi** e **non ha la maggioranza parlamentare** alla Camera. Per poter governare e dare fiducia a un esecutivo, questa alleanza dovrebbe cercare l'appoggio esterno di altri gruppi minori o tentare un "contratto di governo" più ampio, esponendosi a un'elevata instabilità. `;
+            comment += `Questa coalizione controlla solo **${totalSeats} seggi** e **non ha la maggioranza parlamentare** al ${chamberName}. Per poter governare e dare fiducia a un esecutivo, questa alleanza dovrebbe cercare l'appoggio esterno di altri gruppi minori o tentare un "contratto di governo" più ampio, esponendosi a un'elevata instabilità. `;
           }
           
           if (userData.profile) {
             if (userAffinity >= 75) {
-              comment += `<br><br>👉 **La tua rappresentanza:** Saresti **molto ben rappresentato** da questo esecutivo (affinità **${Math.round(userAffinity)}%**). La linea politica media della coalizione rispecchia pienamente le tue risposte sui temi caldi.`;
+              comment += `<br><br>👉 **La tua rappresentanza:** Saresti **molto ben rappresentato** da questo esecutivo (affinità **${Math.round(userAffinity)}%**). La linea politica media della coalizione rispecchia pienamente le tue risposte sui temi del quiz.`;
             } else if (userAffinity >= 50) {
               comment += `<br><br>👉 **La tua rappresentanza:** Ti sentiresti rappresentato solo **parzialmente** (affinità **${Math.round(userAffinity)}%**). Questo governo attuerebbe alcune misure in linea con le tue idee, ma prenderebbe decisioni contrarie su altri temi importanti.`;
             } else {
-              comment += `<br><br>👉 **La tua rappresentanza:** Saresti **molto distante** da questo governo (affinità **${Math.round(userAffinity)}%**). Le sue politiche programmatiche risulterebbero in netto contrasto con i tuoi valori personali.`;
+              comment += `<br><br>👉 **La tua rappresentanza:** Saresti **molto distante** da questo governo (affinità **${Math.round(userAffinity)}%**). Le sue politiche risulterebbero in netto contrasto con i tuoi valori personali.`;
             }
           }
         }
         commentBoxEl.innerHTML = comment;
       }
+    }
     }
 
     document.addEventListener("keydown", (e) => {
