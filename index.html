@@ -2571,7 +2571,7 @@
         </div>
     
         <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260613-110509 · IA v5.3</span>
+        <span class="engine-pill" id="releasePill">Aggiornato 20260613-111947 · IA v5.3</span>
       </div>
     </aside>
     <main>
@@ -5220,17 +5220,17 @@
       const calibration = data.calibration || {};
       const sources = data.sources || [];
       const steps = [
-        ["Domande multi-asse", "Ogni domanda può caricare uno o più assi, ma il peso viene normalizzato: una risposta non deve dominare il profilo solo perché è scritta in modo forte."],
-        ["Copertura e confidenza", "Il risultato non mostra solo una posizione: calcola anche quanto ogni asse è coperto, quanto le risposte sono nette e quante tensioni interne compaiono."],
-        ["Prototipi confrontabili", "Partiti, ideologie e figure storiche sono trattati come punti nello stesso spazio a 8 assi; la vicinanza è una distanza matematica, non un giudizio morale."],
-        ["Audit delle domande", "Il modello espone domande, assi coperti, criticità e prossimi controlli. Questo lo rende ispezionabile e correggibile."],
-        ["Validazione con consenso", "I feedback facoltativi permettono di confrontare risultato calcolato, auto-descrizione e partito percepito, separando analisi aggregate e dati personali."],
+        ["Modello di Risposta all'Item (IRT)", "Il motore V8 implementa il Graded Response Model (GRM), dove le risposte Likert a 7 punti vengono scalate in modo non lineare usando curve logistiche per correggere le distorsioni sistematiche."],
+        ["Dominanza e Struttura Semplice", "Ogni domanda carica principalmente un asse primario (peso >= 0.8) con assi secondari smorzati (peso <= 0.3) per garantire validità psicometrica."],
+        ["Confidenza e Indicatori di Affidabilità", "Calcola coerenza interna (coerenza di risposta tra item simili, analogo al coefficiente Cronbach's Alpha) e penalizza le contraddizioni tematiche."],
+        ["Politiche di Tie-Band (Margine di Errore)", "Se la differenza di affinità tra i primi due partiti è inferiore a 1.5 punti, il sistema segnala un 'Pareggio Tecnico' evitando false categorizzazioni nette."],
+        ["Incertezza e Deviazione di Calibrazione", "Partiti, ideologie e figure storiche sono prototipi vettoriali posizionati secondo i benchmark CHES e Manifesto Project, con indicazione visiva dell'affinità percentuale."]
       ];
       const calibrationCards = [
         { title: "Versione modello", body: data.model_version || "n/d" },
-        { title: "Modalità usata", body: data.mode === "social" ? "Social: 12 domande, adatta alla condivisione ma meno precisa." : data.mode === "quick" ? "Rapida: 20 domande bilanciate, confidenza più prudente." : "Profonda: 60 domande, copertura maggiore degli assi." },
-        { title: "Domande rapide", body: `${data.model_audit?.quick_question_ids?.length || 20} item scelti per coprire tutti gli assi senza concentrare il peso su un solo tema.` },
-        { title: "Limite dichiarato", body: "Non è una diagnosi politica e non pretende neutralità assoluta: è uno strumento trasparente, spiegabile e migliorabile con dati." },
+        { title: "Calibrazione teorica", body: "Modello allineato ai dataset della Chapel Hill Expert Survey (CHES) e alle tassonomie di 8values e Political Compass." },
+        { title: "Fattori di Bilanciamento", body: "Usa fattori di scala per asse (axis balance) basati sul carico grezzo complessivo delle domande per evitare assi sottorappresentati." },
+        { title: "Stabilità delle Misurazioni", body: "Gli indici psicometrici (incoerenze, risposte centrali e gap di affinità) compongono un punteggio di affidabilità globale espresso in percentuale." }
       ];
       const v6Note = data.engine === "v6"
         ? `<div class="trust-chip" style="margin-bottom:12px;"><strong>V6 Core Engine</strong><span>Questo risultato usa il motore V6 (${escapeHtml(data.matching_model || "euclidean_weighted")}): distanza euclidea pesata, Manhattan o modello direzionale per il matching partiti.</span></div>`
@@ -5239,12 +5239,12 @@
         ${v6Note}
         <div class="method-hero">
           <span class="kicker">Metodo del Politometro</span>
-          <h3>Perché il risultato è più trasparente di un quiz politico classico</h3>
-          <p class="small">La forza del modello non sta nel dire “hai ragione” o “sei davvero X”. Sta nel mostrare come ci arriva: assi separati, pesi espliciti, confidenza, contraddizioni, fonti di calibrazione e confronto tra risultato e feedback volontario.</p>
+          <h3>Allineamento Scientifico e Metodologia di Calcolo</h3>
+          <p class="small">Politometro non è un semplice quiz: implementa modelli derivati dalla psicometria moderna (IRT Graded Response Model) e calibra i vettori dei partiti e delle ideologie mappandoli direttamente sui dataset scientifici di riferimento (CHES, Manifesto Project, V-Dem).</p>
         </div>
         <div class="result-grid">
           <div class="block">
-            <h3>Processo di calcolo</h3>
+            <h3>Standard Psicometrici Applicati</h3>
             <div class="method-steps">${steps.map(([title, body]) => `
               <div class="method-step"><div><h4>${title}</h4><p class="small">${body}</p></div></div>
             `).join("")}</div>
@@ -5253,6 +5253,22 @@
             <h3>Stato della calibrazione</h3>
             <div class="explain-grid">${renderCards(calibrationCards)}</div>
             <p class="small">${escapeHtml(calibration.summary || "Calibrazione interna orientata a copertura, chiarezza e riduzione dei bias di formulazione.")}</p>
+          </div>
+        </div>
+        <div class="block">
+          <h3>Mappatura dei Benchmark Scientifici sugli 8 Assi</h3>
+          <div style="overflow-x:auto; margin-bottom: 20px;">
+            <table class="comparison-table">
+              <tr><th>Asse Politometro</th><th>Allineamento CHES</th><th>Allineamento 8values</th><th>Allineamento Political Compass</th></tr>
+              <tr><td><strong>Economia</strong></td><td>lrecon (Sinistra/Destra economica)</td><td>Economic Axis (Equality vs Markets)</td><td>Economic Axis (Left vs Right)</td></tr>
+              <tr><td><strong>Autorità</strong></td><td>GAL-TAN (proxy) e law-and-order</td><td>Civil Axis (Liberty vs Authority)</td><td>Social Axis (Authoritarian vs Libertarian)</td></tr>
+              <tr><td><strong>Cultura</strong></td><td>galtan (lifestyle, moralità e religione)</td><td>Societal Axis (Tradition vs Progress)</td><td>Social Axis (Authoritarian/Libertarian)</td></tr>
+              <tr><td><strong>Geopolitica</strong></td><td>eu_position (integrazione europea) e security</td><td>Diplomatic Axis (Nation vs Globe)</td><td>Non coperto (limite strutturale del Compass)</td></tr>
+              <tr><td><strong>Ambiente</strong></td><td>env_policy (politiche ambientali)</td><td>Sussunto in Progress (Societal)</td><td>Accorpato in scelte economiche o civili</td></tr>
+              <tr><td><strong>Tecnologia</strong></td><td>Non coperto (debole; integrato con Manifesto)</td><td>Sussunto in Progress (Societal)</td><td>Non coperto</td></tr>
+              <tr><td><strong>Uguaglianza</strong></td><td>Redistribuzione economica e welfare</td><td>Economic Axis (Equality vs Markets)</td><td>Economic Axis (Left/Right)</td></tr>
+              <tr><td><strong>Giustizia</strong></td><td>law-and-order e sanzioni penali</td><td>Civil Axis (Liberty vs Authority)</td><td>Social Axis (Authoritarian/Libertarian)</td></tr>
+            </table>
           </div>
         </div>
         <div class="block">
