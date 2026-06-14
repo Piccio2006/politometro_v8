@@ -917,6 +917,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      min-width: 0;
     }
     .identity-line {
       display: flex;
@@ -1022,6 +1023,9 @@
       font-weight: 700;
       font-size: 13px;
       border: 1px solid rgba(34,87,122,.08);
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      line-height: 1.25;
     }
     .axis {
       display: grid;
@@ -1144,6 +1148,20 @@
     .poster .avatar {
       border-color: rgba(255,255,255,.25);
       box-shadow: none;
+    }
+    .poster .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      justify-content: flex-start;
+    }
+    .poster .chip {
+      background: rgba(255,255,255,.15);
+      color: #e8f0f4;
+      border-color: rgba(255,255,255,.22);
+      font-size: 12px;
+      padding: 5px 10px;
+      white-space: nowrap;
     }
     .mini-axis {
       display: grid;
@@ -2559,7 +2577,6 @@
         <a href="metodo.html">Metodo</a>
         <a href="privacy.html">Privacy</a>
         <a href="supporto.html">Supporto</a>
-        <a href="organizzazioni.html">Organizzazioni</a>
       </nav>
       <div class="side-note">
         Il risultato non misura una verità definitiva: stima un profilo coerente con le risposte, segnala incertezza e mostra dove il dato è più o meno stabile.
@@ -2567,11 +2584,10 @@
           <a href="metodo.html" style="color:#b9c8d0;">Metodo</a>
           <a href="privacy.html" style="color:#b9c8d0;">Privacy</a>
           <a href="supporto.html" style="color:#b9c8d0;">Supporto</a>
-          <a href="organizzazioni.html" style="color:#b9c8d0;">Aziende e organizzazioni</a>
         </div>
     
         <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260613-174251 · IA v5.3</span>
+        <span class="engine-pill" id="releasePill">Aggiornato 20260614-130511 · IA v5.3</span>
       </div>
     </aside>
     <main>
@@ -3867,6 +3883,7 @@
       lastResult: null,
       sessionId: `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       user: null,
+      cloudAccountsAvailable: true,
       mode: "quick",
       activeOverlays: [], // IDs dei profili locali da sovrapporre nei grafici
       selectedQuestions: [],
@@ -4001,7 +4018,7 @@
         button.className = "option";
         if (state.answers[q.id] === value) button.classList.add("selected");
         button.innerHTML = `<span class="num">${value}</span><span>${option.replace(/^\d\s*[–-]\s*/, "")}</span>`;
-        button.addEventListener("click", () => chooseAnswer(value, { autoAdvance: true }));
+        button.addEventListener("click", () => chooseAnswer(value, { autoAdvance: false }));
         el("options").appendChild(button);
       });
 
@@ -4012,8 +4029,8 @@
       const hint = document.getElementById("answerHint");
       if (hint) {
         hint.textContent = state.answers[q.id]
-          ? (isLast ? "Pronto per calcolare il risultato." : "Avanzo tra un attimo, oppure premi Avanti.")
-          : "Tasti rapidi: 1-7 per rispondere, Invio per andare avanti.";
+          ? (isLast ? "Pronto! Premi «Calcola risultato» per vedere il tuo profilo." : "Risposta registrata. Premi «Avanti» per continuare.")
+          : "Seleziona una risposta (1–7) o usa i tasti numerici, poi premi Avanti.";
       }
     }
 
@@ -5518,40 +5535,28 @@
             ? `<div class="trust-chip" style="margin-bottom:12px;"><strong>Motore V6 attivo</strong><span>Matching: ${escapeHtml(data.matching_model || "euclidean_weighted")}. Confronta anche il tab Metodo.</span></div>`
             : ""));
       const salienceSlidersBox = data.engine === "v8"
-        ? `
-        <div class="block explicit-salience-box" style="margin-bottom: 20px;">
-          <h3>Pesa i tuoi assi (Salienza Esplicita)</h3>
-          <p class="small text-muted" style="margin-bottom:15px;">
-            Quanto è importante ciascun tema per la tua scelta politica? Modifica i pesi per ricalcolare istantaneamente le tue affinità.
-          </p>
-          <div class="sliders-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;">
-            ${(data.axes || []).map((axis, idx) => {
+        ? (() => {
+            const innerSliders = (data.axes || []).map((axis, idx) => {
               const val = state.explicitSalience[axis.name] ?? 1.0;
               const pct = Math.round(val * 100) + "%";
-              return `
-                <div class="slider-control" style="display:flex; flex-direction:column; gap:4px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong class="small" style="color:var(--ink);">${axis.name}</strong>
-                    <span id="salience-val-${idx}" style="font-size:12px; font-weight:bold; color:var(--accent-2);">${pct}</span>
-                  </div>
-                  <input type="range" 
-                         class="salience-slider" 
-                         data-axis="${axis.name}" 
-                         data-idx="${idx}" 
-                         min="0" 
-                         max="2" 
-                         step="0.1" 
-                         value="${val}" 
-                         style="width:100%; accent-color:var(--accent-2); cursor:pointer;" />
-                </div>
-              `;
-            }).join("")}
-          </div>
-          <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <button class="btn small" id="resetSlidersBtn" style="min-height:32px; padding:6px 12px; font-size:12px;">Ripristina pesi</button>
-          </div>
-        </div>
-        `
+              return '<div class="slider-control" style="display:flex; flex-direction:column; gap:4px;">' +
+                '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                '<strong class="small" style="color:var(--ink);">' + axis.name + '</strong>' +
+                '<span id="salience-val-' + idx + '" style="font-size:12px; font-weight:bold; color:var(--accent-2);">' + pct + '</span>' +
+                '</div>' +
+                '<input type="range" class="salience-slider" data-axis="' + axis.name + '" data-idx="' + idx + '" min="0" max="2" step="0.1" value="' + val + '" style="width:100%; accent-color:var(--accent-2); cursor:pointer;" />' +
+                '</div>';
+            }).join("");
+            return '<details class="block explicit-salience-box" style="margin-bottom: 16px;">' +
+              '<summary style="list-style:none; padding:14px 18px; cursor:pointer; font-weight:700; font-size:14px; color:var(--accent); display:flex; align-items:center; gap:10px; user-select:none;">' +
+              '⚖️ Pesa i tuoi assi (Salienza Esplicita) <span class="chip" style="font-size:11px; margin-left:auto;">espandi</span></summary>' +
+              '<div style="padding:0 18px 16px;">' +
+              '<p class="small text-muted" style="margin-bottom:15px;">Quanto è importante ciascun tema per la tua scelta politica? Modifica i pesi per ricalcolare istantaneamente le tue affinità.</p>' +
+              '<div class="sliders-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;">' +
+              innerSliders + '</div>' +
+              '<div style="margin-top: 15px; display: flex; gap: 10px;"><button class="btn small" id="resetSlidersBtn" style="min-height:32px; padding:6px 12px; font-size:12px;">Ripristina pesi</button></div>' +
+              '</div></details>';
+          })()
         : "";
 
       const archetype = resultArchetype(data);
@@ -5561,23 +5566,13 @@
         <div class="tabs">
           <button class="tab active" data-tab="summary" data-icon="◎">Sintesi</button>
           <button class="tab" data-tab="ai" data-icon="🤖">Analisi IA</button>
-          <button class="tab" data-tab="coalitions" data-icon="🗳️">Coalizioni</button>
-          <button class="tab" data-tab="sondaggi" data-icon="📊">Sondaggi & Trend</button>
-          <button class="tab" data-tab="scenari" data-icon="📈 Scenari">Simulatore Elettorale</button>
-          <button class="tab" data-tab="dna-politico" data-icon="🔬">Laboratorio DNA</button>
-          <button class="tab" data-tab="leader-arena" data-icon="🎮">Arena dei Leader</button>
-          <button class="tab" data-tab="macro-sim" data-icon="💸">Simulatore Macro</button>
+          <button class="tab" data-tab="scenari" data-icon="📈">Simulazioni</button>
+          <button class="tab" data-tab="sondaggi" data-icon="📊">Osservatorio</button>
           <button class="tab" data-tab="world" data-icon="✦">Mondo</button>
-          <button class="tab" data-tab="share" data-icon="□">Condividi</button>
-          <button class="tab" data-tab="charts" data-icon="▥">Grafici</button>
-          <button class="tab" data-tab="map" data-icon="⌖">Mappa</button>
+          <button class="tab" data-tab="charts" data-icon="▥">Grafici & Mappa</button>
           <button class="tab" data-tab="personal-history" data-icon="⌛">I miei Test</button>
-          <button class="tab" data-tab="history" data-icon="※">Storici</button>
-          <button class="tab" data-tab="report" data-icon="§">Spiegazioni</button>
-          <button class="tab" data-tab="drivers" data-icon="↯">Peso domande</button>
           <button class="tab" data-tab="method" data-icon="∴">Metodo</button>
-          <button class="tab" data-tab="audit" data-icon="◈">Audit</button>
-          <button class="tab" data-tab="feedback" data-icon="◇">Feedback</button>
+          <button class="tab" data-tab="share" data-icon="□">Condividi</button>
         </div>
         <div id="panel-summary" class="tab-panel active">
           ${engineNote}
@@ -5780,7 +5775,7 @@
           <div class="block">
             <h2>📊 Osservatorio Sondaggi Elettorali & Trend Storici</h2>
             <p class="small text-muted" style="margin-bottom: 20px;">
-              Analisi scientifica e trend delle intenzioni di voto dei principali partiti italiani basata sulla media ponderata degli ultimi sondaggi (IPSOS, SWG, Demopolis, Noto, Tecné).
+              Analisi delle intenzioni di voto dei principali partiti italiani. La base corrente usa l'ultimo dato YouTrend reperito nella tabella pubblica consultata il 14 giugno 2026; i trend precedenti restano indicativi e vanno aggiornati con fonti ufficiali quando disponibili.
             </p>
             
             <div class="result-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 20px;">
@@ -5806,7 +5801,7 @@
                   <!-- Dynamically populated -->
                 </div>
                 <div class="ethics-note" style="margin: 0; background: rgba(34,87,122,0.04); font-size: 12px; line-height: 1.45;">
-                  <strong>Metodologia Sondaggi:</strong> I dati mostrati sono aggiornati settimanalmente integrando le ultime pubblicazioni ufficiali sul portale della Presidenza del Consiglio dei Ministri. Applichiamo una media mobile esponenziale (decay = 0.9) per ridurre il rumore statistico.
+                  <strong>Metodologia Sondaggi:</strong> Base corrente: YouTrend, campione 813, dato reperito il 14 giugno 2026. I sondaggi sono stime campionarie, non risultati elettorali; il simulatore serve per esplorare scenari, non per prevedere con certezza il Parlamento.
                 </div>
               </div>
             </div>
@@ -5843,6 +5838,12 @@
             <p class="small text-muted" style="margin-bottom: 20px;">
               Modifica le percentuali di voto nazionali per simulare la distribuzione dei seggi in Parlamento secondo l'attuale legge elettorale italiana (Rosatellum) con sbarramenti al 3% per i partiti singoli e 10% per le coalizioni.
             </p>
+            <div class="surface-actions" style="margin-bottom:18px;">
+              <button class="btn primary" data-jump-tab="coalitions">Coalizioni</button>
+              <button class="btn" data-jump-tab="dna-politico">Laboratorio DNA</button>
+              <button class="btn" data-jump-tab="leader-arena">Arena dei leader</button>
+              <button class="btn" data-jump-tab="macro-sim">Simulazione macro</button>
+            </div>
 
             <div class="result-grid" style="grid-template-columns: 1fr 1.2fr; gap: 20px;">
               <div class="block" style="padding: 20px; border-color: var(--line);">
@@ -6230,6 +6231,13 @@
           </div>
         </div>
         <div id="panel-charts" class="tab-panel">
+          <div class="block">
+            <h3>Grafici e mappa</h3>
+            <div class="surface-actions">
+              <button class="btn primary" data-jump-tab="charts">Radar e barre</button>
+              <button class="btn" data-jump-tab="map">Mappa 2D/3D</button>
+            </div>
+          </div>
           <div class="chart-grid">
             <div class="block">
               <h3>Radar custom degli 8 assi</h3>
@@ -6389,6 +6397,16 @@
           </div>
         </div>
         <div id="panel-method" class="tab-panel">
+          <div class="block">
+            <h3>Metodo, spiegazioni e audit</h3>
+            <div class="surface-actions">
+              <button class="btn primary" data-jump-tab="method">Metodo</button>
+              <button class="btn" data-jump-tab="report">Spiegazioni</button>
+              <button class="btn" data-jump-tab="drivers">Peso domande</button>
+              <button class="btn" data-jump-tab="history">Storici</button>
+              <button class="btn" data-jump-tab="audit">Audit</button>
+            </div>
+          </div>
           ${renderMethodologyPanel(data)}
         </div>
         <div id="panel-audit" class="tab-panel">
@@ -6517,6 +6535,13 @@
           </div>
         </div>
         <div id="panel-share" class="tab-panel">
+          <div class="block">
+            <h3>Condividi e feedback</h3>
+            <div class="surface-actions">
+              <button class="btn primary" data-jump-tab="share">Condividi</button>
+              <button class="btn" data-jump-tab="feedback">Feedback</button>
+            </div>
+          </div>
           <div class="result-grid">
             <div class="block">
               <h3>Card custom</h3>
@@ -6577,9 +6602,19 @@
           if (tab.dataset.tab === "personal-history") {
             loadPersonalHistory();
           }
-          if (tab.dataset.tab === "sondaggi" || tab.dataset.tab === "scenari" || tab.dataset.tab === "dna-politico" || tab.dataset.tab === "leader-arena" || tab.dataset.tab === "macro-sim") {
+          if (tab.dataset.tab === "sondaggi" || tab.dataset.tab === "scenari" || tab.dataset.tab === "dna-politico" || tab.dataset.tab === "leader-arena" || tab.dataset.tab === "macro-sim" || tab.dataset.tab === "history" || tab.dataset.tab === "world") {
             initializeAdditionalFeatures(data);
           }
+        });
+      });
+      document.querySelectorAll("#results button:not([type])").forEach((button) => {
+        button.type = "button";
+      });
+      document.querySelectorAll("[data-jump-tab]").forEach((button) => {
+        button.addEventListener("click", () => {
+          jumpToTab(button.getAttribute("data-jump-tab"));
+          setTimeout(() => drawVisuals(data), 30);
+          initializeAdditionalFeatures(data);
         });
       });
       const mapFilter = document.getElementById("mapFilter");
@@ -6628,7 +6663,7 @@
     }
 
     function bindSalienceSliders() {
-      const sliders = document.querySelectorAll(".salience-slider");
+      const sliders = document.querySelectorAll(".explicit-salience-box .salience-slider[data-axis]");
       sliders.forEach(slider => {
         const idx = slider.getAttribute("data-idx");
         const axis = slider.getAttribute("data-axis");
@@ -7212,26 +7247,6 @@
 	          </div>
         </div>
         <details class="setup-details">
-          <summary>Aziende, media e organizzazioni</summary>
-          <div class="setup-body">
-            <div class="partner-panel">
-              <div>
-                <h4>Soluzioni professionali</h4>
-                <p class="small">Politometro può diventare un'esperienza brandizzata per media, scuole, aziende e organizzazioni: quiz pubblico, report, card social e analytics aggregati.</p>
-              </div>
-              <div class="partner-grid">
-                <div class="partner-card"><strong>Media</strong><span class="small">Quiz editoriale, card social, report aggregati e contenuti data-driven.</span></div>
-                <div class="partner-card"><strong>Scuole e fondazioni</strong><span class="small">Strumento educativo per leggere valori, assi politici e partecipazione civica.</span></div>
-                <div class="partner-card"><strong>Organizzazioni</strong><span class="small">Dashboard su trend e segmenti, sempre in forma aggregata e con consenso.</span></div>
-              </div>
-              <div class="surface-actions">
-                <a class="btn primary" href="organizzazioni.html">Soluzioni per organizzazioni</a>
-                <a class="btn" href="metodo.html">Metodo</a>
-              </div>
-            </div>
-          </div>
-        </details>
-        <details class="setup-details">
           <summary>Motore di calcolo (V8)</summary>
           <div class="setup-body">
             <div class="explain-grid">
@@ -7489,6 +7504,7 @@
     // User auth event bindings and helper functions
     async function checkAuthSession() {
       if (location.protocol === "file:") {
+        state.cloudAccountsAvailable = false;
         renderUserWidget(null);
         return;
       }
@@ -7509,8 +7525,10 @@
             return;
           }
         }
+        state.cloudAccountsAvailable = false;
       } catch (err) {
         console.error("Errore verifica sessione utente:", err);
+        state.cloudAccountsAvailable = false;
       }
       state.user = null;
       renderUserWidget(null);
@@ -7536,6 +7554,22 @@
         `;
         document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
       } else {
+        if (!state.cloudAccountsAvailable) {
+          container.innerHTML = `
+            <div class="user-card">
+              <div class="user-avatar">L</div>
+              <div class="user-info">
+                <span class="user-nickname">Modalità locale</span>
+                <span class="user-email">Cronologia salvata nel browser</span>
+              </div>
+              <button class="user-logout-btn" id="openAuthInfoBtn" title="Info">Info</button>
+            </div>
+          `;
+          document.getElementById("openAuthInfoBtn")?.addEventListener("click", () => {
+            showAppNotice("Account cloud non attivo in questa versione statica. Puoi comunque salvare e confrontare i test nella cronologia locale del browser.");
+          });
+          return;
+        }
         container.innerHTML = `
           <button class="user-widget-btn" id="openAuthBtn">Accedi / Registrati</button>
         `;
@@ -7608,7 +7642,9 @@
         errorDiv.textContent = errJson.detail || "Errore durante l'accesso. Riprova.";
         errorDiv.style.display = "block";
       } catch (err) {
-        errorDiv.textContent = "Errore di rete. Controlla la tua connessione.";
+        state.cloudAccountsAvailable = false;
+        renderUserWidget(null);
+        errorDiv.textContent = "Account cloud non attivo in questa versione statica. Usa la cronologia locale oppure avvia la versione server.";
         errorDiv.style.display = "block";
       }
     }
@@ -7657,7 +7693,9 @@
         errorDiv.textContent = errJson.detail || "Errore durante la registrazione.";
         errorDiv.style.display = "block";
       } catch (err) {
-        errorDiv.textContent = "Errore di rete. Controlla la tua connessione.";
+        state.cloudAccountsAvailable = false;
+        renderUserWidget(null);
+        errorDiv.textContent = "Account cloud non attivo in questa versione statica. Usa la cronologia locale oppure avvia la versione server.";
         errorDiv.style.display = "block";
       }
     }
@@ -8977,8 +9015,9 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       { month: "Gen 2026", fdi: 28.6, pd: 20.3, m5s: 14.1, lega: 7.9, fi: 8.5, avs: 5.0, altri: 15.6 },
       { month: "Feb 2026", fdi: 28.3, pd: 20.7, m5s: 13.9, lega: 8.1, fi: 8.6, avs: 5.2, altri: 15.2 },
       { month: "Mar 2026", fdi: 28.0, pd: 21.0, m5s: 13.6, lega: 8.2, fi: 8.8, avs: 5.4, altri: 15.0 },
-      { month: "Apr 2026", fdi: 27.8, pd: 21.4, m5s: 13.5, lega: 8.0, fi: 9.0, avs: 5.5, altri: 14.8 },
-      { month: "Mag 2026", fdi: 27.5, pd: 21.8, m5s: 13.2, lega: 8.1, fi: 9.2, avs: 5.7, altri: 14.5 }
+      { month: "Apr 2026", fdi: 27.9, pd: 22.0, m5s: 12.9, lega: 6.9, fi: 9.0, avs: 6.4, altri: 14.9 },
+      { month: "Mag 2026", fdi: 27.7, pd: 21.7, m5s: 13.5, lega: 5.9, fi: 7.8, avs: 6.4, altri: 17.0 },
+      { month: "Giu 2026", fdi: 28.6, pd: 21.5, m5s: 11.7, lega: 6.1, fi: 9.1, avs: 7.2, altri: 15.8 }
     ];
 
     const PARTY_DESCRIPTIONS = {
@@ -9116,15 +9155,15 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     ];
 
     let simVotePercentages = {
-      "FdI": 27.5,
-      "PD": 21.8,
-      "M5S": 13.2,
-      "Lega": 8.1,
-      "FI": 9.2,
-      "AVS": 5.7,
-      "Azione": 3.5,
-      "IV": 2.2,
-      "Altri": 8.8
+      "FdI": 28.6,
+      "PD": 21.5,
+      "M5S": 11.7,
+      "Lega": 6.1,
+      "FI": 9.1,
+      "AVS": 7.2,
+      "Azione": 4.3,
+      "IV": 1.9,
+      "Altri": 9.6
     };
 
     let dnaActiveAxisIdx = 0;
@@ -9654,6 +9693,20 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         ]
       }
     ];
+    // Aggiungiamo l'Italia che mancava!
+    WORLD_SYSTEMS_DB.unshift({
+      country: "Italia",
+      system: "Proporzionale con sbarramento al 3% (Camera) e 8% (coalizioni) — Rosatellum",
+      description: "Sistema parlamentare bicamerale. Il proporzionale favorisce la frammentazione ma con forte pressione verso le coalizioni. I governi nascono da ampie negoziazioni tra partiti.",
+      parties: [
+        { name: "Fratelli d'Italia", economy: 0.35, authority: 0.70, culture: -0.80, geopolitics: 0.65, environment: -0.45, technology: -0.10, equality: -0.60, justice: 0.75, notes: "Primo partito italiano, destra nazionale-conservatrice, guida il governo Meloni." },
+        { name: "Partito Democratico", economy: -0.55, authority: -0.50, culture: 0.75, geopolitics: 0.70, environment: 0.80, technology: 0.45, equality: 0.85, justice: -0.45, notes: "Centrosinistra socialdemocratico, principale forza di opposizione." },
+        { name: "Movimento 5 Stelle", economy: -0.70, authority: -0.20, culture: 0.40, geopolitics: -0.60, environment: 0.90, technology: 0.70, equality: 0.80, justice: 0.20, notes: "Forza populista progressista, terzo partito per consensi." },
+        { name: "Forza Italia", economy: 0.60, authority: 0.25, culture: -0.40, geopolitics: 0.80, environment: -0.20, technology: 0.20, equality: -0.40, justice: 0.40, notes: "Centrodestra liberale PPE, partito fondato da Berlusconi, ora guidato da Tajani." },
+        { name: "Lega", economy: 0.20, authority: 0.65, culture: -0.75, geopolitics: -0.70, environment: -0.60, technology: -0.15, equality: -0.70, justice: 0.80, notes: "Destra populista autonomista, con forte componente securitaria e anti-immigrazione." }
+      ]
+    });
+
 
     function populateWorldSystems() {
       const container = document.getElementById("worldSystemsDetailsBox");
@@ -14573,6 +14626,9 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     // Inizializza i controller dei nuovi tab
     function initializeAdditionalFeatures(data) {
       console.log("Inizializzazione Dashboard Aggiuntive...");
+      const safeRun = (fn) => {
+        try { fn(); } catch (err) { console.warn("Modulo non inizializzato:", err); }
+      };
       
       // Tab Sondaggi: Disegna grafici e popola liste
       drawPollingTrends();
@@ -14589,27 +14645,77 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       setupAcademicTabs();
       renderAcademicQuestionExplanations();
       setupElectoralScenarios(data);
-      POLITICAL_GLOSSARY_DB.push(...EXTRA_GLOSSARY);
-      Object.assign(DETAILED_AXIS_ESSAYS, REMAINING_ESSAYS);
+      if (!state.extraDatabasesHydrated) {
+        POLITICAL_GLOSSARY_DB.push(...EXTRA_GLOSSARY);
+        Object.assign(DETAILED_AXIS_ESSAYS, REMAINING_ESSAYS);
+        state.extraDatabasesHydrated = true;
+      }
       renderGlossary();
       populateWorldSystems();
       populateRegionalStats();
       populateChesExpertIndex();
+      populateHistoricalThinkers();
+      renderThinkersExtra();
+      renderPartiesHistory();
+      renderHistoricalElectionsArchive();
+      safeRun(renderCoalitionHistoryDetails);
+      safeRun(renderRegionalLaws);
+      safeRun(renderDetailedWorldSystems);
+      safeRun(renderDetailedWorldSystemsPart2);
+      safeRun(renderDetailedWorldSystemsPart3);
+      safeRun(renderConstitutionalCases);
+      safeRun(renderConstitutionalCasesPart2);
+      safeRun(renderConstitutionalCasesPart3);
+      safeRun(renderElectoralIndicators);
+      safeRun(renderDiagnosticLogs);
+      safeRun(renderMethodologyFaq);
+      safeRun(renderAcademicBibliography);
+      safeRun(renderResearchMethodologiesGuide);
+      safeRun(renderRegionalProfiles);
+      safeRun(renderSocioEconomicTheories);
+      safeRun(renderTreatiesTimeline);
+      safeRun(renderMunicipalLaws);
+      safeRun(renderRhetoricalTechniques);
+      safeRun(renderParliamentaryRules);
+      safeRun(renderAdministrativeCourts);
+      safeRun(renderRegionalFinance);
+      safeRun(renderMassMediaSystems);
+      safeRun(renderPhilosophyClassics);
+      safeRun(renderPhilosophyClassicsPart2);
+      safeRun(renderPhilosophyClassicsPart3);
+      safeRun(renderPhilosophyClassicsPart4);
+      safeRun(renderPhilosophyClassicsPart5);
+      safeRun(renderPhilosophyClassicsPart6);
+      safeRun(renderPhilosophyClassicsPart7);
+      safeRun(renderPhilosophyClassicsPart8);
+      safeRun(renderPhilosophyClassicsPart9);
+      safeRun(renderPhilosophyClassicsPart10);
+      safeRun(renderPhilosophyClassicsPart11);
+      safeRun(renderPhilosophyClassicsPart12);
+      safeRun(renderPhilosophyClassicsPart13);
+      safeRun(renderPhilosophyClassicsPart14);
+      safeRun(renderPhilosophyClassicsPart15);
+      safeRun(renderPhilosophyClassicsPart16);
+      safeRun(setupMacroSim);
+      const arenaButton = document.getElementById("btnStartArenaBattle");
+      if (arenaButton) {
+        arenaButton.onclick = () => runArenaSimulation(data);
+      }
       
       // Eventi per bottoni e slider aggiuntivi
       const btnResetSliders = document.getElementById("btnResetSliders");
       if (btnResetSliders) {
         btnResetSliders.onclick = () => {
           simVotePercentages = {
-            "FdI": 27.5,
-            "PD": 21.8,
-            "M5S": 13.2,
-            "Lega": 8.1,
-            "FI": 9.2,
-            "AVS": 5.7,
-            "Azione": 3.5,
-            "IV": 2.2,
-            "Altri": 8.8
+            "FdI": 28.6,
+            "PD": 21.5,
+            "M5S": 11.7,
+            "Lega": 6.1,
+            "FI": 9.1,
+            "AVS": 7.2,
+            "Azione": 4.3,
+            "IV": 1.9,
+            "Altri": 9.6
           };
           updateElectoralSlidersUI(data);
           runElectoralSimulation();
@@ -14730,7 +14836,8 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         { name: "Movimento 5 Stelle", value: latest.m5s, color: "#F1C40F" },
         { name: "Forza Italia", value: latest.fi, color: "#3498DB" },
         { name: "Lega per Salvini Premier", value: latest.lega, color: "#009344" },
-        { name: "Alleanza Verdi e Sinistra", value: latest.avs, color: "#2ECC71" }
+        { name: "Alleanza Verdi e Sinistra", value: latest.avs, color: "#2ECC71" },
+        { name: "Altri e liste minori", value: latest.altri, color: "#9B59B6" }
       ];
       
       sortable.sort((a,b) => b.value - a.value);

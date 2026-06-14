@@ -1,5 +1,5 @@
-const CACHE = "politometro-public-20260613-174251";
-const HTML_PATHS = new Set(["/", "/index.html", "/privacy.html", "/metodo.html", "/supporto.html", "/organizzazioni.html"]);
+const CACHE = "politometro-public-20260614-130511";
+const HTML_PATHS = new Set(["/", "/index.html", "/privacy.html", "/metodo.html", "/supporto.html"]);
 const CORE = ["./manifest.webmanifest", "./icon.svg", "./icon-192.png", "./icon-512.png", "./og-image.png"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
