@@ -7759,6 +7759,21 @@
       updateIdentityPreview();
       document.getElementById("installApp").addEventListener("click", requestInstallApp);
       bindEngineControls();
+      // Badge test precedenti
+      try {
+        const prev = JSON.parse(localStorage.getItem("politometro_local_tests") || "[]");
+        if (prev.length > 0) {
+          const heroBadges = document.querySelector(".hero-badges");
+          if (heroBadges) {
+            const b = document.createElement("span");
+            b.className = "hero-badge";
+            b.title = "I tuoi test salvati localmente";
+            b.textContent = `↩ ${prev.length} test ${prev.length === 1 ? "salvato" : "salvati"}`;
+            b.style.cssText = "background:linear-gradient(135deg,rgba(242,184,128,.18),rgba(56,163,165,.12));border-color:rgba(242,184,128,.35);color:var(--accent);animation:none;";
+            heroBadges.appendChild(b);
+          }
+        }
+      } catch(e) {}
       // Animazione entrata landing
       requestAnimationFrame(() => {
         const els = [
