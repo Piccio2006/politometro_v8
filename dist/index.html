@@ -251,8 +251,8 @@
       box-shadow: 0 22px 52px rgba(34, 87, 122, .13);
     }
     @keyframes rise {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(14px) scale(.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes sheen {
       0%, 40% { transform: translateX(-100%); }
@@ -783,15 +783,20 @@
       background: linear-gradient(135deg, var(--accent) 0%, #1a4a62 100%);
       border-color: transparent;
       color: #fff;
-      box-shadow: 0 4px 18px rgba(34,87,122,.35);
+      box-shadow: 0 4px 18px rgba(34,87,122,.35), 0 1px 0 rgba(255,255,255,.12) inset;
       transform: translateY(-1px);
     }
-    .tab.active::after { opacity: 0; }
+    .tab.active::after {
+      opacity: 0;
+    }
+    .tab.active::before {
+      opacity: 1;
+    }
     .tab-panel { display: none; }
     .tab-panel.active {
       display: grid;
       gap: 18px;
-      animation: rise .24s ease both;
+      animation: rise .28s cubic-bezier(.2,.8,.2,1) both;
     }
     .result-grid {
       display: grid;
