@@ -50,25 +50,36 @@ def parse_pct(s):
 
 
 def _extract_from_text(text):
-    """Cerca percentuali per partito nel testo plain della pagina.
-    Gestisce formati: '28,2%', 'al 28,2', 'al 28,2%', '28,2 per cento'.
+    """Cerca percentuali per partito nel testo plain.
+    Strategia: trova il nome partito, cerca la prima percentuale nei successivi 500 char.
     """
-    PCT = r"(?:al\s+)?(\d{1,2}[,\.]\d+)(?:\s*%|\s+per\s+cento)?"
-    patterns = {
-        "fdi":  rf"(?:Fratelli d.Italia|FdI)[^%\d]{{0,80}}?{PCT}",
-        "pd":   rf"(?:Partito Democratico|\bPD\b)[^%\d]{{0,80}}?{PCT}",
-        "m5s":  rf"(?:Movimento 5 Stelle|M5S|Cinque Stelle)[^%\d]{{0,80}}?{PCT}",
-        "lega": rf"\bLega\b[^%\d]{{0,80}}?{PCT}",
-        "fi":   rf"(?:Forza Italia|\bFI\b)[^%\d]{{0,80}}?{PCT}",
-        "avs":  rf"(?:Alleanza Verdi[^%\d]{{0,10}}Sinistra|AVS)[^%\d]{{0,80}}?{PCT}",
+    PARTY_ALIASES = {
+        "fdi":  ["Fratelli d'Italia", "Fratelli d", "FdI", "Fdi"],
+        "pd":   ["Partito Democratico", "il Pd ", " Pd ", "PD "],
+        "m5s":  ["Movimento 5 Stelle", "M5S", "Cinque Stelle"],
+        "lega": [" Lega ", "la Lega"],
+        "fi":   ["Forza Italia", " Fi "],
+        "avs":  [" AVS ", "Avs ", "Alleanza Verdi Sinistra", "Alleanza Verdi e Sinistra"],
     }
+    PCT_PAT = re.compile(
+        r"(?:al|del|pari al|attestarsi al|attestandosi al|cala al|scende al|sale al|guadagna|si attesta al)?\s*"
+        r"(\d{1,2}[,\.]\d+)\s*(?:%|per\s+cento)",
+        re.IGNORECASE,
+    )
     results = {}
-    for key, pat in patterns.items():
-        m = re.search(pat, text, re.IGNORECASE | re.DOTALL)
-        if m:
-            val = parse_pct(m.group(1))
-            if val is not None:
-                results[key] = val
+    text_l = text.lower()
+    for key, aliases in PARTY_ALIASES.items():
+        for alias in aliases:
+            pos = text_l.find(alias.lower())
+            if pos == -1:
+                continue
+            window = text[pos: pos + 500]
+            m = PCT_PAT.search(window)
+            if m:
+                val = parse_pct(m.group(1))
+                if val is not None:
+                    results[key] = val
+                    break
     return results
 
 
