@@ -14966,19 +14966,31 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       sortable.sort((a,b) => b.value - a.value);
       
-      sortable.forEach(p => {
+      const maxVal = Math.max(...sortable.map(p => p.value));
+      sortable.forEach((p, i) => {
+        const barW = Math.round((p.value / maxVal) * 100);
         html += `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--paper); border:1px solid var(--line); padding:10px 14px; border-radius:8px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:${p.color}; display:inline-block;"></span>
-              <span style="font-weight:600; font-size:13.5px;">${p.name}</span>
+          <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid ${p.color};border-radius:8px;padding:10px 14px;transition:box-shadow .18s ease;" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseleave="this.style.boxShadow=''">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="width:9px;height:9px;border-radius:50%;background:${p.color};display:inline-block;flex-shrink:0;"></span>
+                <span style="font-weight:700;font-size:13px;">${p.name}</span>
+              </div>
+              <span style="font-weight:900;font-size:15px;color:${p.color};font-family:var(--display);">${p.value.toFixed(1)}%</span>
             </div>
-            <div style="font-weight:bold; font-size:14px; color:var(--ink);">${p.value.toFixed(1)}%</div>
+            <div style="height:5px;border-radius:999px;background:#e5ecef;overflow:hidden;">
+              <div style="height:100%;border-radius:inherit;background:${p.color};width:0%;transition:width .9s cubic-bezier(.2,.8,.2,1) ${i * 0.07}s;" data-target-width="${barW}%" class="poll-bar-anim"></div>
+            </div>
           </div>
         `;
       });
-      
       container.innerHTML = html;
+      // Anima le barre con un piccolo delay
+      requestAnimationFrame(() => {
+        container.querySelectorAll(".poll-bar-anim").forEach(b => {
+          b.style.width = b.dataset.targetWidth;
+        });
+      });
     }
 
     function populatePartyAccordion() {
