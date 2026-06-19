@@ -1,0 +1,59 @@
+name: Aggiorna sondaggi
+
+on:
+  schedule:
+    # Ogni domenica alle 10:00 UTC
+    - cron: "0 10 * * 0"
+  workflow_dispatch:
+    # Permette lancio manuale dal pannello Actions
+
+permissions:
+  contents: write
+
+jobs:
+  update-polls:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installa dipendenze scraping
+        run: pip install requests beautifulsoup4
+
+      - name: Scarica dati sondaggi
+        id: scrape
+        run: python scripts/update_polls.py
+        # Se lo script esce con codice 1 (scraping fallito) il workflow si ferma qui
+        # e NON tocca dist/ né pubblica nulla.
+
+      - name: Build sito (copia standalone → dist/)
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          src = Path("politometro_standalone.html").read_text(encoding="utf-8")
+          dist = Path("dist")
+          dist.mkdir(exist_ok=True)
+          (dist / "index.html").write_text(src, encoding="utf-8")
+          print(f"dist/index.html scritto ({len(src):,} byte)")
+          EOF
+
+      - name: Commit dati aggiornati
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/polls_latest.json politometro_standalone.html dist/index.html
+          # Esce silenziosamente se non c'è nulla da committare
+          git diff --cached --quiet && echo "Nessuna modifica da committare" && exit 0
+          MESE=$(python -c "import datetime,json; print(json.load(open('data/polls_latest.json'))['mese'])")
+          git commit -m "sondaggi: aggiornamento automatico $MESE"
+          git push
+
+      # GitHub Pages serve già da main — il commit del passo precedente è sufficiente.
