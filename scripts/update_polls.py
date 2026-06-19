@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Scarica le ultime percentuali dei partiti italiani da YouTraend (fallback: Wikipedia)
+Scarica le ultime percentuali dei partiti italiani da YouTraend (Supermedia)
 e aggiorna SONDAGGI_TRENDS in politometro_standalone.html.
 Salva anche data/polls_latest.json come archivio della fetch.
 
@@ -27,9 +27,11 @@ STANDALONE = ROOT / "politometro_standalone.html"
 
 HEADERS = {
     "User-Agent": (
-        "Mozilla/5.0 (compatible; PolitometroBot/1.0; "
-        "+https://piccio2006.github.io/politometro-v6m2)"
-    )
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "it-IT,it;q=0.9",
 }
 
 MESI_IT = {
@@ -47,146 +49,202 @@ def parse_pct(s):
         return None
 
 
-def scrape_youtrend():
-    """Prova a ricavare percentuali dalla pagina aggregatore YouTraend."""
-    urls = [
-        "https://www.youtrend.it/sondaggi-politici-italia/",
-        "https://www.youtrend.it/category/sondaggi-politici/",
-        "https://www.youtrend.it/",
-        "https://youtrend.it/",
-    ]
-    try:
-        resp = None
-        for url in urls:
-            r = requests.get(url, headers=HEADERS, timeout=15)
-            if r.status_code == 200:
-                resp = r
-                break
-        if resp is None:
-            print("  YouTraend: nessun URL funzionante")
-            return None, None
-        soup = BeautifulSoup(resp.text, "html.parser")
-        text = soup.get_text(" ", strip=True)
+def _extract_from_text(text):
+    """Cerca percentuali per partito nel testo plain della pagina."""
+    patterns = {
+        "fdi":  r"Fratelli d.Italia[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+        "pd":   r"Partito Democratico[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+        "m5s":  r"(?:Movimento 5 Stelle|M5S)[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+        "lega": r"\bLega\b[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+        "fi":   r"Forza Italia[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+        "avs":  r"Alleanza Verdi[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+    }
+    results = {}
+    for key, pat in patterns.items():
+        m = re.search(pat, text, re.IGNORECASE | re.DOTALL)
+        if m:
+            val = parse_pct(m.group(1))
+            if val is not None:
+                results[key] = val
+    return results
 
-        patterns = {
-            "fdi":  r"Fratelli d.Italia\D{0,40}?(\d{1,2}[,\.]\d)",
-            "pd":   r"Partito Democratico\D{0,40}?(\d{1,2}[,\.]\d)",
-            "m5s":  r"Movimento 5 Stelle\D{0,40}?(\d{1,2}[,\.]\d)",
-            "lega": r"\bLega\b\D{0,40}?(\d{1,2}[,\.]\d)",
-            "fi":   r"Forza Italia\D{0,40}?(\d{1,2}[,\.]\d)",
-            "avs":  r"Alleanza Verdi\D{0,40}?(\d{1,2}[,\.]\d)",
-        }
+
+def scrape_youtrend():
+    """
+    1) Trova l'articolo Supermedia più recente su YouTraend
+    2) Lo scarica e ne estrae le percentuali
+    """
+    try:
+        # Trova l'URL dell'ultimo articolo Supermedia dalla homepage
+        home = requests.get("https://www.youtrend.it/", headers=HEADERS, timeout=15)
+        home.raise_for_status()
+        soup = BeautifulSoup(home.text, "html.parser")
+
+        # Cerca link che contengono "supermedia" nell'href
+        supermedia_url = None
+        for a in soup.find_all("a", href=True):
+            href = a["href"]
+            if "supermedia" in href.lower() and "youtrend" in href.lower():
+                if href.startswith("http"):
+                    supermedia_url = href
+                else:
+                    supermedia_url = "https://www.youtrend.it" + href
+                break
+
+        if not supermedia_url:
+            # Prova la pagina category
+            cat = requests.get(
+                "https://www.youtrend.it/?s=supermedia", headers=HEADERS, timeout=15
+            )
+            if cat.status_code == 200:
+                soup2 = BeautifulSoup(cat.text, "html.parser")
+                for a in soup2.find_all("a", href=True):
+                    href = a["href"]
+                    if "supermedia" in href.lower():
+                        supermedia_url = href if href.startswith("http") else "https://www.youtrend.it" + href
+                        break
+
+        if not supermedia_url:
+            print("  YouTraend: articolo Supermedia non trovato nella homepage")
+            return None, None
+
+        print(f"  YouTraend: articolo trovato → {supermedia_url}")
+        article = requests.get(supermedia_url, headers=HEADERS, timeout=15)
+        article.raise_for_status()
+
+        # Prima prova a trovare una tabella con dati partiti
+        soup_art = BeautifulSoup(article.text, "html.parser")
         results = {}
-        for key, pat in patterns.items():
-            m = re.search(pat, text, re.IGNORECASE)
-            if m:
-                val = parse_pct(m.group(1))
-                if val is not None:
-                    results[key] = val
+
+        for table in soup_art.find_all("table"):
+            ttext = table.get_text(" ")
+            if "Fratelli" in ttext or "FdI" in ttext:
+                # Cerca righe con nome partito e percentuale
+                for row in table.find_all("tr"):
+                    cells = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+                    if len(cells) < 2:
+                        continue
+                    name = cells[0].lower()
+                    pct_cell = next((c for c in cells[1:] if re.search(r"\d+[,\.]\d", c)), None)
+                    if not pct_cell:
+                        continue
+                    val = parse_pct(re.search(r"(\d+[,\.]\d)", pct_cell).group(1))
+                    if val is None:
+                        continue
+                    if "fratelli" in name or "fdi" in name:
+                        results["fdi"] = val
+                    elif "democratico" in name or name.strip() == "pd":
+                        results["pd"] = val
+                    elif "movimento" in name or "m5s" in name or "stelle" in name:
+                        results["m5s"] = val
+                    elif "lega" in name:
+                        results["lega"] = val
+                    elif "forza" in name or name.strip() == "fi":
+                        results["fi"] = val
+                    elif "verdi" in name or "alleanza" in name or "avs" in name:
+                        results["avs"] = val
+                if len(results) >= 4:
+                    break
+
+        # Fallback: cerca nel testo dell'articolo
+        if len(results) < 4:
+            results = _extract_from_text(soup_art.get_text(" "))
 
         if len(results) >= 5:
             print(f"  YouTraend OK: trovati {len(results)} partiti")
-            return results, "YouTraend"
-        print(f"  YouTraend: troppo pochi dati ({len(results)} partiti), provo fallback")
+            return results, "YouTraend/Supermedia"
+
+        print(f"  YouTraend: trovati solo {len(results)} partiti nell'articolo")
     except Exception as e:
         print(f"  YouTraend non disponibile: {e}")
     return None, None
 
 
-def _map_header(h):
-    h = h.lower().strip()
-    if "fratelli" in h or h in ("fdi", "f.d'i.", "f.d'i"):
-        return "fdi"
-    if "democratico" in h or h in ("pd",):
-        return "pd"
-    if "movimento" in h or "stelle" in h or h in ("m5s", "5s"):
-        return "m5s"
-    if "lega" in h:
-        return "lega"
-    if "forza" in h or h in ("fi", "f.i."):
-        return "fi"
-    if "verdi" in h or "alleanza" in h or h in ("avs",):
-        return "avs"
-    return None
-
-
-def scrape_wikipedia():
-    """Scarica la pagina Wikipedia dei sondaggi italiani e legge l'ultima riga dati."""
-    urls = [
-        "https://it.wikipedia.org/wiki/Sondaggi_sull%27intenzione_di_voto_in_Italia",
-        "https://it.wikipedia.org/wiki/Sondaggi_politici_italiani",
-        "https://it.wikipedia.org/wiki/Sondaggi_politici_sulla_XXI_legislatura_italiana",
+def scrape_wikipedia_api():
+    """Usa la Wikipedia API (JSON) invece della pagina HTML diretta — meno bloccata."""
+    page_names = [
+        "Sondaggi_sull'intenzione_di_voto_in_Italia",
+        "Sondaggi_politici_sulla_XXI_legislatura_italiana",
     ]
-    resp = None
-    for url in urls:
-        r = requests.get(url, headers=HEADERS, timeout=20)
-        if r.status_code == 200:
-            resp = r
-            print(f"  Wikipedia: URL trovato → {url}")
-            break
-    if resp is None:
-        raise ValueError("Nessun URL Wikipedia funzionante")
-    soup = BeautifulSoup(resp.text, "html.parser")
+    for page in page_names:
+        try:
+            api_url = (
+                "https://it.wikipedia.org/w/api.php"
+                f"?action=parse&page={requests.utils.quote(page)}"
+                "&prop=text&format=json&disabletoc=1"
+            )
+            resp = requests.get(api_url, headers=HEADERS, timeout=20)
+            if resp.status_code != 200:
+                continue
+            data = resp.json()
+            if "error" in data:
+                continue
+            html_content = data["parse"]["text"]["*"]
+            print(f"  Wikipedia API OK: pagina '{page}'")
 
-    target_parties = {"fratelli", "democratico", "movimento", "lega", "forza", "verdi"}
-    best_table = None
-    best_hits = 0
+            soup = BeautifulSoup(html_content, "html.parser")
+            target_parties = {"fratelli", "democratico", "movimento", "lega", "forza", "verdi"}
+            best_table = None
+            best_hits = 0
+            for table in soup.find_all("table"):
+                text = table.get_text().lower()
+                hits = sum(1 for p in target_parties if p in text)
+                if hits > best_hits:
+                    best_hits = hits
+                    best_table = table
 
-    for table in soup.find_all("table", class_="wikitable"):
-        text = table.get_text().lower()
-        hits = sum(1 for p in target_parties if p in text)
-        if hits > best_hits:
-            best_hits = hits
-            best_table = table
+            if best_hits < 4 or best_table is None:
+                continue
 
-    if best_hits < 4:
-        raise ValueError("Nessuna tabella con abbastanza partiti trovata su Wikipedia")
+            # Cerca ultima riga con dati numerici
+            rows = best_table.find_all("tr")
+            # Prima riga = header
+            header_cells = [th.get_text(strip=True).lower() for th in rows[0].find_all(["th", "td"])]
 
-    # Trova header
-    rows = best_table.find_all("tr")
-    col_map = {}
-    header_row_idx = 0
-    for ri, row in enumerate(rows):
-        cells = row.find_all(["th"])
-        if len(cells) >= 5:
-            for ci, cell in enumerate(cells):
-                key = _map_header(cell.get_text(strip=True))
-                if key:
-                    col_map[key] = ci
-            if len(col_map) >= 4:
-                header_row_idx = ri
-                break
+            col_map = {}
+            for i, h in enumerate(header_cells):
+                if "fratelli" in h or h in ("fdi",):
+                    col_map["fdi"] = i
+                elif "democratico" in h or h == "pd":
+                    col_map["pd"] = i
+                elif "movimento" in h or "stelle" in h or h in ("m5s",):
+                    col_map["m5s"] = i
+                elif "lega" in h:
+                    col_map["lega"] = i
+                elif "forza" in h or h in ("fi",):
+                    col_map["fi"] = i
+                elif "verdi" in h or "alleanza" in h or h in ("avs",):
+                    col_map["avs"] = i
 
-    if len(col_map) < 4:
-        raise ValueError(f"Troppo poche colonne mappate: {col_map}")
+            if len(col_map) < 4:
+                continue
 
-    print(f"  Wikipedia: colonne trovate: {col_map}")
+            results = {}
+            for row in reversed(rows[1:]):
+                cells = row.find_all(["td", "th"])
+                if len(cells) < max(col_map.values()) + 1:
+                    continue
+                candidate = {}
+                for key, idx in col_map.items():
+                    val = parse_pct(cells[idx].get_text(strip=True))
+                    if val is not None:
+                        candidate[key] = val
+                if len(candidate) >= 4:
+                    results = candidate
+                    break
 
-    # Leggi ultima riga con valori numerici validi
-    results = {}
-    for row in reversed(rows[header_row_idx + 1:]):
-        cells = row.find_all(["td", "th"])
-        if len(cells) < max(col_map.values()) + 1:
-            continue
-        candidate = {}
-        for key, idx in col_map.items():
-            val = parse_pct(cells[idx].get_text(strip=True))
-            if val is not None:
-                candidate[key] = val
-        if len(candidate) >= 4:
-            results = candidate
-            break
+            if results:
+                return results, "Wikipedia"
 
-    if not results:
-        raise ValueError("Nessuna riga dati valida trovata")
+        except Exception as e:
+            print(f"  Wikipedia API errore ({page}): {e}")
 
-    return results, "Wikipedia"
+    return None, None
 
 
 def compute_altri(data):
     known = sum(data.get(k, 0) for k in ("fdi", "pd", "m5s", "lega", "fi", "avs"))
-    altri = round(100.0 - known, 1)
-    return max(altri, 0.0)
+    return round(max(100.0 - known, 0.0), 1)
 
 
 def load_previous():
@@ -204,8 +262,8 @@ def main():
     # Scraping
     data, fonte = scrape_youtrend()
     if data is None:
-        print("Tentativo Wikipedia...")
-        data, fonte = scrape_wikipedia()
+        print("Tentativo Wikipedia API...")
+        data, fonte = scrape_wikipedia_api()
 
     if data is None:
         print("ERRORE: nessuna fonte disponibile. Nessun file modificato.")
@@ -241,7 +299,6 @@ def main():
     # Aggiorna politometro_standalone.html
     html = STANDALONE.read_text(encoding="utf-8")
 
-    # Formatta nuova entry
     new_entry = (
         f'      {{ month: "{month_str}", '
         f'fdi: {data["fdi"]}, pd: {data["pd"]}, m5s: {data["m5s"]}, '
@@ -255,7 +312,6 @@ def main():
     end_idx = html.index(end_marker, start_idx)
     trends_block = html[start_idx:end_idx]
 
-    # Se il mese corrente esiste già → sostituisci; altrimenti aggiungi
     month_pattern = re.compile(
         r'\{ month: "' + re.escape(month_str) + r'"[^}]+\}'
     )
@@ -267,7 +323,7 @@ def main():
         print(f"Aggiunta nuova voce per {month_str}")
 
     STANDALONE.write_text(html, encoding="utf-8")
-    print(f"Aggiornato: politometro_standalone.html")
+    print("Aggiornato: politometro_standalone.html")
     print("\nDone.")
 
 
