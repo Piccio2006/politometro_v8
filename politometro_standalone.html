@@ -4673,13 +4673,14 @@
         const dir = Object.keys(ORIENT).reduce((d, k) => d || (name.includes(k) ? ORIENT[k] : null), null);
         const grad = BAR_GRAD[dir] || BAR_GRAD._def;
         const pct = Math.max(0, Math.min(100, Number(item.affinity) || 0));
-        const rank = idx === 0 ? ' style="border-left:3px solid var(--accent-2);background:linear-gradient(90deg,rgba(56,163,165,.06),transparent);"' : '';
+        const rankStyle = idx === 0 ? ' style="border-left:3px solid var(--accent-2);background:linear-gradient(90deg,rgba(56,163,165,.06),transparent);"' : '';
+        const rankBadge = idx === 0 ? '<span style="font-size:14px;margin-left:4px;vertical-align:middle;" title="Partito più vicino">🥇</span>' : idx === 1 ? '<span style="font-size:12px;margin-left:4px;vertical-align:middle;" title="Secondo">🥈</span>' : idx === 2 ? '<span style="font-size:12px;margin-left:4px;vertical-align:middle;" title="Terzo">🥉</span>' : '';
         return `
-        <div class="match identity-match"${rank}>
+        <div class="match identity-match"${rankStyle}>
           <div class="identity-main">
             ${renderPortrait(item.name)}
             <div style="min-width:0;flex:1;">
-              <strong style="display:block;">${escapeHtml(name)}</strong>
+              <strong style="display:block;">${escapeHtml(name)}${rankBadge}</strong>
               <div style="margin:4px 0 0;height:5px;border-radius:999px;background:#e5ecef;overflow:hidden;">
                 <div class="coherence-fill" style="width:${pct}%;height:100%;border-radius:inherit;background:${grad};transition:width .8s cubic-bezier(.2,.8,.2,1) ${idx * 0.08}s;"></div>
               </div>
