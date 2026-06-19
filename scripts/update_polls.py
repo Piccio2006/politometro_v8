@@ -49,10 +49,22 @@ def parse_pct(s):
 
 def scrape_youtrend():
     """Prova a ricavare percentuali dalla pagina aggregatore YouTraend."""
+    urls = [
+        "https://www.youtrend.it/sondaggi-politici-italia/",
+        "https://www.youtrend.it/category/sondaggi-politici/",
+        "https://www.youtrend.it/",
+        "https://youtrend.it/",
+    ]
     try:
-        url = "https://youtrend.it/sondaggi-politici-italia/"
-        resp = requests.get(url, headers=HEADERS, timeout=15)
-        resp.raise_for_status()
+        resp = None
+        for url in urls:
+            r = requests.get(url, headers=HEADERS, timeout=15)
+            if r.status_code == 200:
+                resp = r
+                break
+        if resp is None:
+            print("  YouTraend: nessun URL funzionante")
+            return None, None
         soup = BeautifulSoup(resp.text, "html.parser")
         text = soup.get_text(" ", strip=True)
 
@@ -100,9 +112,20 @@ def _map_header(h):
 
 def scrape_wikipedia():
     """Scarica la pagina Wikipedia dei sondaggi italiani e legge l'ultima riga dati."""
-    url = "https://it.wikipedia.org/wiki/Sondaggi_politici_italiani"
-    resp = requests.get(url, headers=HEADERS, timeout=20)
-    resp.raise_for_status()
+    urls = [
+        "https://it.wikipedia.org/wiki/Sondaggi_sull%27intenzione_di_voto_in_Italia",
+        "https://it.wikipedia.org/wiki/Sondaggi_politici_italiani",
+        "https://it.wikipedia.org/wiki/Sondaggi_politici_sulla_XXI_legislatura_italiana",
+    ]
+    resp = None
+    for url in urls:
+        r = requests.get(url, headers=HEADERS, timeout=20)
+        if r.status_code == 200:
+            resp = r
+            print(f"  Wikipedia: URL trovato → {url}")
+            break
+    if resp is None:
+        raise ValueError("Nessun URL Wikipedia funzionante")
     soup = BeautifulSoup(resp.text, "html.parser")
 
     target_parties = {"fratelli", "democratico", "movimento", "lega", "forza", "verdi"}
