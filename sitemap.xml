@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://politometro.example/</loc><priority>1.0</priority></url>
-  <url><loc>https://politometro.example/metodo.html</loc><priority>0.7</priority></url>
-  <url><loc>https://politometro.example/supporto.html</loc><priority>0.7</priority></url>
-  <url><loc>https://politometro.example/privacy.html</loc><priority>0.6</priority></url>
+  <url><loc>https://piccio2006.github.io/politometro-v6m2/</loc><priority>1.0</priority></url>
+  <url><loc>https://piccio2006.github.io/politometro-v6m2/metodo.html</loc><priority>0.7</priority></url>
+  <url><loc>https://piccio2006.github.io/politometro-v6m2/supporto.html</loc><priority>0.7</priority></url>
+  <url><loc>https://piccio2006.github.io/politometro-v6m2/privacy.html</loc><priority>0.6</priority></url>
 </urlset>
