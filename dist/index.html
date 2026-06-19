@@ -826,6 +826,15 @@
       box-shadow: var(--shadow-soft);
       border-color: rgba(56,163,165,.55);
     }
+    .world-grid .world-card:first-child {
+      border-color: rgba(56,163,165,.35);
+      box-shadow: 0 0 0 0 rgba(56,163,165,.2);
+      animation: worldCardGlow 3s ease-in-out infinite;
+    }
+    @keyframes worldCardGlow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(56,163,165,.2); }
+      50% { box-shadow: 0 0 0 8px rgba(56,163,165,0); }
+    }
     .world-card.nemesi {
       background:
         linear-gradient(135deg, rgba(184,74,98,.08), rgba(242,184,128,.10)),
@@ -15649,8 +15658,8 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
           // Radar glow
           const svgEl = resultsEl.querySelector("svg");
           if (svgEl) svgEl.classList.add("radar-glow");
-          // Animate coherence bars
-          resultsEl.querySelectorAll(".coherence-fill, .fill").forEach(bar => {
+          // Animate coherence bars (skip poll-bar-anim which handle themselves)
+          resultsEl.querySelectorAll(".coherence-fill:not(.poll-bar-anim), .fill").forEach(bar => {
             const w = bar.style.width;
             bar.style.width = "0%";
             setTimeout(() => {
@@ -15658,6 +15667,8 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
               bar.style.width = w;
             }, 200);
           });
+          // Colori direzionali partiti nei match
+          if (typeof applyPartyBarColors === "function") setTimeout(applyPartyBarColors, 300);
         }, 80);
       });
       resObs.observe(resultsEl, { attributes: true, attributeFilter: ["class"] });
