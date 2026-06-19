@@ -1061,9 +1061,17 @@
       pointer-events: none;
     }
     .identity-line:hover .avatar,
+    .identity-match {
+      transition: background .18s ease, padding .18s ease, box-shadow .18s ease;
+    }
+    .identity-match:hover {
+      background: linear-gradient(90deg, rgba(56,163,165,.06), transparent);
+      box-shadow: inset 3px 0 0 var(--accent-2);
+      padding-left: 8px;
+    }
     .identity-match:hover .avatar {
-      transform: rotate(-3deg) scale(1.04);
-      box-shadow: 0 14px 32px rgba(16,36,47,.18);
+      transform: rotate(-3deg) scale(1.06);
+      box-shadow: 0 14px 32px rgba(16,36,47,.20);
     }
     .avatar.large {
       width: 72px;
