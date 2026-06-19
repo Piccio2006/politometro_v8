@@ -793,11 +793,19 @@
       display: grid;
       gap: 10px;
       padding: 22px 18px 18px;
-      border-radius: 8px;
-      border: 1px solid rgba(56,163,165,.30);
+      border-radius: 12px;
+      border: 1px solid rgba(56,163,165,.35);
       background:
-        linear-gradient(135deg, rgba(34,87,122,.08), rgba(242,184,128,.12)),
+        radial-gradient(circle at 10% 0%, rgba(56,163,165,.18), transparent 40%),
+        radial-gradient(circle at 90% 100%, rgba(242,184,128,.18), transparent 40%),
+        linear-gradient(135deg, rgba(34,87,122,.06), rgba(242,184,128,.06)),
         #fff;
+      box-shadow: 0 8px 32px rgba(56,163,165,.10), 0 2px 8px rgba(34,87,122,.06);
+      animation: archetypeReveal .5s cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes archetypeReveal {
+      from { opacity:0; transform:translateY(12px) scale(.98); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
     }
     .archetype-card h3 {
       font-family: var(--display);
@@ -953,6 +961,10 @@
       line-height: 1.05;
       margin: 0;
       text-wrap: balance;
+      background: linear-gradient(135deg, var(--ink) 30%, var(--accent-2) 70%, var(--warm));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .chips {
       display: flex;
