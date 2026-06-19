@@ -318,24 +318,34 @@
     .option.selected {
       border-color: var(--accent);
 	      background:
-	        linear-gradient(90deg, rgba(56,163,165,.16), rgba(242,184,128,.16)),
-	        #f7fbfb;
-      box-shadow: 0 0 0 2px rgba(34, 87, 122, .12), var(--shadow-soft);
+	        linear-gradient(90deg, rgba(56,163,165,.22), rgba(242,184,128,.18)),
+	        #f4fafa;
+      box-shadow: 0 0 0 3px rgba(34,87,122,.15), 0 6px 20px rgba(56,163,165,.12);
+    }
+    .option.selected .num {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
     .option.selected::after {
       content: "✓";
       flex: 0 0 auto;
       margin-left: auto;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
       display: grid;
       place-items: center;
-      background: var(--accent-2);
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
       color: #fff;
+      font-size: 15px;
       font-weight: 900;
-      box-shadow: 0 8px 18px rgba(56,163,165,.22);
-      animation: pop .22s ease both;
+      box-shadow: 0 4px 12px rgba(56,163,165,.35), 0 0 0 3px rgba(56,163,165,.15);
+      animation: checkPop .28s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes checkPop {
+      0% { transform: scale(0) rotate(-20deg); opacity:0; }
+      100% { transform: scale(1) rotate(0deg); opacity:1; }
     }
     .num {
       flex: 0 0 auto;
