@@ -62,12 +62,19 @@
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
     }
+    @keyframes sidebarShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     aside {
       background:
-        radial-gradient(circle at 18% 8%, rgba(56,163,165,.35), transparent 32%),
-        linear-gradient(180deg, rgba(10, 20, 30, 0.8), rgba(3, 6, 8, 0.95));
+        radial-gradient(circle at 18% 8%, rgba(56,163,165,.4), transparent 32%),
+        radial-gradient(circle at 82% 92%, rgba(109,89,122,.35), transparent 38%),
+        radial-gradient(circle at 60% 45%, rgba(242,184,128,.12), transparent 28%),
+        linear-gradient(160deg, #0d1f2d 0%, #030608 55%, #101820 100%);
       backdrop-filter: blur(12px);
-      border-right: 1px solid var(--line);
+      border-right: 1px solid rgba(56,163,165,.2);
       padding: 28px;
       position: sticky;
       top: 0;
@@ -76,6 +83,7 @@
       flex-direction: column;
       gap: 22px;
       color: #ffffff;
+      box-shadow: 4px 0 32px rgba(0,0,0,.25);
     }
     .brand {
       display: flex;
@@ -263,10 +271,17 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .question-text {
-      font-size: 28px;
-      line-height: 1.16;
+      font-size: 26px;
+      line-height: 1.22;
       margin: 0;
       text-wrap: balance;
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      background: linear-gradient(135deg, var(--ink) 60%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .options {
       display: grid;
@@ -692,30 +707,45 @@
     }
     .tab {
       border: 1px solid var(--line);
-      background: #fff;
+      background: rgba(255,255,255,.85);
       color: var(--ink);
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: 9px 13px;
       cursor: pointer;
       font-weight: 800;
-      transition: transform .16s ease, background .16s ease, box-shadow .16s ease, border-color .16s ease;
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease, color .18s ease;
     }
     .tab::before {
       content: attr(data-icon);
-      margin-right: 6px;
+      margin-right: 5px;
       font-weight: 900;
       opacity: .78;
     }
+    .tab::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(56,163,165,.12), rgba(242,184,128,.10));
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
     .tab:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(56,163,165,.18);
       border-color: var(--accent-2);
     }
+    .tab:hover::after { opacity: 1; }
     .tab.active {
-      background: linear-gradient(135deg, var(--accent), #17384d);
-      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, #1a4a62 100%);
+      border-color: transparent;
       color: #fff;
+      box-shadow: 0 4px 18px rgba(34,87,122,.35);
+      transform: translateY(-1px);
     }
+    .tab.active::after { opacity: 0; }
     .tab-panel { display: none; }
     .tab-panel.active {
       display: grid;
@@ -1046,16 +1076,23 @@
       overflow: visible;
     }
     .pin {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 999px;
-      background: var(--ink);
-      border: 3px solid white;
+      background: white;
+      border: 3px solid var(--ink);
       position: absolute;
       top: 50%;
       transform: translate(-50%, -50%);
-      box-shadow: 0 2px 8px rgba(0,0,0,.25);
-      transition: left .55s cubic-bezier(.2,.8,.2,1);
+      box-shadow: 0 2px 10px rgba(0,0,0,.30), 0 0 0 3px rgba(255,255,255,.8);
+      transition: left .7s cubic-bezier(.2,.8,.2,1);
+    }
+    .pin::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--ink);
     }
     .small {
       color: var(--muted);
@@ -2573,6 +2610,19 @@
        ANIMAZIONI AVANZATE — sessione notturna
     ═══════════════════════════════════════ */
 
+    /* Ripple click su opzioni */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(56,163,165,.22);
+      animation: rippleAnim .55s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
     /* Slide-in per domande */
     @keyframes questionSlideIn {
       from { opacity: 0; transform: translateX(28px); }
@@ -2791,7 +2841,7 @@
             <h2 class="step-title" id="stepTitle">Caricamento</h2>
             <p class="step-subtitle" id="stepSubtitle">Preparo le domande.</p>
           </div>
-          <button class="btn" id="resetBtn">↺ Ricomincia</button>
+          <button class="btn" id="resetBtn" style="display:none;">↺ Ricomincia</button>
         </div>
         <div class="question-panel">
           <h2 class="question-text" id="questionText"></h2>
@@ -4324,14 +4374,21 @@
 
     function renderAxis(axis) {
       const left = Math.max(2, Math.min(98, (axis.value + 1) * 50));
+      const label = axis.value < -0.15 ? "◀ sinistra" : axis.value > 0.15 ? "destra ▶" : "centro ◆";
+      const uid = "pin-" + Math.random().toString(36).slice(2);
+      // Pin parte dal centro (50%) e scivola alla posizione reale dopo render
+      setTimeout(() => {
+        const pin = document.getElementById(uid);
+        if (pin) pin.style.left = left + "%";
+      }, 60);
       return `
         <div class="axis">
           <div class="axis-head">
-            <span>${axis.name}</span>
-            <span>${axis.value >= 0 ? "+" : ""}${axis.value.toFixed(2)}</span>
+            <span style="font-weight:800;">${axis.name}</span>
+            <span style="color:${axis.value < -0.15 ? "var(--accent-2)" : axis.value > 0.15 ? "#e07b3c" : "var(--muted)"}; font-weight:800;">${label}</span>
           </div>
-          <div class="axisbar"><span class="pin" style="left:${left}%"></span></div>
-          <div class="small">${axisDirection(axis.value)} · confidenza asse ${Math.round(axis.confidence * 100)}%</div>
+          <div class="axisbar"><span id="${uid}" class="pin" style="left:50%;transition:left .9s cubic-bezier(.2,.8,.2,1) ${Math.random()*0.2}s"></span></div>
+          <div class="small" style="display:flex;justify-content:space-between;"><span>${axisDirection(axis.value)}</span><span>confidenza ${Math.round(axis.confidence * 100)}%</span></div>
         </div>
       `;
     }
@@ -7151,6 +7208,7 @@
         state.answers = {};
         state.index = 0;
         state.started = true;
+        el("resetBtn").style.display = "";
         renderQuestionAnimated();
         return;
       }
@@ -15362,6 +15420,69 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
        ANIMAZIONI AVANZATE — sessione notturna
     ═══════════════════════════════════════ */
 
+    // ── Ripple effect sulle opzioni risposta ────────────────────────
+    document.addEventListener("click", e => {
+      const opt = e.target.closest(".option");
+      if (!opt) return;
+      const r = opt.getBoundingClientRect();
+      const span = document.createElement("span");
+      const size = Math.max(r.width, r.height) * 1.4;
+      span.className = "ripple";
+      span.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px`;
+      opt.appendChild(span);
+      setTimeout(() => span.remove(), 560);
+    });
+
+    // ── Confetti al completamento quiz ──────────────────────────────
+    function launchConfetti() {
+      const colors = ["#38a3a5","#22577a","#f2b880","#6d597a","#57cc99","#b84a62"];
+      const canvas = document.createElement("canvas");
+      canvas.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({length: 90}, () => ({
+        x: Math.random() * canvas.width,
+        y: -10 - Math.random() * 80,
+        w: 6 + Math.random() * 8,
+        h: 3 + Math.random() * 5,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        vx: (Math.random()-.5)*3,
+        vy: 2 + Math.random()*4,
+        rot: Math.random()*360,
+        vr: (Math.random()-.5)*8,
+        alpha: 1,
+      }));
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of pieces) {
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          p.vy += .06; p.alpha -= .008;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.fillStyle = p.color;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI/180);
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+        }
+        if (++frame < 160) requestAnimationFrame(draw);
+        else canvas.remove();
+      }
+      draw();
+    }
+    // Aggancia al completamento test
+    const _origComplete = window.completeAndCalculate;
+    if (typeof completeAndCalculate === "function") {
+      const __origCC = completeAndCalculate;
+      window.completeAndCalculate = function() {
+        launchConfetti();
+        __origCC.apply(this, arguments);
+      };
+    }
+
     // ── Particle canvas ──────────────────────────────────────────────
     (function initParticles() {
       const canvas = document.createElement("canvas");
@@ -15457,8 +15578,10 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     const _origRenderResults = window.renderResults || null;
     const resultsEl = document.getElementById("results");
     if (resultsEl) {
+      let _confettiFired = false;
       const resObs = new MutationObserver(() => {
         if (!resultsEl.classList.contains("visible")) return;
+        if (!_confettiFired) { _confettiFired = true; setTimeout(launchConfetti, 300); }
         setTimeout(() => {
           resultsEl.querySelectorAll(".score").forEach(scoreEl => {
             const raw = scoreEl.textContent.trim();
