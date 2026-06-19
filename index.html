@@ -15,20 +15,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Politometro</title>
-
-  <meta name="description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <link rel="canonical" href="https://politometro.example/">
-  <meta property="og:title" content="Politometro">
-  <meta property="og:description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <meta property="og:image" content="https://politometro.example/og-image.png">
-  <meta property="og:url" content="https://politometro.example/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Politometro">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Politometro">
-  <meta name="twitter:description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <meta name="twitter:image" content="https://politometro.example/og-image.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#10242f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -2606,14 +2592,7 @@
       </nav>
       <div class="side-note">
         Il risultato non misura una verità definitiva: stima un profilo coerente con le risposte, segnala incertezza e mostra dove il dato è più o meno stabile.
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-          <a href="metodo.html" style="color:#b9c8d0;">Metodo</a>
-          <a href="privacy.html" style="color:#b9c8d0;">Privacy</a>
-          <a href="supporto.html" style="color:#b9c8d0;">Supporto</a>
-        </div>
-    
-        <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260619-093540 · IA v5.3</span>
+        <span class="engine-pill" id="enginePill" style="display:none;"></span>
       </div>
     </aside>
     <main>
@@ -4923,8 +4902,8 @@
 
         ctx.fillStyle = isDark ? "#c5d5dc" : "rgba(16,36,47,.58)";
         ctx.font = "700 11px system-ui";
-        ctx.fillText("PC1 (Economico / Geopolitico)", width - pad - 165, height / 2 - 9);
-        ctx.fillText("PC2 (Culturale / Statale)", width / 2 + 9, pad + 14);
+        ctx.fillText("Asse economico / geopolitico", width - pad - 165, height / 2 - 9);
+        ctx.fillText("Asse culturale / statale", width / 2 + 9, pad + 14);
 
         const userPoint = { x: sx(pca.user.x), y: sy(pca.user.y) };
         const nearest = visible
@@ -5047,7 +5026,7 @@
             ctrl3D.style.display = "none";
             if (subtext) {
               const ev = data.visuals.pca.explained_variance;
-              subtext.textContent = `Varianza spiegata: PC1 ${(ev[0] * 100).toFixed(1)}%, PC2 ${(ev[1] * 100).toFixed(1)}%.`;
+              subtext.textContent = "";
             }
           }
           drawMap(data, document.getElementById("mapFilter")?.value || "all");
@@ -5233,6 +5212,14 @@
       insightsEl.innerHTML = insightsHtml;
     }
 
+    function axisValueLabel(v) {
+      if (v <= -0.65) return "Molto sinistra";
+      if (v <= -0.30) return "Sinistra";
+      if (v < 0.30) return "Centro";
+      if (v < 0.65) return "Destra";
+      return "Molto destra";
+    }
+
     function renderPoster(data) {
       const archetype = resultArchetype(data);
       return `
@@ -5247,11 +5234,10 @@
             <span class="chip">${data.interpretation.family}</span>
             <span class="chip">confidenza ${data.confidence}%</span>
             <span class="chip">coerenza ${data.self_coherence?.score ?? "n/d"}%</span>
-            <span class="chip">affidabilità ${data.reliability?.label || "n/d"}</span>
           </div>
           ${data.axes.map((axis) => `
             <div class="mini-axis">
-              <span>${axis.name} · ${axis.value >= 0 ? "+" : ""}${axis.value.toFixed(2)}</span>
+              <span>${axis.name} · ${axisValueLabel(axis.value)}</span>
               <div class="mini-track"><i class="mini-pin" style="left:${Math.max(2, Math.min(98, (axis.value + 1) * 50))}%"></i></div>
             </div>
           `).join("")}
@@ -5432,13 +5418,10 @@
     }
 
     function buildShareText(data) {
-      const parties = (data.parties || []).slice(0, 3).map((item) => `${item.name} ${item.affinity}%`).join(", ");
-      const historical = (data.historical || []).slice(0, 2).map((item) => `${item.name} ${item.affinity}%`).join(", ");
-      const name = userDisplayName();
+      const top2parties = (data.parties || []).slice(0, 2).map((item) => item.name).join(", ");
       const archetype = resultArchetype(data).name;
-      const coherence = data.self_coherence ? ` Coerenza interna ${data.self_coherence.score}% (${data.self_coherence.label}).` : "";
-      const reliability = data.reliability ? ` Affidabilità ${data.reliability.label}.` : "";
-      return `${name} sul Politometro: ${archetype}. ${data.interpretation.family}; confidenza ${data.confidence}%.${coherence}${reliability} Partiti vicini: ${parties}. Confronti storici: ${historical}.`;
+      const url = "piccio2006.github.io/politometro-v6m2";
+      return `Ho fatto il Politometro e sono ${archetype}. I miei partiti più vicini: ${top2parties}. E tu? → ${url}`;
     }
 
     function buildTikTokCaption(data) {
@@ -5607,7 +5590,6 @@
           <div class="result-grid">
             <div class="block hero-result">
               <span class="kicker">Il tuo archetipo</span>
-              ${renderUserStrip(data)}
               <div class="archetype-card">
                 <div class="identity-line">
                   ${renderPortrait(archetype.name, "large")}
@@ -5620,9 +5602,9 @@
                   <span class="chip">${data.interpretation.family}</span>
                   <span class="chip">confidenza ${data.confidence}%</span>
                   <span class="chip">coerenza ${data.self_coherence?.score ?? "n/d"}%</span>
-                  <span class="chip">affidabilità ${data.reliability?.label || "n/d"}</span>
                 </div>
               </div>
+              ${renderUserStrip(data)}
               ${warnings}
               <div class="surface-actions">
                 <button class="btn primary" id="surfaceShare">Condividi</button>
@@ -6170,9 +6152,8 @@
           </div>
           <div class="chart-grid">
             <div class="block">
-              <h3>Radar custom degli 8 assi</h3>
+              <h3>Il tuo profilo ideologico</h3>
               <canvas id="radarCanvas" class="viz-canvas"></canvas>
-              <p class="small">Grafico disegnato direttamente dal browser sui valori del modello, non immagine Gradio o Matplotlib.</p>
             </div>
             <div class="block">
               <h3>Barre direzionali</h3>
@@ -6185,8 +6166,8 @@
           <div class="block">
             <div class="topbar" style="flex-wrap:wrap; gap:12px;">
               <div>
-                <h3>Mappa PCA interattiva</h3>
-                <p class="small" id="mapPcaSubtext">Varianza spiegata: PC1 ${(data.visuals.pca.explained_variance[0] * 100).toFixed(1)}%, PC2 ${(data.visuals.pca.explained_variance[1] * 100).toFixed(1)}%.</p>
+                <h3>Dove ti posizioni</h3>
+                <p class="small" id="mapPcaSubtext"></p>
               </div>
               <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <select id="mapFilter" style="min-height:36px;">
@@ -6474,7 +6455,7 @@
           </div>
           <div class="result-grid">
             <div class="block">
-              <h3>Card custom</h3>
+              <h3>La tua card</h3>
               <div class="poster-preview" id="posterPreview">${renderPoster(data)}</div>
               <button class="btn primary" id="downloadCard">Scarica card PNG</button>
               <button class="btn" id="downloadPdf">Scarica report PDF</button>
@@ -6513,8 +6494,8 @@
             </div>
             <div class="block">
               <h3>App installabile</h3>
-              <ol class="phone-steps">
-                <li>Apri Politometro da un indirizzo http locale o, meglio, da https quando sara pubblicato.</li>
+              <p class=”small”>Installa Politometro come app sul tuo dispositivo.</p>
+              <ol class=”phone-steps”>
                 <li>Usa “Installa app” o “Aggiungi alla schermata Home” dal browser.</li>
                 <li>Dopo l'installazione si apre a schermo pieno come una piccola app.</li>
               </ol>
@@ -6685,15 +6666,14 @@
 
       const chipY = 715;
       drawCanvasChip(ctx, `coerenza ${data.self_coherence?.score ?? "n/d"}%`, 96, chipY, "#38a3a5");
-      drawCanvasChip(ctx, `affidabilità ${data.reliability?.label || "n/d"}`, 365, chipY, "#f2b880", "#10242f");
-      drawCanvasChip(ctx, data.mode === "deep" ? "60 domande" : data.mode === "social" ? "12 domande" : "20 domande", 660, chipY, "#6d597a");
+      drawCanvasChip(ctx, data.mode === "deep" ? "60 domande" : data.mode === "social" ? "12 domande" : "20 domande", 390, chipY, "#6d597a");
 
       const startY = 840;
       data.axes.forEach((axis, i) => {
         const y = startY + i * 96;
         ctx.fillStyle = "#c5d5dc";
         ctx.font = "800 30px system-ui";
-        ctx.fillText(`${axis.name} ${axis.value >= 0 ? "+" : ""}${axis.value.toFixed(2)}`, 96, y);
+        ctx.fillText(`${axis.name} · ${axisValueLabel(axis.value)}`, 96, y);
         ctx.fillStyle = "rgba(237,243,244,.92)";
         roundRect(ctx, 96, y + 22, 808, 22, 11);
         ctx.fill();
@@ -6726,7 +6706,7 @@
 
       ctx.fillStyle = "#fff";
       ctx.font = "700 34px system-ui";
-      ctx.fillText("politometro.local", 86, 1810);
+      ctx.fillText("piccio2006.github.io/politometro-v6m2", 86, 1810);
       ctx.fillStyle = "#c5d5dc";
       ctx.font = "500 26px system-ui";
       ctx.fillText("Risultato interpretativo, non diagnostico.", 86, 1854);
@@ -7485,19 +7465,7 @@
         document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
       } else {
         if (!state.cloudAccountsAvailable) {
-          container.innerHTML = `
-            <div class="user-card">
-              <div class="user-avatar">L</div>
-              <div class="user-info">
-                <span class="user-nickname">Modalità locale</span>
-                <span class="user-email">Cronologia salvata nel browser</span>
-              </div>
-              <button class="user-logout-btn" id="openAuthInfoBtn" title="Info">Info</button>
-            </div>
-          `;
-          document.getElementById("openAuthInfoBtn")?.addEventListener("click", () => {
-            showAppNotice("Account cloud non attivo in questa versione statica. Puoi comunque salvare e confrontare i test nella cronologia locale del browser.");
-          });
+          container.innerHTML = "";
           return;
         }
         container.innerHTML = `
