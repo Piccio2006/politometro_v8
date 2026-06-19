@@ -15,20 +15,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Politometro</title>
-
-  <meta name="description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <link rel="canonical" href="https://politometro.example/">
-  <meta property="og:title" content="Politometro">
-  <meta property="og:description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <meta property="og:image" content="https://politometro.example/og-image.png">
-  <meta property="og:url" content="https://politometro.example/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Politometro">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Politometro">
-  <meta name="twitter:description" content="Scopri il tuo profilo politico in 8 dimensioni: economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.">
-  <meta name="twitter:image" content="https://politometro.example/og-image.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#10242f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -766,7 +752,7 @@
     .archetype-card {
       display: grid;
       gap: 10px;
-      padding: 18px;
+      padding: 22px 18px 18px;
       border-radius: 8px;
       border: 1px solid rgba(56,163,165,.30);
       background:
@@ -925,6 +911,9 @@
       align-items: center;
       min-width: 0;
     }
+    .identity-line > div {
+      min-width: 0;
+    }
     .avatar {
       --tone-a: #22577a;
       --tone-b: #38a3a5;
@@ -1026,6 +1015,9 @@
       max-width: 100%;
       overflow-wrap: anywhere;
       line-height: 1.25;
+      min-width: 0;
+      white-space: normal;
+      text-align: center;
     }
     .axis {
       display: grid;
@@ -2026,6 +2018,26 @@
       .tab { flex: 0 0 auto; }
       .welcome-card { grid-template-columns: 1fr; }
       .surface-actions .btn { flex: 1 1 180px; }
+      .identity-line {
+        align-items: flex-start;
+      }
+      .avatar.large {
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
+      }
+      .archetype-card {
+        padding: 20px 14px 14px;
+      }
+      .archetype-card .chips {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .archetype-card .chip {
+        border-radius: 8px;
+        padding: 7px 8px;
+        font-size: 12px;
+      }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -2580,14 +2592,7 @@
       </nav>
       <div class="side-note">
         Il risultato non misura una verità definitiva: stima un profilo coerente con le risposte, segnala incertezza e mostra dove il dato è più o meno stabile.
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-          <a href="metodo.html" style="color:#b9c8d0;">Metodo</a>
-          <a href="privacy.html" style="color:#b9c8d0;">Privacy</a>
-          <a href="supporto.html" style="color:#b9c8d0;">Supporto</a>
-        </div>
-    
         <span class="engine-pill" id="enginePill">Motore attivo</span>
-        <span class="engine-pill" id="releasePill">Aggiornato 20260614-130511 · IA v5.3</span>
       </div>
     </aside>
     <main>
@@ -4050,7 +4055,7 @@
             state.index += 1;
             renderQuestionAnimated();
           }
-        }, 520);
+        }, 850);
       }
     }
 
@@ -5634,7 +5639,7 @@
           <div class="block">
             <h2>🤖 Analisi con Intelligenza Artificiale</h2>
             <p class="small text-muted" style="margin-bottom: 20px;">
-              Ottieni una lettura personalizzata del tuo profilo politico. Prima di iniziare, ti offriamo un'analisi locale dettagliata e offline. Per un'interazione avanzata e domande personalizzate, puoi inserire la tua chiave API di Google Gemini.
+              Ottieni una lettura personalizzata del tuo profilo politico. Prima di iniziare, ti offriamo un'analisi locale dettagliata e offline. Per domande personalizzate puoi usare una tua chiave API Gemini direttamente dal browser.
             </p>
             
             <div class="ai-panel-wrap">
@@ -5651,13 +5656,13 @@
 
               <!-- SETUP CHIAVE GEMINI LIVE CHAT -->
               <div id="aiSetupBox" class="ai-setup-box">
-                <h3>💬 Vuoi fare domande o approfondire? Connetti Gemini</h3>
+                <h3>💬 Vuoi fare domande o approfondire? Usa Gemini dal browser</h3>
                 <p class="small">
-                  Inserisci una chiave API Gemini gratuita per parlare liberamente con un assistente IA sul tuo risultato. La chiave viene salvata esclusivamente nel tuo browser (localStorage).
+                  In una pagina statica la chiave non può essere nascosta nel codice: se la usi resta nel tuo browser e può comparire nelle chiamate di rete. Per tenerla davvero segreta serve una versione server/proxy.
                 </p>
                 <div class="ai-key-row">
                   <input type="password" id="aiApiKeyInput" placeholder="Inserisci la tua API Key Gemini (es. AIzaSy...)" style="flex:1; min-width:200px; padding:10px 14px; border-radius:10px; border:1.5px solid rgba(99,102,241,.30); background:rgba(255,255,255,.05); color:var(--ink);" />
-                  <button class="btn primary" id="saveApiKeyBtn">Connetti</button>
+                  <button class="btn primary" id="saveApiKeyBtn">Usa chiave</button>
                 </div>
                 <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" class="ai-key-hint">Come ottenere una chiave API Gemini gratuita? ↗</a>
               </div>
@@ -5686,13 +5691,13 @@
             </p>
 
             <!-- TABS PER SCELTA CAMERA / SENATO -->
-            <div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.01); border:1.5px dashed var(--line); border-radius:12px; margin-bottom:24px;">
-              <h3>📊 CHES 2023 Expert Survey Index (Consenso Accademico)</h3>
-              <p class="small text-muted" style="margin-bottom:12px;">Confronta i giudizi degli esperti di scienze politiche della Chapel Hill Expert Survey sulle coordinate delle principali forze politiche.</p>
-              <div id="chesExpertIndexDetailsBox">
+            <details style="margin-top:24px; padding:18px 20px; background:rgba(0,0,0,0.01); border:1.5px dashed var(--line); border-radius:12px; margin-bottom:24px;">
+              <summary style="cursor:pointer; font-weight:800; color:var(--accent);">Benchmark esperti CHES 2023 (opzionale)</summary>
+              <p class="small text-muted" style="margin:10px 0 12px;">Questo non determina la coalizione: serve solo come riferimento accademico per confrontare le coordinate dei partiti nella Chapel Hill Expert Survey.</p>
+              <div class="ches-index-box" id="chesExpertIndexDetailsBoxCoalitions" data-ches-index-box>
                 <!-- Dynamically populated -->
               </div>
-            </div>
+            </details>
 
             <div style="display:flex; gap:12px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:12px;">
               <button class="btn primary" id="btnChamberCamera" style="flex:1; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; transition:all 0.2s;">🏛️ Camera dei Deputati (400 seggi)</button>
@@ -5775,7 +5780,7 @@
           <div class="block">
             <h2>📊 Osservatorio Sondaggi Elettorali & Trend Storici</h2>
             <p class="small text-muted" style="margin-bottom: 20px;">
-              Analisi delle intenzioni di voto dei principali partiti italiani. La base corrente usa l'ultimo dato YouTrend reperito nella tabella pubblica consultata il 14 giugno 2026; i trend precedenti restano indicativi e vanno aggiornati con fonti ufficiali quando disponibili.
+              Analisi delle intenzioni di voto dei principali partiti italiani. La base corrente usa l'ultimo dato YouTrend disponibile nella tabella pubblica consultata il 14 giugno 2026, aggiornato all'11 giugno 2026; i trend precedenti restano indicativi e vanno aggiornati con fonti ufficiali quando disponibili.
             </p>
             
             <div class="result-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 20px;">
@@ -5801,7 +5806,7 @@
                   <!-- Dynamically populated -->
                 </div>
                 <div class="ethics-note" style="margin: 0; background: rgba(34,87,122,0.04); font-size: 12px; line-height: 1.45;">
-                  <strong>Metodologia Sondaggi:</strong> Base corrente: YouTrend, campione 813, dato reperito il 14 giugno 2026. I sondaggi sono stime campionarie, non risultati elettorali; il simulatore serve per esplorare scenari, non per prevedere con certezza il Parlamento.
+                  <strong>Metodologia Sondaggi:</strong> Base corrente: aggregazione YouTrend aggiornata all'11 giugno 2026, reperita il 14 giugno 2026. I sondaggi sono stime campionarie, non risultati elettorali; il simulatore serve per esplorare scenari, non per prevedere con certezza il Parlamento.
                 </div>
               </div>
             </div>
@@ -7109,7 +7114,7 @@
       }
       if (/^[1-7]$/.test(event.key)) {
         event.preventDefault();
-        chooseAnswer(Number(event.key), { autoAdvance: true });
+        chooseAnswer(Number(event.key), { autoAdvance: false });
       } else if (event.key === "Enter" && !el("nextBtn").disabled) {
         event.preventDefault();
         el("nextBtn").click();
@@ -8170,15 +8175,19 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       }
     }
 
+    function formatAiMessage(text) {
+      return escapeHtml(String(text || ""))
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    }
+
     function aiAppendMessage(role, text) {
       const chatMessages = document.getElementById("aiChatMessages");
       if (!chatMessages) return;
       const msgDiv = document.createElement("div");
       msgDiv.className = `ai-message ${role}`;
-      msgDiv.innerHTML = text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/\n/g, '<br>');
+      msgDiv.innerHTML = formatAiMessage(text);
       chatMessages.appendChild(msgDiv);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -8202,9 +8211,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     function initAIPanel(data) {
       const offlineText = document.getElementById("aiOfflineText");
       if (offlineText) {
-        offlineText.innerHTML = generateOfflineComment(data)
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\n/g, '<br>');
+        offlineText.innerHTML = formatAiMessage(generateOfflineComment(data));
       }
 
       const key = loadGeminiKey();
@@ -8258,7 +8265,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         aiAppendMessage("ai", reply);
       } catch (err) {
         aiRemoveTyping();
-        aiAppendMessage("ai", `⚠️ Errore di comunicazione: ${err.message}\n\nVerifica che la chiave sia valida e di avere una connessione attiva.`);
+        aiAppendMessage("ai", `⚠️ Errore di comunicazione: ${err.message}\n\nVerifica chiave, quota e connessione. Nota: nella versione statica la chiave resta nel browser; non inserirla mai nel codice pubblico del sito.`);
         console.error("Errore Gemini Live:", err);
       } finally {
         sendBtn.disabled = false;
@@ -8273,7 +8280,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         const val = document.getElementById("aiApiKeyInput")?.value;
         if (val) {
           saveGeminiKey(val);
-          showAppNotice("API Key connessa con successo!");
+          showAppNotice("Chiave salvata nel browser. Non viene inserita nel codice del sito.");
           if (state.lastResult) initAIPanel(state.lastResult);
         }
       }
@@ -8302,20 +8309,20 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
 
     // --- 4. LOGICA SIMULATORE DI COALIZIONI (CAMERA E SENATO GIUGNO 2026) ---
     const SIMULATOR_PARTIES = [
-      { name: "Fratelli d'Italia", cameraSeats: 117, senatoSeats: 63, percentage: 28.5, color: "#003366", protoKey: "Fratelli d'Italia" },
+      { name: "Fratelli d'Italia", cameraSeats: 117, senatoSeats: 63, percentage: 28.3, color: "#003366", protoKey: "Fratelli d'Italia" },
       { name: "Partito Democratico", cameraSeats: 69, senatoSeats: 36, percentage: 21.4, color: "#e3182b", protoKey: "PD" },
-      { name: "Movimento 5 Stelle", cameraSeats: 48, senatoSeats: 26, percentage: 13.0, color: "#f1c40f", protoKey: "Movimento 5 Stelle" },
-      { name: "Lega", cameraSeats: 57, senatoSeats: 29, percentage: 7.2, color: "#009246", protoKey: "Lega" },
-      { name: "Forza Italia", cameraSeats: 52, senatoSeats: 20, percentage: 8.2, color: "#0054a5", protoKey: "Forza Italia" },
-      { name: "Alleanza Verdi e Sinistra", cameraSeats: 10, senatoSeats: 4, percentage: 6.2, color: "#2ecc71", protoKey: "Alleanza Verdi e Sinistra" },
-      { name: "Futuro Nazionale (Vannacci)", cameraSeats: 2, senatoSeats: 1, percentage: 4.6, color: "#8e44ad", protoKey: "Lega" },
-      { name: "Azione", cameraSeats: 10, senatoSeats: 0, percentage: 3.0, color: "#1f3a52", protoKey: "Azione / Italia Viva" },
+      { name: "Movimento 5 Stelle", cameraSeats: 48, senatoSeats: 26, percentage: 12.9, color: "#f1c40f", protoKey: "Movimento 5 Stelle" },
+      { name: "Lega", cameraSeats: 57, senatoSeats: 29, percentage: 6.7, color: "#009246", protoKey: "Lega" },
+      { name: "Forza Italia", cameraSeats: 52, senatoSeats: 20, percentage: 8.0, color: "#0054a5", protoKey: "Forza Italia" },
+      { name: "Alleanza Verdi e Sinistra", cameraSeats: 10, senatoSeats: 4, percentage: 6.5, color: "#2ecc71", protoKey: "Alleanza Verdi e Sinistra" },
+      { name: "Futuro Nazionale (Vannacci)", cameraSeats: 2, senatoSeats: 1, percentage: 4.4, color: "#8e44ad", protoKey: "Lega" },
+      { name: "Azione", cameraSeats: 10, senatoSeats: 0, percentage: 2.9, color: "#1f3a52", protoKey: "Azione / Italia Viva" },
       { name: "Italia Viva", cameraSeats: 7, senatoSeats: 8, percentage: 2.4, color: "#ff6600", protoKey: "Azione / Italia Viva" },
-      { name: "+Europa", cameraSeats: 3, senatoSeats: 0, percentage: 2.2, color: "#f39c12", protoKey: "PD" },
-      { name: "Noi Moderati - Civici", cameraSeats: 8, senatoSeats: 8, percentage: 1.5, color: "#3498db", protoKey: "Forza Italia" },
+      { name: "+Europa", cameraSeats: 3, senatoSeats: 0, percentage: 1.4, color: "#f39c12", protoKey: "PD" },
+      { name: "Noi Moderati - Civici", cameraSeats: 8, senatoSeats: 8, percentage: 1.2, color: "#3498db", protoKey: "Forza Italia" },
       { name: "Autonomie e Minoranze", cameraSeats: 4, senatoSeats: 5, percentage: 1.0, color: "#95a5a6", protoKey: "Centrismo pragmatico" },
       { name: "Senatori a Vita (Apartitici)", cameraSeats: 0, senatoSeats: 5, percentage: 0.0, color: "#7f8c8d", protoKey: "Centrismo pragmatico" },
-      { name: "Altri / Gruppo Misto Residuo", cameraSeats: 13, senatoSeats: 8, percentage: 1.8, color: "#bdc3c7", protoKey: "Centrismo pragmatico" }
+      { name: "Altri / Gruppo Misto Residuo", cameraSeats: 13, senatoSeats: 8, percentage: 3.9, color: "#bdc3c7", protoKey: "Centrismo pragmatico" }
     ];
 
     let _selectedCoalitionParties = new Set();
@@ -9017,7 +9024,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       { month: "Mar 2026", fdi: 28.0, pd: 21.0, m5s: 13.6, lega: 8.2, fi: 8.8, avs: 5.4, altri: 15.0 },
       { month: "Apr 2026", fdi: 27.9, pd: 22.0, m5s: 12.9, lega: 6.9, fi: 9.0, avs: 6.4, altri: 14.9 },
       { month: "Mag 2026", fdi: 27.7, pd: 21.7, m5s: 13.5, lega: 5.9, fi: 7.8, avs: 6.4, altri: 17.0 },
-      { month: "Giu 2026", fdi: 28.6, pd: 21.5, m5s: 11.7, lega: 6.1, fi: 9.1, avs: 7.2, altri: 15.8 }
+      { month: "Giu 2026", fdi: 28.3, pd: 21.4, m5s: 12.9, lega: 6.7, fi: 8.0, avs: 6.5, altri: 16.2 }
     ];
 
     const PARTY_DESCRIPTIONS = {
@@ -9155,15 +9162,15 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     ];
 
     let simVotePercentages = {
-      "FdI": 28.6,
-      "PD": 21.5,
-      "M5S": 11.7,
-      "Lega": 6.1,
-      "FI": 9.1,
-      "AVS": 7.2,
-      "Azione": 4.3,
-      "IV": 1.9,
-      "Altri": 9.6
+      "FdI": 28.3,
+      "PD": 21.4,
+      "M5S": 12.9,
+      "Lega": 6.7,
+      "FI": 8.0,
+      "AVS": 6.5,
+      "Azione": 2.9,
+      "IV": 2.4,
+      "Altri": 10.9
     };
 
     let dnaActiveAxisIdx = 0;
@@ -9480,13 +9487,13 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
           extraSection.innerHTML = `
             <hr style="border:0; border-top: 1px solid var(--line); margin: 30px 0;">
             
-            <div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.01); border:1.5px dashed var(--line); border-radius:12px; margin-bottom:24px;">
-              <h3>📊 CHES 2023 Expert Survey Index (Consenso Accademico)</h3>
-              <p class="small text-muted" style="margin-bottom:12px;">Confronta i giudizi degli esperti di scienze politiche della Chapel Hill Expert Survey sulle coordinate delle principali forze politiche.</p>
-              <div id="chesExpertIndexDetailsBox">
+            <details style="margin-top:24px; padding:18px 20px; background:rgba(0,0,0,0.01); border:1.5px dashed var(--line); border-radius:12px; margin-bottom:24px;">
+              <summary style="cursor:pointer; font-weight:800; color:var(--accent);">Benchmark esperti CHES 2023 (opzionale)</summary>
+              <p class="small text-muted" style="margin:10px 0 12px;">Riferimento accademico separato dal tuo risultato: aiuta a confrontare le coordinate dei partiti secondo la Chapel Hill Expert Survey.</p>
+              <div class="ches-index-box" id="chesExpertIndexDetailsBoxDna" data-ches-index-box>
                 <!-- Dynamically populated -->
               </div>
-            </div>
+            </details>
 
             <div style="display:flex; gap:12px; margin-bottom:20px; border-bottom:1px solid var(--line); padding-bottom:12px;">
               <button class="btn primary" id="btnSubDnaTheories" style="padding:8px 14px; font-size:13px; font-weight:700;">🎓 Teorie Politologiche</button>
@@ -9545,9 +9552,9 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
 
     const SIMULATOR_SCENARIOS_DB = [
       {
-        name: "Valori Reali Attuali (Media Sondaggi)",
-        votes: { "FdI": 27.5, "PD": 21.8, "M5S": 13.2, "Lega": 8.1, "FI": 9.2, "AVS": 5.7, "Azione": 3.5, "IV": 2.2, "Altri": 8.8 },
-        comment: "Distribuzione attuale derivata dall'Osservatorio Politometro basata sulla media ponderata nazionale."
+        name: "Valori attuali YouTrend (11 giugno 2026)",
+        votes: { "FdI": 28.3, "PD": 21.4, "M5S": 12.9, "Lega": 6.7, "FI": 8.0, "AVS": 6.5, "Azione": 2.9, "IV": 2.4, "Altri": 10.9 },
+        comment: "Distribuzione derivata dall'ultima aggregazione YouTrend disponibile nella tabella pubblica consultata il 14 giugno 2026."
       },
       {
         name: "Scenario A: Polarizzazione Bipolare",
@@ -10037,54 +10044,60 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     ];
 
     function populateChesExpertIndex() {
-      const container = document.getElementById("chesExpertIndexDetailsBox");
-      if (!container) return;
-      
-      let html = '<div style="margin-bottom:12px;"><label class="small" style="font-weight:bold;">Seleziona Dimensione CHES:</label>';
-      html += '<select id="chesExpertDimensionSelector" class="input" style="width:100%; min-height:36px; margin-top:4px;">';
-      CHES_EXPERT_INDEX_DB.forEach((item, idx) => {
-        html += `<option value="${idx}">${item.name}</option>`;
-      });
-      html += '</select></div>';
-      
-      html += '<div id="chesExpertActiveDataBox" style="background:var(--paper); border:1.5px solid var(--line); border-radius:12px; padding:16px;"></div>';
-      
-      container.innerHTML = html;
-      
-      const selector = document.getElementById("chesExpertDimensionSelector");
-      const dataBox = document.getElementById("chesExpertActiveDataBox");
-      
-      function renderActiveChesDimension(idx) {
-        const item = CHES_EXPERT_INDEX_DB[idx];
-        if (!item) return;
-        
-        let partyRows = "";
-        item.parties.forEach(p => {
-          partyRows += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.04);">
-              <span style="font-weight:600;">${p.name}</span>
-              <div>Punteggio Esperto: <strong>${p.score.toFixed(1)}</strong> <span style="font-size:10.5px; color:var(--muted);">(Dev. Std: ±${p.stdDev.toFixed(2)})</span></div>
+      const containers = Array.from(document.querySelectorAll("[data-ches-index-box]"));
+      if (!containers.length) return;
+
+      containers.forEach((container, boxIndex) => {
+        const selectorId = `chesExpertDimensionSelector${boxIndex}`;
+        const dataBoxId = `chesExpertActiveDataBox${boxIndex}`;
+
+        let html = '<div style="margin-bottom:12px;"><label class="small" style="font-weight:bold;">Scegli dimensione del benchmark CHES:</label>';
+        html += `<select id="${selectorId}" class="input" style="width:100%; min-height:36px; margin-top:4px;">`;
+        CHES_EXPERT_INDEX_DB.forEach((item, idx) => {
+          html += `<option value="${idx}">${item.name}</option>`;
+        });
+        html += '</select></div>';
+
+        html += `<div id="${dataBoxId}" style="background:var(--paper); border:1.5px solid var(--line); border-radius:12px; padding:16px;"></div>`;
+
+        container.innerHTML = html;
+
+        const selector = document.getElementById(selectorId);
+        const dataBox = document.getElementById(dataBoxId);
+
+        function renderActiveChesDimension(idx) {
+          const item = CHES_EXPERT_INDEX_DB[idx];
+          if (!item || !dataBox) return;
+
+          let partyRows = "";
+          item.parties.forEach(p => {
+            partyRows += `
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.04);">
+                <span style="font-weight:600;">${p.name}</span>
+                <div style="text-align:right;">Punteggio medio esperti: <strong>${p.score.toFixed(1)}</strong> <span style="font-size:10.5px; color:var(--muted);">(deviazione: ±${p.stdDev.toFixed(2)})</span></div>
+              </div>
+            `;
+          });
+
+          dataBox.innerHTML = `
+            <div style="border-bottom:1.5px solid var(--line); padding-bottom:8px; margin-bottom:12px;">
+              <strong style="font-size:15px; color:var(--accent);">Dimensione CHES: ${item.name}</strong>
+              <p class="small text-muted" style="margin:4px 0 0 0; line-height:1.4;">${item.meaning}</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              ${partyRows}
             </div>
           `;
-        });
-        
-        dataBox.innerHTML = `
-          <div style="border-bottom:1.5px solid var(--line); padding-bottom:8px; margin-bottom:12px;">
-            <strong style="font-size:15px; color:var(--accent);">📊 CHES Dim: ${item.name}</strong>
-            <p class="small text-muted" style="margin:4px 0 0 0; line-height:1.4;">${item.meaning}</p>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            ${partyRows}
-          </div>
-        `;
-      }
-      
-      selector.onchange = (e) => {
-        renderActiveChesDimension(e.target.value);
-      };
-      
-      // Render first
-      renderActiveChesDimension(0);
+        }
+
+        if (selector) {
+          selector.onchange = (e) => {
+            renderActiveChesDimension(e.target.value);
+          };
+        }
+
+        renderActiveChesDimension(0);
+      });
     }
 
 
@@ -10314,17 +10327,19 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       const container = document.getElementById("regionalLawsBox");
       if (!container) return;
       
-      let html = '<div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">';
-      REGIONAL_SYSTEMS_DETAILS_DB.forEach(item => {
+      let html = '<div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">';
+      REGIONAL_SYSTEMS_DETAILS_DB.forEach((item, index) => {
         html += `
-          <div style="background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <details ${index === 0 ? "open" : ""} style="background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:12px;">
+            <summary style="display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;">
               <strong style="color:var(--accent); font-size:13.5px;">⚖️ ${item.type}</strong>
-              <span class="chip" style="font-size:9.5px; background:rgba(34,87,122,0.06); font-weight:bold;">Legge</span>
+              <span class="chip" style="font-size:9.5px; background:rgba(34,87,122,0.06); font-weight:bold;">Apri scheda</span>
+            </summary>
+            <div style="margin-top:10px; border-top:1px solid var(--line); padding-top:10px;">
+              <span class="small" style="font-weight:bold; color:var(--muted);">${item.law}</span>
+              <p class="small text-muted" style="margin:6px 0 0 0; line-height:1.45;">${item.details}</p>
             </div>
-            <span class="small" style="font-weight:bold; color:var(--muted);">${item.law}</span>
-            <p class="small text-muted" style="margin:4px 0 0 0; line-height:1.4;">${item.details}</p>
-          </div>
+          </details>
         `;
       });
       html += '</div>';
@@ -10478,7 +10493,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       /* Custom scrollbar per i box di dati grandi */
       #historicalThinkersDetailsBox::-webkit-scrollbar,
       #worldSystemsDetailsBox::-webkit-scrollbar,
-      #chesExpertIndexDetailsBox::-webkit-scrollbar,
+      .ches-index-box::-webkit-scrollbar,
       #glossaryContainer::-webkit-scrollbar,
       #academicBibliographyBox::-webkit-scrollbar,
       #academicQuestionDetailsBox::-webkit-scrollbar {
@@ -10487,7 +10502,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       #historicalThinkersDetailsBox::-webkit-scrollbar-track,
       #worldSystemsDetailsBox::-webkit-scrollbar-track,
-      #chesExpertIndexDetailsBox::-webkit-scrollbar-track,
+      .ches-index-box::-webkit-scrollbar-track,
       #glossaryContainer::-webkit-scrollbar-track,
       #academicBibliographyBox::-webkit-scrollbar-track,
       #academicQuestionDetailsBox::-webkit-scrollbar-track {
@@ -10497,7 +10512,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       #historicalThinkersDetailsBox::-webkit-scrollbar-thumb,
       #worldSystemsDetailsBox::-webkit-scrollbar-thumb,
-      #chesExpertIndexDetailsBox::-webkit-scrollbar-thumb,
+      .ches-index-box::-webkit-scrollbar-thumb,
       #glossaryContainer::-webkit-scrollbar-thumb,
       #academicBibliographyBox::-webkit-scrollbar-thumb,
       #academicQuestionDetailsBox::-webkit-scrollbar-thumb {
@@ -10507,7 +10522,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       #historicalThinkersDetailsBox::-webkit-scrollbar-thumb:hover,
       #worldSystemsDetailsBox::-webkit-scrollbar-thumb:hover,
-      #chesExpertIndexDetailsBox::-webkit-scrollbar-thumb:hover,
+      .ches-index-box::-webkit-scrollbar-thumb:hover,
       #glossaryContainer::-webkit-scrollbar-thumb:hover,
       #academicBibliographyBox::-webkit-scrollbar-thumb:hover,
       #academicQuestionDetailsBox::-webkit-scrollbar-thumb:hover {
@@ -10773,20 +10788,22 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       const container = document.getElementById("coalitionHistoryDetailsBox");
       if (!container) return;
       
-      let html = '<div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">';
-      COALITION_HISTORY_DETAILS_DB.forEach(item => {
+      let html = '<div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">';
+      COALITION_HISTORY_DETAILS_DB.forEach((item, index) => {
         html += `
-          <div style="background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <strong style="color:var(--accent); font-size:13.5px;">🗳️ Era: ${item.era}</strong>
-              <span class="chip" style="font-size:9.5px; background:rgba(34,87,122,0.06); font-weight:bold;">Formula</span>
+          <details ${index === 0 ? "open" : ""} style="background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:12px;">
+            <summary style="display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;">
+              <strong style="color:var(--accent); font-size:13.5px;">🗳️ ${item.era}</strong>
+              <span class="chip" style="font-size:9.5px; background:rgba(34,87,122,0.06); font-weight:bold;">Apri formula</span>
+            </summary>
+            <div style="margin-top:10px; border-top:1px solid var(--line); padding-top:10px;">
+              <span class="small" style="font-weight:bold; color:var(--ink);">Coalizione: ${item.coalition}</span>
+              <p class="small text-muted" style="margin:6px 0 0 0; line-height:1.45;"><strong>Logica politica:</strong> ${item.formula}</p>
+              <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">
+                <strong>Stabilità storica:</strong> ${item.stability}
+              </div>
             </div>
-            <span class="small" style="font-weight:bold; color:var(--ink);">Coalizione: ${item.coalition}</span>
-            <p class="small text-muted" style="margin:4px 0 0 0; line-height:1.45;"><strong>Logica Politica:</strong> ${item.formula}</p>
-            <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">
-              <strong>Stabilità Storica:</strong> ${item.stability}
-            </div>
-          </div>
+          </details>
         `;
       });
       html += '</div>';
@@ -10958,11 +10975,25 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       }
     }
 
+    const LEADER_AXES = {
+      "Meloni":     { Economia: 0.35, Autorità: 0.70, Cultura: -0.80, Geopolitica: 0.65, Ambiente: -0.45, Tecnologia: -0.10, Uguaglianza: -0.60, Giustizia: 0.75, col: "#005B94" },
+      "Schlein":    { Economia: -0.55, Autorità: -0.50, Cultura: 0.75, Geopolitica: 0.70, Ambiente: 0.80, Tecnologia: 0.45, Uguaglianza: 0.85, Giustizia: -0.45, col: "#EF3E3E" },
+      "Conte":      { Economia: -0.70, Autorità: -0.20, Cultura: 0.40, Geopolitica: -0.60, Ambiente: 0.90, Tecnologia: 0.70, Uguaglianza: 0.80, Giustizia: 0.20, col: "#F1C40F" },
+      "Salvini":    { Economia: 0.20, Autorità: 0.65, Cultura: -0.75, Geopolitica: -0.70, Ambiente: -0.60, Tecnologia: -0.15, Uguaglianza: -0.70, Giustizia: 0.80, col: "#009344" },
+      "Tajani":     { Economia: 0.60, Autorità: 0.25, Cultura: -0.40, Geopolitica: 0.80, Ambiente: -0.20, Tecnologia: 0.20, Uguaglianza: -0.40, Giustizia: 0.40, col: "#3498DB" },
+      "Calenda":    { Economia: 0.70, Autorità: 0.10, Cultura: 0.30, Geopolitica: 0.90, Ambiente: 0.40, Tecnologia: 0.85, Uguaglianza: 0.10, Giustizia: 0.15, col: "#1F3B5C" },
+      "Renzi":      { Economia: 0.75, Autorità: 0.05, Cultura: 0.45, Geopolitica: 0.85, Ambiente: 0.35, Tecnologia: 0.80, Uguaglianza: 0.20, Giustizia: 0.20, col: "#E67E22" },
+      "Machiavelli":{ Economia: 0.30, Autorità: 0.85, Cultura: -0.70, Geopolitica: -0.40, Ambiente: -0.50, Tecnologia: -0.30, Uguaglianza: -0.50, Giustizia: 0.60, col: "#8B4513" },
+      "Gramsci":    { Economia: -0.95, Autorità: -0.60, Cultura: 0.70, Geopolitica: -0.30, Ambiente: 0.50, Tecnologia: 0.30, Uguaglianza: 0.95, Giustizia: -0.50, col: "#C0392B" },
+      "Einaudi":    { Economia: 0.90, Autorità: -0.30, Cultura: -0.20, Geopolitica: 0.60, Ambiente: -0.10, Tecnologia: 0.60, Uguaglianza: -0.40, Giustizia: 0.20, col: "#2980B9" },
+      "Spinelli":   { Economia: -0.20, Autorità: -0.40, Cultura: 0.60, Geopolitica: 0.95, Ambiente: 0.50, Tecnologia: 0.40, Uguaglianza: 0.50, Giustizia: -0.30, col: "#27AE60" }
+    };
+
     function runArenaSimulation(userData) {
       const challengerA = document.getElementById("arenaChallengerA").value;
       const challengerB = document.getElementById("arenaChallengerB").value;
       const themeAxis = document.getElementById("arenaThemeAxis").value;
-      
+
       const pinA = document.getElementById("arenaPinA");
       const pinB = document.getElementById("arenaPinB");
       const dialogScript = document.getElementById("arenaDialogScript");
@@ -10978,23 +11009,25 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       let colorB = "#EF3E3E";
       
       if (challengerA === "user") {
-        nameA = userData.name || "Tu (Profilo Utente)";
-        coordA = userData.profile ? userData.profile[STANDALONE_DATA.axis_short.indexOf(themeAxis)] : 0;
+        nameA = userData.archetype || userData.name || "Il tuo Profilo";
+        const axisNames = ["Economia", "Autorità", "Cultura", "Geopolitica", "Ambiente", "Tecnologia", "Uguaglianza", "Giustizia"];
+        const axIdx = axisNames.indexOf(themeAxis);
+        coordA = (userData.axes && userData.axes[themeAxis] !== undefined) ? userData.axes[themeAxis] : (userData.profile ? (userData.profile[axIdx] || 0) : 0);
         colorA = "var(--accent-2)";
-      } else {
-        const party = PARTY_DESCRIPTIONS[challengerA] || { col: "#999", axes: {} };
-        coordA = party.axes[themeAxis] !== undefined ? party.axes[themeAxis] : 0;
-        colorA = party.col;
+      } else if (LEADER_AXES[challengerA]) {
+        coordA = LEADER_AXES[challengerA][themeAxis] !== undefined ? LEADER_AXES[challengerA][themeAxis] : 0;
+        colorA = LEADER_AXES[challengerA].col;
       }
       
       if (challengerB === "user") {
-        nameB = userData.name || "Tu (Profilo Utente)";
-        coordB = userData.profile ? userData.profile[STANDALONE_DATA.axis_short.indexOf(themeAxis)] : 0;
+        nameB = userData.archetype || userData.name || "Il tuo Profilo";
+        const axisNames = ["Economia", "Autorità", "Cultura", "Geopolitica", "Ambiente", "Tecnologia", "Uguaglianza", "Giustizia"];
+        const axIdx = axisNames.indexOf(themeAxis);
+        coordB = (userData.axes && userData.axes[themeAxis] !== undefined) ? userData.axes[themeAxis] : (userData.profile ? (userData.profile[axIdx] || 0) : 0);
         colorB = "var(--accent-2)";
-      } else {
-        const party = PARTY_DESCRIPTIONS[challengerB] || { col: "#999", axes: {} };
-        coordB = party.axes[themeAxis] !== undefined ? party.axes[themeAxis] : 0;
-        colorB = party.col;
+      } else if (LEADER_AXES[challengerB]) {
+        coordB = LEADER_AXES[challengerB][themeAxis] !== undefined ? LEADER_AXES[challengerB][themeAxis] : 0;
+        colorB = LEADER_AXES[challengerB].col;
       }
       
       const pctA = Math.max(2, Math.min(98, (coordA + 1) * 50));
@@ -11002,12 +11035,18 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       pinA.style.left = `${pctA}%`;
       pinA.style.background = colorA;
-      
+
       pinB.style.left = `${pctB}%`;
       pinB.style.background = colorB;
-      
+
+      // Aggiorna le etichette dei pin
+      const labelA = document.getElementById("arenaLabelA");
+      const labelB = document.getElementById("arenaLabelB");
+      if (labelA) { labelA.textContent = nameA; labelA.style.color = colorA; }
+      if (labelB) { labelB.textContent = nameB; labelB.style.color = colorB; }
+
       const dist = Math.abs(coordA - coordB);
-      document.getElementById("arenaDiffText").textContent = `Distanza: ${dist.toFixed(2)}`;
+      document.getElementById("arenaDiffText").textContent = `Distanza ideologica: ${dist.toFixed(2)}`;
       
       let argA = "";
       let argB = "";
@@ -14707,15 +14746,15 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       if (btnResetSliders) {
         btnResetSliders.onclick = () => {
           simVotePercentages = {
-            "FdI": 28.6,
-            "PD": 21.5,
-            "M5S": 11.7,
-            "Lega": 6.1,
-            "FI": 9.1,
-            "AVS": 7.2,
-            "Azione": 4.3,
-            "IV": 1.9,
-            "Altri": 9.6
+            "FdI": 28.3,
+            "PD": 21.4,
+            "M5S": 12.9,
+            "Lega": 6.7,
+            "FI": 8.0,
+            "AVS": 6.5,
+            "Azione": 2.9,
+            "IV": 2.4,
+            "Altri": 10.9
           };
           updateElectoralSlidersUI(data);
           runElectoralSimulation();
