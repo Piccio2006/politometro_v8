@@ -7643,6 +7643,21 @@
       updateIdentityPreview();
       document.getElementById("installApp").addEventListener("click", requestInstallApp);
       bindEngineControls();
+      // Animazione entrata landing
+      requestAnimationFrame(() => {
+        const els = [
+          document.querySelector(".welcome-card"),
+          document.querySelector(".explain-grid"),
+          document.querySelector(".trust-strip"),
+        ];
+        els.forEach((el, i) => {
+          if (!el) return;
+          el.style.opacity = "0";
+          el.style.transform = "translateY(18px)";
+          el.style.transition = `opacity .45s cubic-bezier(.2,.8,.2,1) ${i * 0.12}s, transform .45s cubic-bezier(.2,.8,.2,1) ${i * 0.12}s`;
+          requestAnimationFrame(() => { el.style.opacity = "1"; el.style.transform = "translateY(0)"; });
+        });
+      });
     }
 
     function updateIdentityPreview() {
