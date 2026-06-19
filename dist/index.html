@@ -2848,6 +2848,8 @@
       z-index: 0;
       opacity: .18;
     }
+    @keyframes calcDot { 0%,100% { transform:scale(1); opacity:.4; } 50% { transform:scale(1.5); opacity:1; } }
+    #calcPhaseTitle, #calcPhaseDesc { transition: opacity .18s ease; }
 
     /* Shimmer on match scores */
     @keyframes scoreShimmer {
@@ -4385,11 +4387,36 @@
       el("questionText").textContent = "";
       el("options").innerHTML = `
         <div class="completion-card">
-          <div class="completion-sigil">OK</div>
-          <h3>Sto componendo il tuo risultato</h3>
-          <p class="small">Peso le risposte, controllo la coerenza interna e preparo grafici, mappa e report.</p>
+          <div class="completion-sigil" style="font-size:26px;">◈</div>
+          <h3 id="calcPhaseTitle">Analisi in corso…</h3>
+          <p class="small" id="calcPhaseDesc">Peso le risposte, calcolo gli 8 assi e verifico la coerenza interna.</p>
+          <div style="display:flex;gap:7px;justify-content:center;margin-top:4px;">
+            <span class="calc-dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent-2);animation:calcDot 1.1s ease-in-out infinite;"></span>
+            <span class="calc-dot" style="width:8px;height:8px;border-radius:50%;background:var(--warm);animation:calcDot 1.1s ease-in-out .18s infinite;"></span>
+            <span class="calc-dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent);animation:calcDot 1.1s ease-in-out .36s infinite;"></span>
+          </div>
         </div>
       `;
+      // Cicla tra le fasi di calcolo
+      const phases = [
+        ["Peso le risposte sui 8 assi", "Ogni asse ha un peso calibrato sul tuo percorso di risposta."],
+        ["Confronto con 120+ partiti", "Calcolo la distanza angolare nel profilo multidimensionale."],
+        ["Verifico la coerenza interna", "Cerco contraddizioni tematiche tra le risposte simili."],
+        ["Compongo il report ideologico", "Abbino il profilo alle categorie teoriche globali."],
+        ["Preparo i grafici", "Radar, mappa politica, barre per asse — tutto in arrivo."],
+      ];
+      let pi = 0;
+      const phaseTimer = setInterval(() => {
+        pi = (pi + 1) % phases.length;
+        const t = document.getElementById("calcPhaseTitle");
+        const d = document.getElementById("calcPhaseDesc");
+        if (t) { t.style.opacity = "0"; setTimeout(() => { t.textContent = phases[pi][0] + "…"; t.style.opacity = "1"; }, 180); }
+        if (d) { d.style.opacity = "0"; setTimeout(() => { d.textContent = phases[pi][1]; d.style.opacity = "1"; }, 180); }
+      }, 900);
+      // Pulisce il timer quando i risultati arrivano
+      const cleanup = () => { clearInterval(phaseTimer); };
+      document.getElementById("results")?.addEventListener("classchange", cleanup, { once: true });
+      window._calcPhaseTimer = phaseTimer;
       el("prevBtn").disabled = true;
       el("nextBtn").disabled = true;
       el("nextBtn").textContent = "Calcolo in corso";
@@ -15699,6 +15726,7 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       const resObs = new MutationObserver(() => {
         if (!resultsEl.classList.contains("visible")) return;
         if (!_confettiFired) { _confettiFired = true; setTimeout(launchConfetti, 300); }
+        if (window._calcPhaseTimer) { clearInterval(window._calcPhaseTimer); window._calcPhaseTimer = null; }
         setTimeout(() => {
           resultsEl.querySelectorAll(".score").forEach(scoreEl => {
             const raw = scoreEl.textContent.trim();
