@@ -50,14 +50,17 @@ def parse_pct(s):
 
 
 def _extract_from_text(text):
-    """Cerca percentuali per partito nel testo plain della pagina."""
+    """Cerca percentuali per partito nel testo plain della pagina.
+    Gestisce formati: '28,2%', 'al 28,2', 'al 28,2%', '28,2 per cento'.
+    """
+    PCT = r"(?:al\s+)?(\d{1,2}[,\.]\d+)(?:\s*%|\s+per\s+cento)?"
     patterns = {
-        "fdi":  r"Fratelli d.Italia[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
-        "pd":   r"Partito Democratico[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
-        "m5s":  r"(?:Movimento 5 Stelle|M5S)[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
-        "lega": r"\bLega\b[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
-        "fi":   r"Forza Italia[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
-        "avs":  r"Alleanza Verdi[^%\d]{0,60}?(\d{1,2}[,\.]\d)\s*%",
+        "fdi":  rf"(?:Fratelli d.Italia|FdI)[^%\d]{{0,80}}?{PCT}",
+        "pd":   rf"(?:Partito Democratico|\bPD\b)[^%\d]{{0,80}}?{PCT}",
+        "m5s":  rf"(?:Movimento 5 Stelle|M5S|Cinque Stelle)[^%\d]{{0,80}}?{PCT}",
+        "lega": rf"\bLega\b[^%\d]{{0,80}}?{PCT}",
+        "fi":   rf"(?:Forza Italia|\bFI\b)[^%\d]{{0,80}}?{PCT}",
+        "avs":  rf"(?:Alleanza Verdi[^%\d]{{0,10}}Sinistra|AVS)[^%\d]{{0,80}}?{PCT}",
     }
     results = {}
     for key, pat in patterns.items():
@@ -154,7 +157,7 @@ def scrape_youtrend():
         if len(results) < 4:
             results = _extract_from_text(soup_art.get_text(" "))
 
-        if len(results) >= 5:
+        if len(results) >= 4:
             print(f"  YouTraend OK: {len(results)} partiti trovati")
             return results, "YouTraend/Supermedia"
 
