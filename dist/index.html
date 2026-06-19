@@ -411,8 +411,14 @@
     }
     .btn:active:not(:disabled) { transform: translateY(0) scale(.99); }
     .btn.primary {
-      background: linear-gradient(135deg, var(--accent), #17384d);
+      background: linear-gradient(135deg, var(--accent-2) 0%, var(--accent) 50%, #17384d 100%);
+      background-size: 200% 100%;
       color: white;
+      transition: background-position .3s ease, transform .18s ease, box-shadow .18s ease;
+    }
+    .btn.primary:hover:not(:disabled) {
+      background-position: 100% 0;
+      box-shadow: 0 6px 20px rgba(56,163,165,.35);
     }
     .btn:disabled {
       opacity: .45;
