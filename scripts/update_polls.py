@@ -69,92 +69,96 @@ def _extract_from_text(text):
     return results
 
 
-def scrape_youtrend():
-    """
-    1) Trova l'articolo Supermedia più recente su YouTraend
-    2) Lo scarica e ne estrae le percentuali
-    """
+def _find_supermedia_article_url():
+    """Trova l'URL dell'ultimo articolo Supermedia tramite RSS o ricerca."""
+    # 1) RSS feed di YouTraend
+    for feed_url in [
+        "https://www.youtrend.it/feed/",
+        "https://www.youtrend.it/feed/?s=supermedia",
+    ]:
+        try:
+            r = requests.get(feed_url, headers=HEADERS, timeout=15)
+            if r.status_code != 200:
+                continue
+            # Parse XML manualmente (evita dipendenza da feedparser)
+            for link in re.findall(r"<link>(https://www\.youtrend\.it/[^<]+supermedia[^<]+)</link>", r.text, re.IGNORECASE):
+                print(f"  YouTraend RSS: articolo trovato → {link}")
+                return link
+        except Exception as e:
+            print(f"  YouTraend RSS errore: {e}")
+
+    # 2) Pagina di ricerca
     try:
-        # Trova l'URL dell'ultimo articolo Supermedia dalla homepage
-        home = requests.get("https://www.youtrend.it/", headers=HEADERS, timeout=15)
-        home.raise_for_status()
-        soup = BeautifulSoup(home.text, "html.parser")
+        r = requests.get("https://www.youtrend.it/?s=supermedia+agi", headers=HEADERS, timeout=15)
+        if r.status_code == 200:
+            soup = BeautifulSoup(r.text, "html.parser")
+            for a in soup.find_all("a", href=True):
+                href = a["href"]
+                if "supermedia" in href.lower() and re.search(r"/\d{4}/\d{2}/\d{2}/", href):
+                    print(f"  YouTraend search: articolo trovato → {href}")
+                    return href
+    except Exception as e:
+        print(f"  YouTraend search errore: {e}")
 
-        # Cerca link che contengono "supermedia" nell'href
-        supermedia_url = None
-        for a in soup.find_all("a", href=True):
-            href = a["href"]
-            if "supermedia" in href.lower() and "youtrend" in href.lower():
-                if href.startswith("http"):
-                    supermedia_url = href
-                else:
-                    supermedia_url = "https://www.youtrend.it" + href
-                break
+    return None
 
-        if not supermedia_url:
-            # Prova la pagina category
-            cat = requests.get(
-                "https://www.youtrend.it/?s=supermedia", headers=HEADERS, timeout=15
-            )
-            if cat.status_code == 200:
-                soup2 = BeautifulSoup(cat.text, "html.parser")
-                for a in soup2.find_all("a", href=True):
-                    href = a["href"]
-                    if "supermedia" in href.lower():
-                        supermedia_url = href if href.startswith("http") else "https://www.youtrend.it" + href
-                        break
 
-        if not supermedia_url:
-            print("  YouTraend: articolo Supermedia non trovato nella homepage")
+def scrape_youtrend():
+    """Scarica l'ultimo articolo Supermedia YouTraend e ne estrae le percentuali."""
+    try:
+        url = _find_supermedia_article_url()
+        if not url:
+            print("  YouTraend: nessun articolo Supermedia trovato")
             return None, None
 
-        print(f"  YouTraend: articolo trovato → {supermedia_url}")
-        article = requests.get(supermedia_url, headers=HEADERS, timeout=15)
+        article = requests.get(url, headers=HEADERS, timeout=15)
         article.raise_for_status()
-
-        # Prima prova a trovare una tabella con dati partiti
         soup_art = BeautifulSoup(article.text, "html.parser")
         results = {}
 
+        # Prova prima le tabelle
         for table in soup_art.find_all("table"):
             ttext = table.get_text(" ")
-            if "Fratelli" in ttext or "FdI" in ttext:
-                # Cerca righe con nome partito e percentuale
-                for row in table.find_all("tr"):
-                    cells = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
-                    if len(cells) < 2:
-                        continue
-                    name = cells[0].lower()
-                    pct_cell = next((c for c in cells[1:] if re.search(r"\d+[,\.]\d", c)), None)
-                    if not pct_cell:
-                        continue
-                    val = parse_pct(re.search(r"(\d+[,\.]\d)", pct_cell).group(1))
-                    if val is None:
-                        continue
-                    if "fratelli" in name or "fdi" in name:
-                        results["fdi"] = val
-                    elif "democratico" in name or name.strip() == "pd":
-                        results["pd"] = val
-                    elif "movimento" in name or "m5s" in name or "stelle" in name:
-                        results["m5s"] = val
-                    elif "lega" in name:
-                        results["lega"] = val
-                    elif "forza" in name or name.strip() == "fi":
-                        results["fi"] = val
-                    elif "verdi" in name or "alleanza" in name or "avs" in name:
-                        results["avs"] = val
-                if len(results) >= 4:
-                    break
+            if not ("Fratelli" in ttext or "FdI" in ttext):
+                continue
+            for row in table.find_all("tr"):
+                cells = [td.get_text(strip=True) for td in row.find_all(["td", "th"])]
+                if len(cells) < 2:
+                    continue
+                name = cells[0].lower()
+                pct_cell = next((c for c in cells[1:] if re.search(r"\d+[,\.]\d", c)), None)
+                if not pct_cell:
+                    continue
+                m = re.search(r"(\d+[,\.]\d)", pct_cell)
+                if not m:
+                    continue
+                val = parse_pct(m.group(1))
+                if val is None:
+                    continue
+                if "fratelli" in name or "fdi" in name:
+                    results["fdi"] = val
+                elif "democratico" in name or name.strip() == "pd":
+                    results["pd"] = val
+                elif "movimento" in name or "m5s" in name or "stelle" in name:
+                    results["m5s"] = val
+                elif "lega" in name:
+                    results["lega"] = val
+                elif "forza" in name or name.strip() == "fi":
+                    results["fi"] = val
+                elif "verdi" in name or "alleanza" in name or "avs" in name:
+                    results["avs"] = val
+            if len(results) >= 4:
+                break
 
-        # Fallback: cerca nel testo dell'articolo
+        # Fallback: testo libero dell'articolo
         if len(results) < 4:
             results = _extract_from_text(soup_art.get_text(" "))
 
         if len(results) >= 5:
-            print(f"  YouTraend OK: trovati {len(results)} partiti")
+            print(f"  YouTraend OK: {len(results)} partiti trovati")
             return results, "YouTraend/Supermedia"
 
-        print(f"  YouTraend: trovati solo {len(results)} partiti nell'articolo")
+        print(f"  YouTraend: solo {len(results)} partiti trovati nell'articolo")
     except Exception as e:
         print(f"  YouTraend non disponibile: {e}")
     return None, None
