@@ -523,18 +523,26 @@
 	    .trust-chip {
       min-height: 78px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 14px;
 	      background:
 	        linear-gradient(135deg, rgba(56,163,165,.08), rgba(242,184,128,.08)),
 	        linear-gradient(180deg, #fff, #f7fbfb);
       display: grid;
       gap: 5px;
       box-shadow: var(--shadow-soft);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      cursor: default;
+    }
+    .trust-chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(56,163,165,.14);
+      border-color: rgba(56,163,165,.35);
     }
     .trust-chip strong {
       font-size: 13px;
       color: var(--accent);
+      font-weight: 800;
     }
     .trust-chip span {
       color: var(--muted);
@@ -623,14 +631,19 @@
       margin-top: 10px;
     }
     .hero-badge {
-      border: 1px solid rgba(34,87,122,.18);
+      border: 1px solid rgba(56,163,165,.25);
       border-radius: 999px;
-      padding: 7px 10px;
-      background: rgba(255,255,255,.72);
-      color: #24404c;
+      padding: 7px 12px;
+      background: linear-gradient(135deg, rgba(56,163,165,.10), rgba(242,184,128,.10));
+      color: var(--accent);
       font-size: 12px;
-      font-weight: 850;
-      box-shadow: 0 8px 18px rgba(23,32,38,.05);
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(56,163,165,.10);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .hero-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(56,163,165,.18);
     }
     .experience-strip {
       display: grid;
