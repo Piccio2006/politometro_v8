@@ -122,6 +122,16 @@
       justify-content: space-between;
       color: #d8e2e8;
       font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+    #percent {
+      background: linear-gradient(90deg, var(--accent-2), var(--warm));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+      font-size: 16px;
     }
     .track {
       height: 12px;
@@ -4281,8 +4291,13 @@
       const total = (state.selectedQuestions.length || state.questions.length) || 1;
       const pct = Math.round(answered / total * 100);
       el("count").textContent = `${answered} / ${total}`;
-      el("percent").textContent = `${pct}%`;
+      const pctEl = el("percent");
+      pctEl.textContent = `${pct}%`;
       el("progress").style.width = `${pct}%`;
+      // Flash sul % quando cambia
+      pctEl.style.transform = "scale(1.18)";
+      pctEl.style.transition = "transform .15s ease";
+      setTimeout(() => { pctEl.style.transform = "scale(1)"; }, 160);
     }
 
     function renderQuestion() {
