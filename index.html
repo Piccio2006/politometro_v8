@@ -811,6 +811,12 @@
       margin: 0;
       font-size: 18px;
       line-height: 1.15;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+    .world-head > div {
+      min-width: 0;
+      overflow-wrap: break-word;
     }
     .axis-mini-list {
       display: grid;
@@ -5598,10 +5604,10 @@
                     <p class="small">${archetype.line}</p>
                   </div>
                 </div>
-                <div class="chips">
-                  <span class="chip">${data.interpretation.family}</span>
-                  <span class="chip">confidenza ${data.confidence}%</span>
-                  <span class="chip">coerenza ${data.self_coherence?.score ?? "n/d"}%</span>
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
+                  <span style="display:inline-block; background:rgba(34,87,122,.08); border:1px solid rgba(34,87,122,.12); border-radius:6px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--accent); line-height:1.3;">${data.interpretation.family}</span>
+                  <span style="display:inline-block; background:rgba(34,87,122,.08); border:1px solid rgba(34,87,122,.12); border-radius:6px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--accent); line-height:1.3;">confidenza ${data.confidence}%</span>
+                  <span style="display:inline-block; background:rgba(34,87,122,.08); border:1px solid rgba(34,87,122,.12); border-radius:6px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--accent); line-height:1.3;">coerenza ${data.self_coherence?.score ?? "n/d"}%</span>
                 </div>
               </div>
               ${renderUserStrip(data)}
