@@ -62,12 +62,19 @@
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
     }
+    @keyframes sidebarShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     aside {
       background:
-        radial-gradient(circle at 18% 8%, rgba(56,163,165,.35), transparent 32%),
-        linear-gradient(180deg, rgba(10, 20, 30, 0.8), rgba(3, 6, 8, 0.95));
+        radial-gradient(circle at 18% 8%, rgba(56,163,165,.4), transparent 32%),
+        radial-gradient(circle at 82% 92%, rgba(109,89,122,.35), transparent 38%),
+        radial-gradient(circle at 60% 45%, rgba(242,184,128,.12), transparent 28%),
+        linear-gradient(160deg, #0d1f2d 0%, #030608 55%, #101820 100%);
       backdrop-filter: blur(12px);
-      border-right: 1px solid var(--line);
+      border-right: 1px solid rgba(56,163,165,.2);
       padding: 28px;
       position: sticky;
       top: 0;
@@ -76,6 +83,7 @@
       flex-direction: column;
       gap: 22px;
       color: #ffffff;
+      box-shadow: 4px 0 32px rgba(0,0,0,.25);
     }
     .brand {
       display: flex;
@@ -98,7 +106,16 @@
       margin: 0;
       letter-spacing: 0;
       text-wrap: balance;
-      color: #ffffff;
+      background: linear-gradient(90deg, #fff 0%, #38a3a5 35%, #f2b880 55%, #fff 80%);
+      background-size: 250% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: brandShimmer 6s linear infinite;
+    }
+    @keyframes brandShimmer {
+      0% { background-position: 200% center; }
+      100% { background-position: -200% center; }
     }
     .brand p {
       margin: 0;
@@ -114,6 +131,16 @@
       justify-content: space-between;
       color: #d8e2e8;
       font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+    #percent {
+      background: linear-gradient(90deg, var(--accent-2), var(--warm));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+      font-size: 16px;
     }
     .track {
       height: 12px;
@@ -233,8 +260,8 @@
       box-shadow: 0 22px 52px rgba(34, 87, 122, .13);
     }
     @keyframes rise {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(14px) scale(.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
     @keyframes sheen {
       0%, 40% { transform: translateX(-100%); }
@@ -263,10 +290,17 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .question-text {
-      font-size: 28px;
-      line-height: 1.16;
+      font-size: 26px;
+      line-height: 1.22;
       margin: 0;
       text-wrap: balance;
+      font-family: var(--display);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      background: linear-gradient(135deg, var(--ink) 60%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .options {
       display: grid;
@@ -302,25 +336,37 @@
     .option:active { transform: translateY(0) scale(.995); }
     .option.selected {
       border-color: var(--accent);
+      border-left-color: var(--accent-2);
+      border-left-width: 3px;
 	      background:
-	        linear-gradient(90deg, rgba(56,163,165,.16), rgba(242,184,128,.16)),
-	        #f7fbfb;
-      box-shadow: 0 0 0 2px rgba(34, 87, 122, .12), var(--shadow-soft);
+	        linear-gradient(90deg, rgba(56,163,165,.18), rgba(242,184,128,.14)),
+	        #f4fafa;
+      box-shadow: 0 0 0 2px rgba(34,87,122,.12), 0 6px 20px rgba(56,163,165,.10);
+    }
+    .option.selected .num {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
     .option.selected::after {
       content: "✓";
       flex: 0 0 auto;
       margin-left: auto;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
       display: grid;
       place-items: center;
-      background: var(--accent-2);
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
       color: #fff;
+      font-size: 15px;
       font-weight: 900;
-      box-shadow: 0 8px 18px rgba(56,163,165,.22);
-      animation: pop .22s ease both;
+      box-shadow: 0 4px 12px rgba(56,163,165,.35), 0 0 0 3px rgba(56,163,165,.15);
+      animation: checkPop .28s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes checkPop {
+      0% { transform: scale(0) rotate(-20deg); opacity:0; }
+      100% { transform: scale(1) rotate(0deg); opacity:1; }
     }
     .num {
       flex: 0 0 auto;
@@ -376,8 +422,14 @@
     }
     .btn:active:not(:disabled) { transform: translateY(0) scale(.99); }
     .btn.primary {
-      background: linear-gradient(135deg, var(--accent), #17384d);
+      background: linear-gradient(135deg, var(--accent-2) 0%, var(--accent) 50%, #17384d 100%);
+      background-size: 200% 100%;
       color: white;
+      transition: background-position .3s ease, transform .18s ease, box-shadow .18s ease;
+    }
+    .btn.primary:hover:not(:disabled) {
+      background-position: 100% 0;
+      box-shadow: 0 6px 20px rgba(56,163,165,.35);
     }
     .btn:disabled {
       opacity: .45;
@@ -482,18 +534,26 @@
 	    .trust-chip {
       min-height: 78px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 14px;
 	      background:
 	        linear-gradient(135deg, rgba(56,163,165,.08), rgba(242,184,128,.08)),
 	        linear-gradient(180deg, #fff, #f7fbfb);
       display: grid;
       gap: 5px;
       box-shadow: var(--shadow-soft);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      cursor: default;
+    }
+    .trust-chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(56,163,165,.14);
+      border-color: rgba(56,163,165,.35);
     }
     .trust-chip strong {
       font-size: 13px;
       color: var(--accent);
+      font-weight: 800;
     }
     .trust-chip span {
       color: var(--muted);
@@ -582,14 +642,19 @@
       margin-top: 10px;
     }
     .hero-badge {
-      border: 1px solid rgba(34,87,122,.18);
+      border: 1px solid rgba(56,163,165,.25);
       border-radius: 999px;
-      padding: 7px 10px;
-      background: rgba(255,255,255,.72);
-      color: #24404c;
+      padding: 7px 12px;
+      background: linear-gradient(135deg, rgba(56,163,165,.10), rgba(242,184,128,.10));
+      color: var(--accent);
       font-size: 12px;
-      font-weight: 850;
-      box-shadow: 0 8px 18px rgba(23,32,38,.05);
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(56,163,165,.10);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .hero-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(56,163,165,.18);
     }
     .experience-strip {
       display: grid;
@@ -692,35 +757,55 @@
     }
     .tab {
       border: 1px solid var(--line);
-      background: #fff;
+      background: rgba(255,255,255,.85);
       color: var(--ink);
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: 9px 13px;
       cursor: pointer;
       font-weight: 800;
-      transition: transform .16s ease, background .16s ease, box-shadow .16s ease, border-color .16s ease;
+      font-size: 13px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease, color .18s ease;
     }
     .tab::before {
       content: attr(data-icon);
-      margin-right: 6px;
+      margin-right: 5px;
       font-weight: 900;
       opacity: .78;
     }
+    .tab::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(56,163,165,.12), rgba(242,184,128,.10));
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
     .tab:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(56,163,165,.18);
       border-color: var(--accent-2);
     }
+    .tab:hover::after { opacity: 1; }
     .tab.active {
-      background: linear-gradient(135deg, var(--accent), #17384d);
-      border-color: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, #1a4a62 100%);
+      border-color: transparent;
       color: #fff;
+      box-shadow: 0 4px 18px rgba(34,87,122,.35), 0 1px 0 rgba(255,255,255,.12) inset;
+      transform: translateY(-1px);
+    }
+    .tab.active::after {
+      opacity: 0;
+    }
+    .tab.active::before {
+      opacity: 1;
     }
     .tab-panel { display: none; }
     .tab-panel.active {
       display: grid;
       gap: 18px;
-      animation: rise .24s ease both;
+      animation: rise .28s cubic-bezier(.2,.8,.2,1) both;
     }
     .result-grid {
       display: grid;
@@ -753,11 +838,19 @@
       display: grid;
       gap: 10px;
       padding: 22px 18px 18px;
-      border-radius: 8px;
-      border: 1px solid rgba(56,163,165,.30);
+      border-radius: 12px;
+      border: 1px solid rgba(56,163,165,.35);
       background:
-        linear-gradient(135deg, rgba(34,87,122,.08), rgba(242,184,128,.12)),
+        radial-gradient(circle at 10% 0%, rgba(56,163,165,.18), transparent 40%),
+        radial-gradient(circle at 90% 100%, rgba(242,184,128,.18), transparent 40%),
+        linear-gradient(135deg, rgba(34,87,122,.06), rgba(242,184,128,.06)),
         #fff;
+      box-shadow: 0 8px 32px rgba(56,163,165,.10), 0 2px 8px rgba(34,87,122,.06);
+      animation: archetypeReveal .5s cubic-bezier(.2,.8,.2,1) both;
+    }
+    @keyframes archetypeReveal {
+      from { opacity:0; transform:translateY(12px) scale(.98); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
     }
     .archetype-card h3 {
       font-family: var(--display);
@@ -795,6 +888,15 @@
       transform: translateY(-2px);
       box-shadow: var(--shadow-soft);
       border-color: rgba(56,163,165,.55);
+    }
+    .world-grid .world-card:first-child {
+      border-color: rgba(56,163,165,.35);
+      box-shadow: 0 0 0 0 rgba(56,163,165,.2);
+      animation: worldCardGlow 3s ease-in-out infinite;
+    }
+    @keyframes worldCardGlow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(56,163,165,.2); }
+      50% { box-shadow: 0 0 0 8px rgba(56,163,165,0); }
     }
     .world-card.nemesi {
       background:
@@ -893,10 +995,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,.18);
     }
     .kicker {
-      color: var(--muted);
-      font-size: 13px;
+      color: var(--accent-2);
+      font-size: 11px;
       text-transform: uppercase;
       font-weight: 800;
+      letter-spacing: .06em;
     }
     .ideology {
       font-family: var(--display);
@@ -904,6 +1007,10 @@
       line-height: 1.05;
       margin: 0;
       text-wrap: balance;
+      background: linear-gradient(135deg, var(--ink) 30%, var(--accent-2) 70%, var(--warm));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .chips {
       display: flex;
@@ -971,9 +1078,17 @@
       pointer-events: none;
     }
     .identity-line:hover .avatar,
+    .identity-match {
+      transition: background .18s ease, padding .18s ease, box-shadow .18s ease;
+    }
+    .identity-match:hover {
+      background: linear-gradient(90deg, rgba(56,163,165,.06), transparent);
+      box-shadow: inset 3px 0 0 var(--accent-2);
+      padding-left: 8px;
+    }
     .identity-match:hover .avatar {
-      transform: rotate(-3deg) scale(1.04);
-      box-shadow: 0 14px 32px rgba(16,36,47,.18);
+      transform: rotate(-3deg) scale(1.06);
+      box-shadow: 0 14px 32px rgba(16,36,47,.20);
     }
     .avatar.large {
       width: 72px;
@@ -1046,16 +1161,23 @@
       overflow: visible;
     }
     .pin {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 999px;
-      background: var(--ink);
-      border: 3px solid white;
+      background: white;
+      border: 3px solid var(--ink);
       position: absolute;
       top: 50%;
       transform: translate(-50%, -50%);
-      box-shadow: 0 2px 8px rgba(0,0,0,.25);
-      transition: left .55s cubic-bezier(.2,.8,.2,1);
+      box-shadow: 0 2px 10px rgba(0,0,0,.30), 0 0 0 3px rgba(255,255,255,.8);
+      transition: left .7s cubic-bezier(.2,.8,.2,1);
+    }
+    .pin::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--ink);
     }
     .small {
       color: var(--muted);
@@ -1125,12 +1247,24 @@
       max-width: 420px;
       margin: 0 auto;
       padding: 28px;
-      border-radius: 8px;
+      border-radius: 14px;
       background:
-        linear-gradient(160deg, #10242f 0%, #16384a 58%, #23333a 100%);
+        radial-gradient(ellipse at 20% 0%, rgba(56,163,165,.45) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 100%, rgba(242,184,128,.30) 0%, transparent 40%),
+        radial-gradient(ellipse at 60% 50%, rgba(109,89,122,.20) 0%, transparent 55%),
+        linear-gradient(160deg, #0d1f2d 0%, #16384a 58%, #10242f 100%);
       color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow: 0 22px 60px rgba(16,36,47,.22);
+      border: 1px solid rgba(56,163,165,.35);
+      box-shadow: 0 28px 70px rgba(16,36,47,.35), 0 0 0 1px rgba(255,255,255,.04);
+      overflow: hidden;
+      position: relative;
+    }
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-2), var(--warm), var(--accent));
     }
     .poster-preview {
       display: grid;
@@ -1253,11 +1387,15 @@
       text-align: left;
     }
     .comparison-table th {
-      background: #10242f;
+      background: linear-gradient(135deg, #10242f, #1a3a4a);
       color: #fff;
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 800;
     }
+    .comparison-table tr:nth-child(even) td { background: rgba(56,163,165,.03); }
+    .comparison-table tr:hover td { background: rgba(56,163,165,.06); }
     .comparison-table tr:last-child td { border-bottom: 0; }
     .share-grid {
       display: grid;
@@ -1429,31 +1567,46 @@
       align-items: center;
       margin-bottom: 18px;
     }
+    @keyframes conicReveal {
+      from { --score: 0deg; }
+    }
+    @property --score {
+      syntax: "<angle>";
+      inherits: false;
+      initial-value: 0deg;
+    }
     .coherence-ring {
       --score: 0deg;
-      width: 92px;
-      height: 92px;
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
-      background: conic-gradient(var(--accent-2) 0 var(--score), #e5ecef var(--score) 360deg);
+      background: conic-gradient(
+        var(--accent-2) 0 var(--score),
+        var(--warm) calc(var(--score) - 20deg) var(--score),
+        #e5ecef var(--score) 360deg
+      );
       display: grid;
       place-items: center;
       position: relative;
-      box-shadow: inset 0 0 0 1px rgba(34,87,122,.08);
+      box-shadow: 0 0 0 3px rgba(56,163,165,.15), 0 8px 24px rgba(56,163,165,.18);
+      animation: ringReveal .6s cubic-bezier(.2,.8,.2,1) both .2s;
     }
     .coherence-ring::after {
       content: "";
       position: absolute;
-      width: 68px;
-      height: 68px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      background: #fff;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+      background: linear-gradient(135deg, #fff 60%, #f0f8f8);
+      box-shadow: inset 0 2px 6px rgba(56,163,165,.12);
     }
     .coherence-ring strong {
       position: relative;
       z-index: 1;
-      font-size: 20px;
+      font-size: 21px;
+      font-weight: 900;
       color: var(--accent);
+      font-family: var(--display);
     }
     .coherence-bars {
       display: grid;
@@ -2568,6 +2721,204 @@
       0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
       40% { transform: scale(1.2); opacity: 1; }
     }
+
+    /* ═══════════════════════════════════════
+       ANIMAZIONI AVANZATE — sessione notturna
+    ═══════════════════════════════════════ */
+
+    /* Ripple click su opzioni */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(56,163,165,.22);
+      animation: rippleAnim .55s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* Slide-in per domande */
+    @keyframes questionSlideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes questionSlideOut {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-28px); }
+    }
+    .question-enter { animation: questionSlideIn .32s cubic-bezier(.2,.8,.2,1) both; }
+    .question-exit  { animation: questionSlideOut .22s ease both; }
+
+    /* Reveal progressivo per blocchi risultato */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal-block {
+      opacity: 0;
+      animation: fadeUp .45s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .reveal-block:nth-child(1) { animation-delay: .05s; }
+    .reveal-block:nth-child(2) { animation-delay: .12s; }
+    .reveal-block:nth-child(3) { animation-delay: .20s; }
+    .reveal-block:nth-child(4) { animation-delay: .28s; }
+    .reveal-block:nth-child(5) { animation-delay: .36s; }
+    .reveal-block:nth-child(6) { animation-delay: .44s; }
+
+    /* Float animation per il sigilo benvenuto */
+    @keyframes floatSigil {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50%       { transform: translateY(-8px) rotate(2deg); }
+    }
+    .welcome-sigil { animation: floatSigil 4s ease-in-out infinite !important; }
+
+    /* Pulse CTA */
+    @keyframes ctaPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56,163,165,.45); }
+      50%       { box-shadow: 0 0 0 10px rgba(56,163,165,0); }
+    }
+    #startBtn { animation: ctaPulse 2.4s ease-in-out infinite; }
+
+    /* Mode card: freccia hover */
+    .mode-card::after {
+      content: "→";
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent-2);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .mode-card:not(.locked):hover::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .mode-card.selected::after {
+      opacity: 1;
+      transform: translateX(0);
+      content: "✓";
+      color: var(--accent);
+    }
+
+    /* Barre partiti: colori direzionali */
+    .match-bar-left  { background: linear-gradient(90deg, #22577a, #38a3a5) !important; }
+    .match-bar-right { background: linear-gradient(90deg, #e07b3c, #b84a62) !important; }
+    .match-bar-center{ background: linear-gradient(90deg, #6d597a, #957fad) !important; }
+
+    /* Animated bar fill */
+    @keyframes barGrow {
+      from { width: 0 !important; }
+    }
+    .animated-bar { animation: barGrow .7s cubic-bezier(.2,.8,.2,1) both; }
+
+    /* Scroll reveal via JS */
+    .scroll-hidden {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .scroll-visible {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    /* Tab fade transition */
+    .tab-panel.active {
+      animation: fadeInTab .28s ease both !important;
+    }
+
+    /* Count-up numbers */
+    .count-up { font-variant-numeric: tabular-nums; }
+
+    /* Glow effect su archetype card */
+    .archetype-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .archetype-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(135deg, var(--accent-2), var(--warm), var(--violet));
+      opacity: 0;
+      transition: opacity .4s ease;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .archetype-card > * { position: relative; z-index: 1; }
+
+    /* Hero badge animation */
+    .hero-badge {
+      animation: pop .3s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .hero-badge:nth-child(1) { animation-delay: .1s; }
+    .hero-badge:nth-child(2) { animation-delay: .2s; }
+    .hero-badge:nth-child(3) { animation-delay: .3s; }
+    .hero-badge:nth-child(4) { animation-delay: .4s; }
+
+    /* Radar glow on complete */
+    @keyframes radarGlow {
+      0%   { filter: drop-shadow(0 0 0 rgba(56,163,165,0)); }
+      50%  { filter: drop-shadow(0 0 12px rgba(56,163,165,.5)); }
+      100% { filter: drop-shadow(0 0 4px rgba(56,163,165,.2)); }
+    }
+    .radar-glow { animation: radarGlow 1.2s ease forwards; }
+
+    /* Coherence ring pulse on load */
+    @keyframes ringReveal {
+      from { transform: scale(.7) rotate(-90deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .coherence-ring { animation: ringReveal .6s cubic-bezier(.2,.8,.2,1) both .2s; }
+
+    /* Step counter: hide when no mode selected */
+    .counter-hidden { opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+    .counter-visible { opacity: 1; transition: opacity .3s ease; }
+
+    /* Landing headline gradient */
+    .landing-headline {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--warm));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+      line-height: 1.2;
+      margin: 0 0 8px;
+    }
+
+    /* Particle canvas */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .18;
+    }
+    @keyframes calcDot { 0%,100% { transform:scale(1); opacity:.4; } 50% { transform:scale(1.5); opacity:1; } }
+    #calcPhaseTitle, #calcPhaseDesc { transition: opacity .18s ease; }
+
+    /* Shimmer on match scores */
+    @keyframes scoreShimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .score-highlight {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--warm), var(--accent-2), var(--accent));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: scoreShimmer 3s linear infinite;
+      font-weight: 900;
+    }
   </style>
 </head>
 <body>
@@ -2608,7 +2959,7 @@
             <h2 class="step-title" id="stepTitle">Caricamento</h2>
             <p class="step-subtitle" id="stepSubtitle">Preparo le domande.</p>
           </div>
-          <button class="btn" id="resetBtn">↺ Ricomincia</button>
+          <button class="btn" id="resetBtn" style="display:none;">↺ Ricomincia</button>
         </div>
         <div class="question-panel">
           <h2 class="question-text" id="questionText"></h2>
@@ -4002,8 +4353,13 @@
       const total = (state.selectedQuestions.length || state.questions.length) || 1;
       const pct = Math.round(answered / total * 100);
       el("count").textContent = `${answered} / ${total}`;
-      el("percent").textContent = `${pct}%`;
+      const pctEl = el("percent");
+      pctEl.textContent = `${pct}%`;
       el("progress").style.width = `${pct}%`;
+      // Flash sul % quando cambia
+      pctEl.style.transform = "scale(1.18)";
+      pctEl.style.transition = "transform .15s ease";
+      setTimeout(() => { pctEl.style.transform = "scale(1)"; }, 160);
     }
 
     function renderQuestion() {
@@ -4085,11 +4441,36 @@
       el("questionText").textContent = "";
       el("options").innerHTML = `
         <div class="completion-card">
-          <div class="completion-sigil">OK</div>
-          <h3>Sto componendo il tuo risultato</h3>
-          <p class="small">Peso le risposte, controllo la coerenza interna e preparo grafici, mappa e report.</p>
+          <div class="completion-sigil" style="font-size:26px;">◈</div>
+          <h3 id="calcPhaseTitle">Analisi in corso…</h3>
+          <p class="small" id="calcPhaseDesc">Peso le risposte, calcolo gli 8 assi e verifico la coerenza interna.</p>
+          <div style="display:flex;gap:7px;justify-content:center;margin-top:4px;">
+            <span class="calc-dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent-2);animation:calcDot 1.1s ease-in-out infinite;"></span>
+            <span class="calc-dot" style="width:8px;height:8px;border-radius:50%;background:var(--warm);animation:calcDot 1.1s ease-in-out .18s infinite;"></span>
+            <span class="calc-dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent);animation:calcDot 1.1s ease-in-out .36s infinite;"></span>
+          </div>
         </div>
       `;
+      // Cicla tra le fasi di calcolo
+      const phases = [
+        ["Peso le risposte sui 8 assi", "Ogni asse ha un peso calibrato sul tuo percorso di risposta."],
+        ["Confronto con 120+ partiti", "Calcolo la distanza angolare nel profilo multidimensionale."],
+        ["Verifico la coerenza interna", "Cerco contraddizioni tematiche tra le risposte simili."],
+        ["Compongo il report ideologico", "Abbino il profilo alle categorie teoriche globali."],
+        ["Preparo i grafici", "Radar, mappa politica, barre per asse — tutto in arrivo."],
+      ];
+      let pi = 0;
+      const phaseTimer = setInterval(() => {
+        pi = (pi + 1) % phases.length;
+        const t = document.getElementById("calcPhaseTitle");
+        const d = document.getElementById("calcPhaseDesc");
+        if (t) { t.style.opacity = "0"; setTimeout(() => { t.textContent = phases[pi][0] + "…"; t.style.opacity = "1"; }, 180); }
+        if (d) { d.style.opacity = "0"; setTimeout(() => { d.textContent = phases[pi][1]; d.style.opacity = "1"; }, 180); }
+      }, 900);
+      // Pulisce il timer quando i risultati arrivano
+      const cleanup = () => { clearInterval(phaseTimer); };
+      document.getElementById("results")?.addEventListener("classchange", cleanup, { once: true });
+      window._calcPhaseTimer = phaseTimer;
       el("prevBtn").disabled = true;
       el("nextBtn").disabled = true;
       el("nextBtn").textContent = "Calcolo in corso";
@@ -4141,14 +4522,27 @@
 
     function renderAxis(axis) {
       const left = Math.max(2, Math.min(98, (axis.value + 1) * 50));
+      const label = axis.value < -0.15 ? "◀ sinistra" : axis.value > 0.15 ? "destra ▶" : "centro ◆";
+      const uid = "pin-" + Math.random().toString(36).slice(2);
+      // Pin parte dal centro (50%) e scivola alla posizione reale dopo render
+      setTimeout(() => {
+        const pin = document.getElementById(uid);
+        if (pin) pin.style.left = left + "%";
+      }, 60);
       return `
         <div class="axis">
           <div class="axis-head">
-            <span>${axis.name}</span>
-            <span>${axis.value >= 0 ? "+" : ""}${axis.value.toFixed(2)}</span>
+            <span style="font-weight:800;">${axis.name}</span>
+            <span style="color:${axis.value < -0.15 ? "var(--accent-2)" : axis.value > 0.15 ? "#e07b3c" : "var(--muted)"}; font-weight:800;">${label}</span>
           </div>
-          <div class="axisbar"><span class="pin" style="left:${left}%"></span></div>
-          <div class="small">${axisDirection(axis.value)} · confidenza asse ${Math.round(axis.confidence * 100)}%</div>
+          <div class="axisbar"><span id="${uid}" class="pin" style="left:50%;transition:left .9s cubic-bezier(.2,.8,.2,1) ${Math.random()*0.2}s"></span></div>
+          <div class="small" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span style="color:var(--muted);">${axisDirection(axis.value)}</span>
+            <span style="display:flex;align-items:center;gap:5px;color:var(--muted);">
+              <span style="display:inline-block;width:38px;height:3px;border-radius:999px;background:#e5ecef;overflow:hidden;vertical-align:middle;"><span style="display:block;height:100%;border-radius:inherit;background:${Math.round(axis.confidence*100) >= 70 ? 'var(--accent-2)' : Math.round(axis.confidence*100) >= 45 ? 'var(--warm)' : '#b84a62'};width:${Math.round(axis.confidence * 100)}%;transition:width .8s ease .3s;"></span></span>
+              ${Math.round(axis.confidence * 100)}%
+            </span>
+          </div>
         </div>
       `;
     }
@@ -4278,15 +4672,39 @@
     }
 
     function renderMatches(items) {
-      return items.map((item) => `
-        <div class="match identity-match">
+      const ORIENT = {
+        "FdI": "right", "Lega": "right", "FI": "right", "NM": "right",
+        "PD": "left", "AVS": "left", "SI": "left",
+        "M5S": "center", "Az": "center", "IV": "center", "+E": "center",
+      };
+      const BAR_GRAD = {
+        left:   "linear-gradient(90deg,#22577a,#38a3a5)",
+        right:  "linear-gradient(90deg,#e07b3c,#b84a62)",
+        center: "linear-gradient(90deg,#6d597a,#957fad)",
+        _def:   "linear-gradient(90deg,var(--accent-2),var(--warm))",
+      };
+      return items.map((item, idx) => {
+        const name = item.name || "";
+        const dir = Object.keys(ORIENT).reduce((d, k) => d || (name.includes(k) ? ORIENT[k] : null), null);
+        const grad = BAR_GRAD[dir] || BAR_GRAD._def;
+        const pct = Math.max(0, Math.min(100, Number(item.affinity) || 0));
+        const rankStyle = idx === 0 ? ' style="border-left:3px solid var(--accent-2);background:linear-gradient(90deg,rgba(56,163,165,.06),transparent);"' : '';
+        const rankBadge = idx === 0 ? '<span style="font-size:14px;margin-left:4px;vertical-align:middle;" title="Partito più vicino">🥇</span>' : idx === 1 ? '<span style="font-size:12px;margin-left:4px;vertical-align:middle;" title="Secondo">🥈</span>' : idx === 2 ? '<span style="font-size:12px;margin-left:4px;vertical-align:middle;" title="Terzo">🥉</span>' : '';
+        return `
+        <div class="match identity-match"${rankStyle}>
           <div class="identity-main">
             ${renderPortrait(item.name)}
-            <strong>${item.name}<span class="small"> distanza ${item.distance}${item.gap_to_next != null ? ` · margine +${item.gap_to_next}` : ""}${item.metadata?.comparability === "extreme_context" ? " · alto rischio interpretativo" : ""}</span></strong>
+            <div style="min-width:0;flex:1;">
+              <strong style="display:block;">${escapeHtml(name)}${rankBadge}</strong>
+              <div style="margin:4px 0 0;height:5px;border-radius:999px;background:#e5ecef;overflow:hidden;">
+                <div class="coherence-fill" style="width:${pct}%;height:100%;border-radius:inherit;background:${grad};transition:width .8s cubic-bezier(.2,.8,.2,1) ${idx * 0.08}s;"></div>
+              </div>
+              <span class="small" style="color:var(--muted);">distanza ${item.distance}${item.gap_to_next != null ? ` · margine +${item.gap_to_next}` : ""}${item.metadata?.comparability === "extreme_context" ? " · ⚠ contesto estremo" : ""}</span>
+            </div>
           </div>
-          <span class="score">${item.affinity}%</span>
+          <span class="score" style="min-width:48px;text-align:right;">${item.affinity}%</span>
         </div>
-      `).join("");
+      `}).join("");
     }
 
     function renderPrecision(data) {
@@ -5579,16 +5997,16 @@
       el("results").classList.add("visible");
       el("results").innerHTML = `
         <div class="tabs">
-          <button class="tab active" data-tab="summary" data-icon="◎">Sintesi</button>
-          <button class="tab" data-tab="ai" data-icon="🤖">Analisi IA</button>
-          <button class="tab" data-tab="scenari" data-icon="📈">Simulazioni</button>
-          <button class="tab" data-tab="coalitions" data-icon="🗳️">Coalizioni</button>
-          <button class="tab" data-tab="sondaggi" data-icon="📊">Osservatorio</button>
-          <button class="tab" data-tab="world" data-icon="✦">Mondo</button>
-          <button class="tab" data-tab="charts" data-icon="▥">Grafici & Mappa</button>
-          <button class="tab" data-tab="personal-history" data-icon="⌛">I miei Test</button>
-          <button class="tab" data-tab="method" data-icon="∴">Metodo</button>
-          <button class="tab" data-tab="share" data-icon="□">Condividi</button>
+          <button class="tab active" data-tab="summary" data-icon="◎" title="Il tuo archetipo, partiti vicini e coerenza interna">Sintesi</button>
+          <button class="tab" data-tab="ai" data-icon="🤖" title="Lettura IA personalizzata del tuo profilo">Analisi IA</button>
+          <button class="tab" data-tab="scenari" data-icon="📈" title="Simulazioni di coalizioni e scenari elettorali">Simulazioni</button>
+          <button class="tab" data-tab="coalitions" data-icon="🗳️" title="Compatibilità con coalizioni e governi possibili">Coalizioni</button>
+          <button class="tab" data-tab="sondaggi" data-icon="📊" title="Sondaggi elettorali e trend storici">Osservatorio</button>
+          <button class="tab" data-tab="world" data-icon="✦" title="Il tuo mondo politico: partito, ideologia, figura storica">Mondo</button>
+          <button class="tab" data-tab="charts" data-icon="▥" title="Radar multidimensionale e mappa politica">Grafici & Mappa</button>
+          <button class="tab" data-tab="personal-history" data-icon="⌛" title="I tuoi test precedenti e confronti nel tempo">I miei Test</button>
+          <button class="tab" data-tab="method" data-icon="∴" title="Come funziona il modello, fonti e benchmark">Metodo</button>
+          <button class="tab" data-tab="share" data-icon="□" title="Condividi il tuo profilo sui social">Condividi</button>
         </div>
         <div id="panel-summary" class="tab-panel active">
           ${engineNote}
@@ -5604,10 +6022,10 @@
                     <p class="small">${archetype.line}</p>
                   </div>
                 </div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">
-                  <span style="display:inline-block; background:rgba(34,87,122,.08); border:1px solid rgba(34,87,122,.12); border-radius:6px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--accent); line-height:1.3;">${data.interpretation.family}</span>
-                  <span style="display:inline-block; background:rgba(34,87,122,.08); border:1px solid rgba(34,87,122,.12); border-radius:6px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--accent); line-height:1.3;">confidenza ${data.confidence}%</span>
-                  <span style="display:inline-block; background:rgba(34,87,122,.08); border:1px solid rgba(34,87,122,.12); border-radius:6px; padding:5px 11px; font-size:12px; font-weight:700; color:var(--accent); line-height:1.3;">coerenza ${data.self_coherence?.score ?? "n/d"}%</span>
+                <div style="display:flex; flex-wrap:wrap; gap:7px; margin-top:8px;">
+                  <span style="display:inline-block; background:linear-gradient(135deg,rgba(56,163,165,.14),rgba(242,184,128,.10)); border:1px solid rgba(56,163,165,.25); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:800; color:var(--accent); line-height:1.3; letter-spacing:.02em;">${escapeHtml(data.interpretation.family)}</span>
+                  <span style="display:inline-block; background:linear-gradient(135deg,rgba(56,163,165,.10),rgba(34,87,122,.08)); border:1px solid rgba(56,163,165,.22); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:800; color:var(--accent); line-height:1.3;">◎ confidenza <strong>${data.confidence}%</strong></span>
+                  <span style="display:inline-block; background:linear-gradient(135deg,rgba(242,184,128,.14),rgba(56,163,165,.08)); border:1px solid rgba(242,184,128,.30); border-radius:8px; padding:6px 12px; font-size:12px; font-weight:800; color:#7a5c22; line-height:1.3;">◈ coerenza <strong>${data.self_coherence?.score ?? "n/d"}%</strong></span>
                 </div>
               </div>
               ${renderUserStrip(data)}
@@ -5654,7 +6072,7 @@
             
             <div class="ai-panel-wrap">
               <!-- ANALISI EDITORIALE OFFLINE -->
-              <div id="aiOfflineBox" class="block" style="border: 1.5px solid rgba(56,163,165,.25); border-radius: 16px; padding: 22px; background: rgba(56,163,165,.03); margin-bottom: 18px;">
+              <div id="aiOfflineBox" class="block" style="border: 1.5px solid rgba(56,163,165,.28); border-radius: 16px; padding: 22px; background: linear-gradient(135deg,rgba(56,163,165,.05),rgba(242,184,128,.04)); margin-bottom: 18px; box-shadow:0 4px 20px rgba(56,163,165,.08);" >
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
                   <h3 style="margin:0; font-size:18px; color:var(--accent-2); display:flex; align-items:center; gap:8px;">📝 Analisi Locale del Profilo (Gratuita)</h3>
                   <span class="badge" style="background:var(--accent-2); margin-left:0; color:#fff;">100% Offline & Privata</span>
@@ -6471,12 +6889,12 @@
               <p class="small">Su iPhone/Android il pulsante di sistema apre WhatsApp, Telegram, AirDrop, note o altre app disponibili. Per TikTok conviene scaricare la card PNG e usare la caption copiata.</p>
               <button class="btn primary" id="nativeShare">Condividi dal telefono</button>
               <div class="share-grid" style="margin-top:10px;">
-                <button class="btn" id="shareWhatsapp">WhatsApp</button>
-                <button class="btn" id="shareTelegram">Telegram</button>
-                <button class="btn" id="shareX">X / Twitter</button>
-                <button class="btn" id="shareFacebook">Facebook</button>
-                <button class="btn" id="shareLinkedin">LinkedIn</button>
-                <button class="btn" id="shareTiktok">TikTok</button>
+                <button class="btn" id="shareWhatsapp" style="background:#25D366;color:#fff;border-color:#25D366;">● WhatsApp</button>
+                <button class="btn" id="shareTelegram" style="background:#2CA5E0;color:#fff;border-color:#2CA5E0;">✈ Telegram</button>
+                <button class="btn" id="shareX" style="background:#000;color:#fff;border-color:#222;">✕ X/Twitter</button>
+                <button class="btn" id="shareFacebook" style="background:#1877F2;color:#fff;border-color:#1877F2;">f Facebook</button>
+                <button class="btn" id="shareLinkedin" style="background:#0A66C2;color:#fff;border-color:#0A66C2;">in LinkedIn</button>
+                <button class="btn" id="shareTiktok" style="background:linear-gradient(135deg,#010101,#ff0050);color:#fff;border-color:#010101;">♫ TikTok</button>
               </div>
               <p class="small share-status" id="shareStatus"></p>
             </div>
@@ -6968,6 +7386,7 @@
         state.answers = {};
         state.index = 0;
         state.started = true;
+        el("resetBtn").style.display = "";
         renderQuestionAnimated();
         return;
       }
@@ -7109,58 +7528,51 @@
 
     function renderConsentIntro() {
       updateProgress();
-      el("stepTitle").textContent = "Scegli esperienza";
-      el("stepSubtitle").textContent = "Prima identità e ritmo, poi metodo e dettagli quando servono.";
-      el("questionText").textContent = "Scopri il tuo profilo politico multidimensionale.";
+      el("stepTitle").textContent = "Scopri dove ti collochi politicamente";
+      el("stepSubtitle").textContent = "Un test serio, visuale e spiegabile — in 3 minuti.";
+      el("questionText").textContent = "";
       el("options").innerHTML = `
-        <div class="welcome-card">
-          <div class="welcome-sigil">P</div>
+        <div class=”welcome-card”>
+          <div class=”welcome-sigil”>P</div>
           <div>
-            <h3 style="margin:0 0 6px;">Benvenuto nel Politometro</h3>
-            <p class="small">Un test politico visuale, mobile-first e spiegabile: rispondi, scopri il tuo profilo, esplora affinità, distanza e coerenza interna.</p>
-            <div class="hero-badges">
-              <span class="hero-badge">3 minuti</span>
-              <span class="hero-badge">8 dimensioni</span>
-              <span class="hero-badge">Report personale</span>
-              <span class="hero-badge">Card social</span>
+            <h2 class=”landing-headline”>Il tuo profilo politico,<br>in 8 dimensioni.</h2>
+            <p class=”small”>Non un'etichetta — una mappa. Scopri affinità con partiti, ideologie e figure storiche, e capisce <em>perché</em>.</p>
+            <div class=”hero-badges”>
+              <span class=”hero-badge”>⚡ 3 minuti</span>
+              <span class=”hero-badge”>◈ 8 assi</span>
+              <span class=”hero-badge”>✦ Report completo</span>
+              <span class=”hero-badge”>□ Card social</span>
             </div>
           </div>
         </div>
-        <div class="experience-strip">
-          <div class="experience-panel">
-            <h4>Dal quiz al tuo mondo politico.</h4>
-            <p class="small">Il risultato non si ferma a un'etichetta: mostra perché sei vicino a certi partiti, ideologie e figure storiche, e dove invece ti allontani.</p>
+        <div class=”explain-grid” style=”margin-bottom:4px;”>
+          <div class=”mode-card mode-social” id=”modeSocial”>
+            <span class=”kicker” style=”color:var(--accent-2);font-size:11px;”>VELOCE</span>
+            <h4 style=”margin:4px 0 6px;”>Modalità social</h4>
+            <p class=”small”>12 domande · risultato immediato e condivisibile.</p>
           </div>
-          <div class="experience-steps">
-            <div class="experience-step"><span>1</span> Scegli una modalità</div>
-            <div class="experience-step"><span>2</span> Rispondi con calma</div>
-            <div class="experience-step"><span>3</span> Guarda mappa, report e card</div>
+          <div class=”mode-card mode-quick selected” id=”modeQuick”>
+            <span class=”kicker” style=”color:var(--accent);font-size:11px;”>CONSIGLIATA ★</span>
+            <h4 style=”margin:4px 0 6px;”>Modalità rapida</h4>
+            <p class=”small”>20 domande bilanciate · la scelta migliore per iniziare.</p>
+          </div>
+          <div class=”mode-card mode-deep” id=”modeDeep”>
+            <span class=”kicker” style=”color:#6d597a;font-size:11px;”>COMPLETA</span>
+            <h4 style=”margin:4px 0 6px;”>Modalità profonda</h4>
+            <p class=”small”>60 domande · più sfumature, più report, più precisione.</p>
+          </div>
+          <div class=”mode-card mode-election locked” id=”modeElection” aria-disabled=”true” style=”opacity:.6;”>
+            <span class=”kicker” style=”color:#b84a62;font-size:11px;”>PROSSIMAMENTE</span>
+            <h4 style=”margin:4px 0 6px;”>Elezioni 2027</h4>
+            <p class=”small”>Analisi con programmi ufficiali e fonti verificate — in arrivo.</p>
+            <div class=”worksite-mini” aria-hidden=”true”><span></span><span></span><span></span></div>
           </div>
         </div>
-        <div class="trust-strip">
-          <div class="trust-chip"><strong>8 assi leggibili</strong><span>Economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza e giustizia.</span></div>
-          <div class="trust-chip"><strong>Risultato spiegato</strong><span>Mostra affinità, differenze, coerenza interna e livello di confidenza.</span></div>
-          <div class="trust-chip"><strong>Privacy prudente</strong><span>Di base resta nel browser. I dati aggregati richiedono consenso esplicito.</span></div>
-          <div class="trust-chip"><strong>Pronto per campagne</strong><span>Modalità editoriali, scolastiche o “Elezioni 2027” con fonti documentate.</span></div>
-        </div>
-        <div class="explain-grid">
-	          <div class="mode-card mode-social" id="modeSocial">
-	            <h4>Modalità social</h4>
-	            <p class="small">12 domande. Per chi vuole un risultato immediato, leggero e condivisibile.</p>
-	          </div>
-	          <div class="mode-card mode-quick selected" id="modeQuick">
-	            <h4>Modalità rapida</h4>
-	            <p class="small">20 domande bilanciate. La scelta migliore per iniziare.</p>
-	          </div>
-	          <div class="mode-card mode-deep" id="modeDeep">
-	            <h4>Modalità profonda</h4>
-	            <p class="small">60 domande. Più dettagli, più sfumature, più report.</p>
-	          </div>
-	          <div class="mode-card mode-election locked" id="modeElection" aria-disabled="true">
-	            <h4>Modalità Elezioni 2027 <span class="badge">Lavori in corso</span></h4>
-	            <p class="small">Non è ancora utilizzabile perché servono programmi ufficiali, liste definitive, fonti verificabili e doppia revisione delle posizioni dei partiti.</p>
-	            <div class="worksite-mini" aria-hidden="true"><span></span><span></span><span></span></div>
-	          </div>
+        <div class=”trust-strip”>
+          <div class=”trust-chip”><strong>8 assi leggibili</strong><span>Economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza, giustizia.</span></div>
+          <div class=”trust-chip”><strong>Risultato spiegato</strong><span>Affinità, differenze, coerenza interna e confidenza — tutto trasparente.</span></div>
+          <div class=”trust-chip”><strong>Privacy by design</strong><span>Resta nel tuo browser. Dati aggregati solo con consenso esplicito.</span></div>
+          <div class=”trust-chip”><strong>Metodo aperto</strong><span>Fonti, pesi e algoritmo documentati. Nessuna scatola nera.</span></div>
         </div>
         <details class="setup-details">
           <summary>Motore di calcolo (V8)</summary>
@@ -7362,6 +7774,36 @@
       updateIdentityPreview();
       document.getElementById("installApp").addEventListener("click", requestInstallApp);
       bindEngineControls();
+      // Badge test precedenti
+      try {
+        const prev = JSON.parse(localStorage.getItem("politometro_local_tests") || "[]");
+        if (prev.length > 0) {
+          const heroBadges = document.querySelector(".hero-badges");
+          if (heroBadges) {
+            const b = document.createElement("span");
+            b.className = "hero-badge";
+            b.title = "I tuoi test salvati localmente";
+            b.textContent = `↩ ${prev.length} test ${prev.length === 1 ? "salvato" : "salvati"}`;
+            b.style.cssText = "background:linear-gradient(135deg,rgba(242,184,128,.18),rgba(56,163,165,.12));border-color:rgba(242,184,128,.35);color:var(--accent);animation:none;";
+            heroBadges.appendChild(b);
+          }
+        }
+      } catch(e) {}
+      // Animazione entrata landing
+      requestAnimationFrame(() => {
+        const els = [
+          document.querySelector(".welcome-card"),
+          document.querySelector(".explain-grid"),
+          document.querySelector(".trust-strip"),
+        ];
+        els.forEach((el, i) => {
+          if (!el) return;
+          el.style.opacity = "0";
+          el.style.transform = "translateY(18px)";
+          el.style.transition = `opacity .45s cubic-bezier(.2,.8,.2,1) ${i * 0.12}s, transform .45s cubic-bezier(.2,.8,.2,1) ${i * 0.12}s`;
+          requestAnimationFrame(() => { el.style.opacity = "1"; el.style.transform = "translateY(0)"; });
+        });
+      });
     }
 
     function updateIdentityPreview() {
@@ -14694,19 +15136,31 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
       
       sortable.sort((a,b) => b.value - a.value);
       
-      sortable.forEach(p => {
+      const maxVal = Math.max(...sortable.map(p => p.value));
+      sortable.forEach((p, i) => {
+        const barW = Math.round((p.value / maxVal) * 100);
         html += `
-          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--paper); border:1px solid var(--line); padding:10px 14px; border-radius:8px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="width:10px; height:10px; border-radius:50%; background:${p.color}; display:inline-block;"></span>
-              <span style="font-weight:600; font-size:13.5px;">${p.name}</span>
+          <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid ${p.color};border-radius:8px;padding:10px 14px;transition:box-shadow .18s ease;" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseleave="this.style.boxShadow=''">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="width:9px;height:9px;border-radius:50%;background:${p.color};display:inline-block;flex-shrink:0;"></span>
+                <span style="font-weight:700;font-size:13px;">${p.name}</span>
+              </div>
+              <span style="font-weight:900;font-size:15px;color:${p.color};font-family:var(--display);">${p.value.toFixed(1)}%</span>
             </div>
-            <div style="font-weight:bold; font-size:14px; color:var(--ink);">${p.value.toFixed(1)}%</div>
+            <div style="height:5px;border-radius:999px;background:#e5ecef;overflow:hidden;">
+              <div style="height:100%;border-radius:inherit;background:${p.color};width:0%;transition:width .9s cubic-bezier(.2,.8,.2,1) ${i * 0.07}s;" data-target-width="${barW}%" class="poll-bar-anim"></div>
+            </div>
           </div>
         `;
       });
-      
       container.innerHTML = html;
+      // Anima le barre con un piccolo delay
+      requestAnimationFrame(() => {
+        container.querySelectorAll(".poll-bar-anim").forEach(b => {
+          b.style.width = b.dataset.targetWidth;
+        });
+      });
     }
 
     function populatePartyAccordion() {
@@ -15181,6 +15635,264 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
         .then((registration) => registration.update?.())
         .catch(() => {});
     }
+
+    /* ═══════════════════════════════════════
+       ANIMAZIONI AVANZATE — sessione notturna
+    ═══════════════════════════════════════ */
+
+    // ── Ripple effect sulle opzioni risposta ────────────────────────
+    document.addEventListener("click", e => {
+      const opt = e.target.closest(".option");
+      if (!opt) return;
+      const r = opt.getBoundingClientRect();
+      const span = document.createElement("span");
+      const size = Math.max(r.width, r.height) * 1.4;
+      span.className = "ripple";
+      span.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-r.left-size/2}px;top:${e.clientY-r.top-size/2}px`;
+      opt.appendChild(span);
+      setTimeout(() => span.remove(), 560);
+    });
+
+    // ── Confetti al completamento quiz ──────────────────────────────
+    function launchConfetti() {
+      const colors = ["#38a3a5","#22577a","#f2b880","#6d597a","#57cc99","#b84a62"];
+      const canvas = document.createElement("canvas");
+      canvas.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;";
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({length: 90}, () => ({
+        x: Math.random() * canvas.width,
+        y: -10 - Math.random() * 80,
+        w: 6 + Math.random() * 8,
+        h: 3 + Math.random() * 5,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        vx: (Math.random()-.5)*3,
+        vy: 2 + Math.random()*4,
+        rot: Math.random()*360,
+        vr: (Math.random()-.5)*8,
+        alpha: 1,
+      }));
+      let frame = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of pieces) {
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          p.vy += .06; p.alpha -= .008;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.fillStyle = p.color;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI/180);
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+        }
+        if (++frame < 160) requestAnimationFrame(draw);
+        else canvas.remove();
+      }
+      draw();
+    }
+    // Aggancia al completamento test
+    const _origComplete = window.completeAndCalculate;
+    if (typeof completeAndCalculate === "function") {
+      const __origCC = completeAndCalculate;
+      window.completeAndCalculate = function() {
+        launchConfetti();
+        __origCC.apply(this, arguments);
+      };
+    }
+
+    // ── Particle canvas ──────────────────────────────────────────────
+    (function initParticles() {
+      const canvas = document.createElement("canvas");
+      canvas.id = "particle-canvas";
+      document.body.prepend(canvas);
+      const ctx = canvas.getContext("2d");
+      let W, H, particles = [];
+
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      const SYMBOLS = ["●", "◆", "▲", "■", "○"];
+      const COLORS  = ["#38a3a5", "#22577a", "#f2b880", "#6d597a", "#57cc99"];
+
+      for (let i = 0; i < 28; i++) {
+        particles.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          vx: (Math.random() - .5) * .35,
+          vy: (Math.random() - .5) * .35,
+          size: 8 + Math.random() * 14,
+          symbol: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          alpha: .12 + Math.random() * .18,
+        });
+      }
+
+      function tick() {
+        ctx.clearRect(0, 0, W, H);
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < -30) p.x = W + 30;
+          if (p.x > W + 30) p.x = -30;
+          if (p.y < -30) p.y = H + 30;
+          if (p.y > H + 30) p.y = -30;
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle   = p.color;
+          ctx.font        = `${p.size}px sans-serif`;
+          ctx.fillText(p.symbol, p.x, p.y);
+        }
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    // ── Scroll reveal ─────────────────────────────────────────────────
+    (function initScrollReveal() {
+      if (!window.IntersectionObserver) return;
+      const obs = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("scroll-visible");
+            obs.unobserve(e.target);
+          }
+        }
+      }, { threshold: .12 });
+
+      function observe() {
+        document.querySelectorAll(".block, .trust-chip, .mode-card, .match, .world-card")
+          .forEach(el => {
+            if (!el.classList.contains("scroll-visible")) {
+              el.classList.add("scroll-hidden");
+              obs.observe(el);
+            }
+          });
+      }
+      // Osserva subito e re-osserva quando cambiano i tab
+      observe();
+      document.addEventListener("click", e => {
+        if (e.target.matches(".tab")) setTimeout(observe, 80);
+      });
+    })();
+
+    // ── Count-up animato per i numeri dei risultati ──────────────────
+    function animateCountUp(el, target, suffix = "%", duration = 900) {
+      const start = performance.now();
+      const from  = 0;
+      function step(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(from + (target - from) * ease) + suffix;
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Attiva count-up su tutti gli elementi .score quando i risultati appaiono
+    const _origRenderResults = window.renderResults || null;
+    const resultsEl = document.getElementById("results");
+    if (resultsEl) {
+      let _confettiFired = false;
+      const resObs = new MutationObserver(() => {
+        if (!resultsEl.classList.contains("visible")) return;
+        if (!_confettiFired) { _confettiFired = true; setTimeout(launchConfetti, 300); }
+        if (window._calcPhaseTimer) { clearInterval(window._calcPhaseTimer); window._calcPhaseTimer = null; }
+        setTimeout(() => {
+          resultsEl.querySelectorAll(".score").forEach(scoreEl => {
+            const raw = scoreEl.textContent.trim();
+            const num = parseFloat(raw.replace("%", "").replace(",", "."));
+            if (!isNaN(num)) {
+              scoreEl.classList.add("count-up", "score-highlight");
+              animateCountUp(scoreEl, num, raw.includes("%") ? "%" : "", 800);
+            }
+          });
+          // Reveal blocks
+          resultsEl.querySelectorAll(".block").forEach((b, i) => {
+            b.classList.add("reveal-block");
+            b.style.animationDelay = (i * 0.07) + "s";
+          });
+          // Radar glow
+          const svgEl = resultsEl.querySelector("svg");
+          if (svgEl) svgEl.classList.add("radar-glow");
+          // Animate coherence bars (skip poll-bar-anim which handle themselves)
+          resultsEl.querySelectorAll(".coherence-fill:not(.poll-bar-anim), .fill").forEach(bar => {
+            const w = bar.style.width;
+            bar.style.width = "0%";
+            setTimeout(() => {
+              bar.style.transition = "width .8s cubic-bezier(.2,.8,.2,1)";
+              bar.style.width = w;
+            }, 200);
+          });
+          // Colori direzionali partiti nei match
+          if (typeof applyPartyBarColors === "function") setTimeout(applyPartyBarColors, 300);
+        }, 80);
+      });
+      resObs.observe(resultsEl, { attributes: true, attributeFilter: ["class"] });
+    }
+
+    // ── Colori direzionali barre partiti ────────────────────────────
+    const PARTY_ORIENTATION = {
+      "FdI": "right", "Lega": "right", "FI": "right", "NM": "right",
+      "PD": "left", "AVS": "left", "SI": "left",
+      "M5S": "center", "Az": "center", "IV": "center", "+E": "center",
+    };
+    function applyPartyBarColors() {
+      document.querySelectorAll(".match").forEach(matchEl => {
+        const nameEl = matchEl.querySelector("strong");
+        if (!nameEl) return;
+        const name = nameEl.textContent.trim().split("\n")[0].trim();
+        const bars = matchEl.querySelectorAll(".coherence-fill, [style*='width']");
+        let dir = null;
+        for (const [key, val] of Object.entries(PARTY_ORIENTATION)) {
+          if (name.includes(key)) { dir = val; break; }
+        }
+        if (dir) bars.forEach(b => {
+          b.classList.remove("match-bar-left", "match-bar-right", "match-bar-center");
+          b.classList.add(`match-bar-${dir}`, "animated-bar");
+        });
+      });
+    }
+    document.addEventListener("click", e => {
+      if (e.target.matches(".tab")) setTimeout(applyPartyBarColors, 150);
+    });
+
+    // ── Slide animato tra domande ────────────────────────────────────
+    const _origRenderQuestion = typeof renderQuestion === "function" ? renderQuestion : null;
+    (function patchQuestionTransition() {
+      const optionsEl = document.getElementById("options");
+      if (!optionsEl) return;
+      let firstRender = true;
+      const qObs = new MutationObserver(() => {
+        if (firstRender) { firstRender = false; return; }
+        optionsEl.classList.remove("question-enter", "question-exit");
+        void optionsEl.offsetWidth; // reflow
+        optionsEl.classList.add("question-enter");
+        const onEnd = () => {
+          optionsEl.classList.remove("question-enter");
+          optionsEl.removeEventListener("animationend", onEnd);
+        };
+        optionsEl.addEventListener("animationend", onEnd, { once: true });
+      });
+      qObs.observe(optionsEl, { childList: true });
+    })();
+
+    // ── Nascondi contatore fino a selezione modalità ─────────────────
+    (function patchCounter() {
+      const meterTopEl = document.querySelector(".meter-top");
+      if (!meterTopEl) return;
+      meterTopEl.classList.add("counter-hidden");
+      document.addEventListener("click", e => {
+        const card = e.target.closest(".mode-card:not(.locked)");
+        if (card) meterTopEl.classList.replace("counter-hidden", "counter-visible");
+      });
+    })();
+
   </script>
 </body>
 </html>
