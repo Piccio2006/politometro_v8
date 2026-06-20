@@ -4054,11 +4054,11 @@
       const qCorr = (ordinal.questions || []).filter((row) => row.n >= 10);
       if (qCorr.length) {
         const top = qCorr[0];
-        insights.push(standaloneInsight("question", `Domanda sensibile a ${standaloneReadableField(top.field)}`, `Questa domanda varia parecchio per ${standaloneReadableField(top.field)}: “${top.question}”. Controllala per capire se misura ideologia o anche linguaggio/competenza.`, top.n, Math.abs(top.correlation), top.n < 30));
+        insights.push(standaloneInsight("question", `Domanda sensibile a ${standaloneReadableField(top.field)}`, `Questa domanda varia parecchio per ${standaloneReadableField(top.field)}: "${top.question}". Controllala per capire se misura ideologia o anche linguaggio/competenza.`, top.n, Math.abs(top.correlation), top.n < 30));
       }
       if (gaps.length) {
         const gap = gaps[0];
-        insights.push(standaloneInsight("gap", `Differenza forte tra gruppi su ${standaloneReadableField(gap.field)}`, `La domanda “${gap.question}” separa ${gap.low_group} e ${gap.high_group} con gap medio ${gap.gap}. Utile per revisione item e segmenti editoriali.`, gap.min_group_n || 0, Math.abs(gap.gap || 0), Boolean(gap.caution)));
+        insights.push(standaloneInsight("gap", `Differenza forte tra gruppi su ${standaloneReadableField(gap.field)}`, `La domanda "${gap.question}" separa ${gap.low_group} e ${gap.high_group} con gap medio ${gap.gap}. Utile per revisione item e segmenti editoriali.`, gap.min_group_n || 0, Math.abs(gap.gap || 0), Boolean(gap.caution)));
       }
       const ratings = feedback.map((row) => Number(row.accuracy_rating)).filter(Number.isFinite);
       if (ratings.length) {
@@ -4072,7 +4072,7 @@
         const low = large.reduce((a, b) => a.average_confidence < b.average_confidence ? a : b);
         const delta = standaloneRound(top.average_confidence - low.average_confidence, 2);
         if (Math.abs(delta) >= 4) {
-          insights.push(standaloneInsight("confidence", `Confidenza diversa per ${standaloneReadableField(field)}`, `La confidenza media è più alta in “${top.value}” rispetto a “${low.value}” di ${delta} punti. Può segnalare domande più chiare per alcuni gruppi.`, Math.min(top.n, low.n), Math.abs(delta), Math.min(top.n, low.n) < 30));
+          insights.push(standaloneInsight("confidence", `Confidenza diversa per ${standaloneReadableField(field)}`, `La confidenza media è più alta in "${top.value}" rispetto a "${low.value}" di ${delta} punti. Può segnalare domande più chiare per alcuni gruppi.`, Math.min(top.n, low.n), Math.abs(delta), Math.min(top.n, low.n) < 30));
           break;
         }
       }
@@ -6918,9 +6918,9 @@
             </div>
             <div class="block">
               <h3>App installabile</h3>
-              <p class=”small”>Installa Politometro come app sul tuo dispositivo.</p>
-              <ol class=”phone-steps”>
-                <li>Usa “Installa app” o “Aggiungi alla schermata Home” dal browser.</li>
+              <p class="small">Installa Politometro come app sul tuo dispositivo.</p>
+              <ol class="phone-steps">
+                <li>Usa "Installa app" o "Aggiungi alla schermata Home" dal browser.</li>
                 <li>Dopo l'installazione si apre a schermo pieno come una piccola app.</li>
               </ol>
               <button class="btn primary" id="installAppResult" style="margin-top:12px;">Installa app</button>
@@ -7532,47 +7532,47 @@
       el("stepSubtitle").textContent = "Un test serio, visuale e spiegabile — in 3 minuti.";
       el("questionText").textContent = "";
       el("options").innerHTML = `
-        <div class=”welcome-card”>
-          <div class=”welcome-sigil”>P</div>
+        <div class="welcome-card">
+          <div class="welcome-sigil">P</div>
           <div>
-            <h2 class=”landing-headline”>Il tuo profilo politico,<br>in 8 dimensioni.</h2>
-            <p class=”small”>Non un'etichetta — una mappa. Scopri affinità con partiti, ideologie e figure storiche, e capisce <em>perché</em>.</p>
-            <div class=”hero-badges”>
-              <span class=”hero-badge”>⚡ 3 minuti</span>
-              <span class=”hero-badge”>◈ 8 assi</span>
-              <span class=”hero-badge”>✦ Report completo</span>
-              <span class=”hero-badge”>□ Card social</span>
+            <h2 class="landing-headline">Il tuo profilo politico,<br>in 8 dimensioni.</h2>
+            <p class="small">Non un'etichetta — una mappa. Scopri affinità con partiti, ideologie e figure storiche, e capisce <em>perché</em>.</p>
+            <div class="hero-badges">
+              <span class="hero-badge">⚡ 3 minuti</span>
+              <span class="hero-badge">◈ 8 assi</span>
+              <span class="hero-badge">✦ Report completo</span>
+              <span class="hero-badge">□ Card social</span>
             </div>
           </div>
         </div>
-        <div class=”explain-grid” style=”margin-bottom:4px;”>
-          <div class=”mode-card mode-social” id=”modeSocial”>
-            <span class=”kicker” style=”color:var(--accent-2);font-size:11px;”>VELOCE</span>
-            <h4 style=”margin:4px 0 6px;”>Modalità social</h4>
-            <p class=”small”>12 domande · risultato immediato e condivisibile.</p>
+        <div class="explain-grid" style="margin-bottom:4px;">
+          <div class="mode-card mode-social" id="modeSocial">
+            <span class="kicker" style="color:var(--accent-2);font-size:11px;">VELOCE</span>
+            <h4 style="margin:4px 0 6px;">Modalità social</h4>
+            <p class="small">12 domande · risultato immediato e condivisibile.</p>
           </div>
-          <div class=”mode-card mode-quick selected” id=”modeQuick”>
-            <span class=”kicker” style=”color:var(--accent);font-size:11px;”>CONSIGLIATA ★</span>
-            <h4 style=”margin:4px 0 6px;”>Modalità rapida</h4>
-            <p class=”small”>20 domande bilanciate · la scelta migliore per iniziare.</p>
+          <div class="mode-card mode-quick selected" id="modeQuick">
+            <span class="kicker" style="color:var(--accent);font-size:11px;">CONSIGLIATA ★</span>
+            <h4 style="margin:4px 0 6px;">Modalità rapida</h4>
+            <p class="small">20 domande bilanciate · la scelta migliore per iniziare.</p>
           </div>
-          <div class=”mode-card mode-deep” id=”modeDeep”>
-            <span class=”kicker” style=”color:#6d597a;font-size:11px;”>COMPLETA</span>
-            <h4 style=”margin:4px 0 6px;”>Modalità profonda</h4>
-            <p class=”small”>60 domande · più sfumature, più report, più precisione.</p>
+          <div class="mode-card mode-deep" id="modeDeep">
+            <span class="kicker" style="color:#6d597a;font-size:11px;">COMPLETA</span>
+            <h4 style="margin:4px 0 6px;">Modalità profonda</h4>
+            <p class="small">60 domande · più sfumature, più report, più precisione.</p>
           </div>
-          <div class=”mode-card mode-election locked” id=”modeElection” aria-disabled=”true” style=”opacity:.6;”>
-            <span class=”kicker” style=”color:#b84a62;font-size:11px;”>PROSSIMAMENTE</span>
-            <h4 style=”margin:4px 0 6px;”>Elezioni 2027</h4>
-            <p class=”small”>Analisi con programmi ufficiali e fonti verificate — in arrivo.</p>
-            <div class=”worksite-mini” aria-hidden=”true”><span></span><span></span><span></span></div>
+          <div class="mode-card mode-election locked" id="modeElection" aria-disabled="true" style="opacity:.6;">
+            <span class="kicker" style="color:#b84a62;font-size:11px;">PROSSIMAMENTE</span>
+            <h4 style="margin:4px 0 6px;">Elezioni 2027</h4>
+            <p class="small">Analisi con programmi ufficiali e fonti verificate — in arrivo.</p>
+            <div class="worksite-mini" aria-hidden="true"><span></span><span></span><span></span></div>
           </div>
         </div>
-        <div class=”trust-strip”>
-          <div class=”trust-chip”><strong>8 assi leggibili</strong><span>Economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza, giustizia.</span></div>
-          <div class=”trust-chip”><strong>Risultato spiegato</strong><span>Affinità, differenze, coerenza interna e confidenza — tutto trasparente.</span></div>
-          <div class=”trust-chip”><strong>Privacy by design</strong><span>Resta nel tuo browser. Dati aggregati solo con consenso esplicito.</span></div>
-          <div class=”trust-chip”><strong>Metodo aperto</strong><span>Fonti, pesi e algoritmo documentati. Nessuna scatola nera.</span></div>
+        <div class="trust-strip">
+          <div class="trust-chip"><strong>8 assi leggibili</strong><span>Economia, autorità, cultura, geopolitica, ambiente, tecnologia, uguaglianza, giustizia.</span></div>
+          <div class="trust-chip"><strong>Risultato spiegato</strong><span>Affinità, differenze, coerenza interna e confidenza — tutto trasparente.</span></div>
+          <div class="trust-chip"><strong>Privacy by design</strong><span>Resta nel tuo browser. Dati aggregati solo con consenso esplicito.</span></div>
+          <div class="trust-chip"><strong>Metodo aperto</strong><span>Fonti, pesi e algoritmo documentati. Nessuna scatola nera.</span></div>
         </div>
         <details class="setup-details">
           <summary>Motore di calcolo (V8)</summary>
