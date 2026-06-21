@@ -3332,12 +3332,12 @@
         0,
         100
       ), 1);
-      let label = "Bassa";
-      let explanation = "Il risultato è esplorativo: troppe risposte centrali, tensioni interne o match molto ravvicinati riducono la stabilità.";
-      if (score >= 76) {
+      let label = "Esplorativa";
+      let explanation = "Il risultato è esplorativo: con più risposte o meno ambiguità il profilo sarà più nitido.";
+      if (score >= 72) {
         label = "Alta";
         explanation = "Il risultato è abbastanza stabile: assi coperti, poche tensioni forti e riferimenti principali sufficientemente separati.";
-      } else if (score >= 58) {
+      } else if (score >= 50) {
         label = "Media";
         explanation = "Il risultato è leggibile ma va interpretato con prudenza: alcune risposte o confronti sono vicini tra loro.";
       }
@@ -5844,7 +5844,7 @@
     function buildShareText(data) {
       const top2parties = (data.parties || []).slice(0, 2).map((item) => item.name).join(", ");
       const archetype = resultArchetype(data).name;
-      const url = "piccio2006.github.io/politometro-v6m2";
+      const url = "piccio2006.github.io/politometro_v8";
       return `Ho fatto il Politometro e sono ${archetype}. I miei partiti più vicini: ${top2parties}. E tu? → ${url}`;
     }
 
@@ -5961,11 +5961,11 @@
         ? `<div class="warning"><strong>Risultato meno stabile in alcuni blocchi.</strong><br>${contradictions.map(x => x.message).join("<br>")}</div>`
         : "";
       const engineNote = data.engine === "v8"
-        ? `<div class="trust-chip" style="margin-bottom:12px; border-left: 4px solid var(--accent-2);"><strong>Motore V8 attivo (IRT + Salienza Esplicita)</strong><span>Modello psicometrico Graded Response Model (IRT) non lineare e Fused Consensus.</span></div>`
+        ? `<div class="trust-chip" style="margin-bottom:12px; border-left: 4px solid var(--accent-2);"><strong>Analisi avanzata attiva</strong><span>Profilo calcolato con modello psicometrico di precisione su 8 dimensioni politiche.</span></div>`
         : (data.engine === "v7"
-          ? `<div class="trust-chip" style="margin-bottom:12px;"><strong>Motore V7 attivo (Fused Consensus)</strong><span>Modello integrato multi-algoritmo con salienza dinamica.</span></div>`
+          ? `<div class="trust-chip" style="margin-bottom:12px;"><strong>Analisi multi-modello attiva</strong><span>Profilo calcolato con salienza adattiva e confronto integrato su 8 dimensioni.</span></div>`
           : (data.engine === "v6"
-            ? `<div class="trust-chip" style="margin-bottom:12px;"><strong>Motore V6 attivo</strong><span>Matching: ${escapeHtml(data.matching_model || "euclidean_weighted")}. Confronta anche il tab Metodo.</span></div>`
+            ? `<div class="trust-chip" style="margin-bottom:12px;"><strong>Analisi standard attiva</strong><span>Profilo calcolato su 8 dimensioni politiche con copertura per asse.</span></div>`
             : ""));
       const salienceSlidersBox = data.engine === "v8"
         ? (() => {
@@ -7130,7 +7130,7 @@
 
       ctx.fillStyle = "#fff";
       ctx.font = "700 34px system-ui";
-      ctx.fillText("piccio2006.github.io/politometro-v6m2", 86, 1810);
+      ctx.fillText("piccio2006.github.io/politometro_v8", 86, 1810);
       ctx.fillStyle = "#c5d5dc";
       ctx.font = "500 26px system-ui";
       ctx.fillText("Risultato interpretativo, non diagnostico.", 86, 1854);
@@ -7511,12 +7511,12 @@
       const pill = document.getElementById("enginePill");
       if (pill) {
         pill.textContent = state.engine === "v8"
-          ? `Motore V8 Fused 2.0 · ${state.matchingModel}`
+          ? `Analisi avanzata`
           : (state.engine === "v7"
-            ? `Motore V7 Fused · ${state.matchingModel}`
+            ? `Analisi multi-modello`
             : (state.engine === "v6"
-              ? `Motore V6 · ${state.matchingModel}`
-              : "Motore Legacy V5"));
+              ? `Analisi standard`
+              : "Analisi base"));
       }
     }
 
