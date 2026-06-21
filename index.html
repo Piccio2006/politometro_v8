@@ -3731,7 +3731,7 @@
         model_audit: STANDALONE_DATA.model_audit,
         sources: STANDALONE_DATA.sources,
         calibration: STANDALONE_DATA.calibration,
-        method: engine === "v8" ? "Versione autonoma V8: Graded Response Model (IRT) non lineare, Fused Consensus 2.0 con Salienza Esplicita e Mappatura del Sincretismo Politico." : (engine === "v7" ? "Versione autonoma V7: integrazione multi-modello (8values, Compass, Wahl-O-Mat, Isidewith), salienza adattiva basata sulla forza delle opinioni ed explainability." : "Versione autonoma V6: modello multi-asse eseguito nel browser con pesi normalizzati, copertura per asse, chiarezza delle risposte e penalizzazione delle incoerenze tematiche.")
+        method: engine === "v8" ? "Modello psicometrico avanzato multidimensionale con analisi del sincretismo politico." : (engine === "v7" ? "Modello multi-asse con salienza adattiva ed explainability." : "Modello multi-asse eseguito nel browser con pesi normalizzati e analisi della coerenza interna.")
       };
     }
 
@@ -7581,9 +7581,9 @@
               <div class="field">
                 <label for="engineMode">Motore</label>
                 <select id="engineMode">
-                  <option value="v8" selected>V8 Fused 2.0 (Consigliato)</option>
-                  <option value="v7">V7 Fused</option>
-                  <option value="v6">Motore V6</option>
+                  <option value="v8" selected>Modello avanzato (Consigliato)</option>
+                  <option value="v7">Modello bilanciato</option>
+                  <option value="v6">Modello base</option>
                   <option value="legacy">Legacy V5</option>
                 </select>
               </div>
