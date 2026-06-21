@@ -4454,8 +4454,10 @@
       // Cicla tra le fasi di calcolo
       const phases = [
         ["Peso le risposte sui 8 assi", "Ogni asse ha un peso calibrato sul tuo percorso di risposta."],
+        ["Applico il modello IRT V8.1", "Curve logistiche non lineari per correggere distorsioni sistematiche."],
         ["Confronto con 120+ partiti", "Calcolo la distanza angolare nel profilo multidimensionale."],
         ["Verifico la coerenza interna", "Cerco contraddizioni tematiche tra le risposte simili."],
+        ["Rilevamento sincretismo politico", "Identifico combinazioni ideologiche rare e posizionamenti ibridi."],
         ["Compongo il report ideologico", "Abbino il profilo alle categorie teoriche globali."],
         ["Preparo i grafici", "Radar, mappa politica, barre per asse — tutto in arrivo."],
       ];
@@ -4516,7 +4518,7 @@
 
     function axisDirection(value) {
       if (value < -0.15) return "sinistra / libertario / apertura";
-      if (value > 0.15) return "destra / autorita / conservazione";
+      if (value > 0.15) return "destra / autorità / conservazione";
       return "zona bilanciata";
     }
 
@@ -5813,7 +5815,7 @@
       if (compact) {
         return `
           <div class="block">
-            <span class="kicker">Nuovo</span>
+            <span class="kicker">Confronti interpretativi</span>
             <h3>${escapeHtml(world.title || "Il tuo mondo politico")}</h3>
             <p class="small">${escapeHtml(world.summary || "Partito, figura storica e nemesi spiegati sugli 8 assi.")}</p>
             ${body}
@@ -5885,7 +5887,7 @@
     async function copyShareLink() {
       const url = publicShareUrl();
       if (!url) {
-        setShareStatus("Questa copia e offline: per avere un link condivisibile serve pubblicarla online o avviarla da un server raggiungibile.");
+        setShareStatus("Questa copia è offline: per avere un link condivisibile serve pubblicarla online o avviarla da un server raggiungibile.");
         return;
       }
       await copyText(url);
@@ -5953,8 +5955,34 @@
       setupMapInteractions(data);
     }
 
+    async function _trackResult(result) {
+      try {
+        const BACKEND = ""; // URL backend — lascia vuoto finché non deployato
+        if (!BACKEND) return;
+        await fetch(BACKEND + "/api/quiz/result", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)),
+            mode: result.mode || "",
+            engine_version: "v8.1",
+            profile: result.profile || {},
+            archetype: result.archetype?.id || "",
+            top_match: result.party_ranking?.[0]?.name || "",
+            top_affinity: result.party_ranking?.[0]?.affinity || 0,
+            global_confidence: result.global_confidence || 0,
+            reliability_score: result.reliability?.score || 0,
+            reliability_label: result.reliability?.label || "",
+            answered_count: result.answered_questions || 0
+          }),
+          signal: AbortSignal.timeout(3000)
+        });
+      } catch (_) {}
+    }
+
     function renderResults(data) {
       state.lastResult = data;
+      _trackResult(data);
       el("quiz").style.display = "none";
       const contradictions = Array.isArray(data.contradictions) ? data.contradictions : [];
       const warnings = contradictions.length
@@ -6206,9 +6234,12 @@
 
         <div id="panel-sondaggi" class="tab-panel">
           <div class="block">
-            <h2>📊 Osservatorio Sondaggi Elettorali & Trend Storici</h2>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+              <h2 style="margin:0;">📊 Osservatorio Sondaggi Elettorali</h2>
+              <span id="pollsUpdateBadge" style="font-size:11px;font-weight:700;color:var(--accent-2);background:rgba(56,163,165,.1);border:1px solid rgba(56,163,165,.25);border-radius:20px;padding:3px 10px;letter-spacing:.03em;"></span>
+            </div>
             <p class="small text-muted" style="margin-bottom: 20px;">
-              Analisi delle intenzioni di voto dei principali partiti italiani. La base corrente usa l'ultimo dato YouTrend disponibile nella tabella pubblica consultata il 14 giugno 2026, aggiornato all'11 giugno 2026; i trend precedenti restano indicativi e vanno aggiornati con fonti ufficiali quando disponibili.
+              Fonte: YouTraend/Supermedia AGI — aggiornato automaticamente ogni domenica. Medie sondaggi nazionali; i trend precedenti restano indicativi.
             </p>
             
             <div class="result-grid" style="grid-template-columns: 1.2fr 0.8fr; gap: 20px;">
@@ -6234,7 +6265,7 @@
                   <!-- Dynamically populated -->
                 </div>
                 <div class="ethics-note" style="margin: 0; background: rgba(34,87,122,0.04); font-size: 12px; line-height: 1.45;">
-                  <strong>Metodologia Sondaggi:</strong> Base corrente: aggregazione YouTrend aggiornata all'11 giugno 2026, reperita il 14 giugno 2026. I sondaggi sono stime campionarie, non risultati elettorali; il simulatore serve per esplorare scenari, non per prevedere con certezza il Parlamento.
+                  <strong>Metodologia Sondaggi:</strong> Base corrente: aggregazione YouTrend, ultimo dato disponibile: <span id="pollsMethodologyDate"></span>. I sondaggi sono stime campionarie, non risultati elettorali; il simulatore serve per esplorare scenari, non per prevedere con certezza il Parlamento.
                 </div>
               </div>
             </div>
@@ -6914,7 +6945,7 @@
                   <button class="btn" id="copyShareLink">Copia link</button>
                 </div>
               </div>
-              <p class="small">Se stai usando il file offline, il test funziona ma quel link non e pubblico. Per condividerlo davvero serve metterlo online o aprirlo da un server raggiungibile.</p>
+              <p class="small">Se stai usando il file offline, il test funziona ma quel link non è pubblico. Per condividerlo davvero serve metterlo online o aprirlo da un server raggiungibile.</p>
             </div>
             <div class="block">
               <h3>App installabile</h3>
@@ -7536,7 +7567,7 @@
           <div class="welcome-sigil">P</div>
           <div>
             <h2 class="landing-headline">Il tuo profilo politico,<br>in 8 dimensioni.</h2>
-            <p class="small">Non un'etichetta — una mappa. Scopri affinità con partiti, ideologie e figure storiche, e capisce <em>perché</em>.</p>
+            <p class="small">Non un'etichetta — una mappa. Scopri affinità con partiti, ideologie e figure storiche, e capisci <em>perché</em>.</p>
             <div class="hero-badges">
               <span class="hero-badge">⚡ 3 minuti</span>
               <span class="hero-badge">◈ 8 assi</span>
@@ -7590,8 +7621,8 @@
               <div class="field">
                 <label for="matchingModel">Algoritmo matching partiti</label>
                 <select id="matchingModel">
-                  <option value="fused_consensus" selected>Fused Consensus (Consigliato)</option>
-                  <option value="euclidean_weighted">Euclideo pesato (V6)</option>
+                  <option value="fused_consensus" selected>Algoritmo avanzato multi-criterio (Consigliato)</option>
+                  <option value="euclidean_weighted">Distanza euclidea pesata</option>
                   <option value="manhattan_weighted">Manhattan (Wahl-O-Mat style)</option>
                   <option value="directional">Direzionale (cosine)</option>
                 </select>
@@ -15119,7 +15150,19 @@ Rispondi sempre in ITALIANO. Spiega in modo chiaro e oggettivo le correlazioni g
     function populateLatestPolls() {
       const container = document.getElementById("pollingLatestList");
       if (!container) return;
-      
+
+      // Popola il badge con il mese dell'ultimo dato
+      const badge = document.getElementById("pollsUpdateBadge");
+      if (badge) {
+        const lastMonth = SONDAGGI_TRENDS[SONDAGGI_TRENDS.length - 1]?.month || "";
+        if (lastMonth) badge.textContent = "Dati: " + lastMonth;
+      }
+      const dateSpan = document.getElementById("pollsMethodologyDate");
+      if (dateSpan) {
+        const lastMonth = SONDAGGI_TRENDS[SONDAGGI_TRENDS.length - 1]?.month || "";
+        dateSpan.textContent = lastMonth || "n/d";
+      }
+
       let html = "";
       // Prendi l'ultimo mese
       const latest = SONDAGGI_TRENDS[SONDAGGI_TRENDS.length - 1];
