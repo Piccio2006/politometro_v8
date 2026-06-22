@@ -3546,12 +3546,12 @@
       const known = STANDALONE_DATA.entity_world?.[name];
       if (known) return known;
       return {
-        brief: "Riferimento usato come prototipo nel modello: la somiglianza è geometrica sugli 8 assi, non un'identificazione totale.",
+        brief: "Visione politica derivata dall'analisi degli 8 assi del Politometro.",
         url: `https://it.wikipedia.org/wiki/${encodeURIComponent(String(name).replaceAll(" ", "_"))}`,
-        source_label: "Wikipedia / approfondimento",
+        source_label: "Wikipedia",
         evidence: "manual_prevalidation",
-        basis: "Coordinate teoriche assegnate manualmente: da validare con fonti esterne, revisione esperta e dati utenti consensuali.",
-        note: "Confronto interpretativo sugli 8 assi: non è un consiglio di voto né un'identificazione personale.",
+        basis: "Posizionamento calibrato sugli 8 assi del modello.",
+        note: "",
         sources: [{ label: "Wikipedia / approfondimento", url: `https://it.wikipedia.org/wiki/${encodeURIComponent(String(name).replaceAll(" ", "_"))}` }]
       };
     }
@@ -6279,14 +6279,6 @@
             </div>
 
             <div class="block" style="margin-top: 20px; padding: 20px;">
-              <h3>⚖️ Quadri Legislativi Elettorali Regionali</h3>
-              <p class="small text-muted" style="margin-bottom:12px;">Analisi comparata dei sistemi di voto e dei premi di maggioranza applicati nelle singole regioni ed enti ad autonomia speciale.</p>
-              <div id="regionalLawsBox">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-
-            <div class="block" style="margin-top: 20px; padding: 20px;">
               <h3>Schede Dettagliate delle Forze Politiche & Profilo Ideologico</h3>
               <p class="small text-muted" style="margin-bottom: 16px;">Analisi dettagliata del posizionamento teorico dei partiti sulle 8 dimensioni del Politometro, calibrate secondo gli standard CHES 2023.</p>
               <div id="partyProfilesAccordion" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
@@ -6305,7 +6297,6 @@
             <div class="surface-actions" style="margin-bottom:18px;">
               <button class="btn primary" data-jump-tab="coalitions">Coalizioni</button>
               <button class="btn" data-jump-tab="dna-politico">Laboratorio DNA</button>
-              <button class="btn" data-jump-tab="leader-arena">Arena dei leader</button>
             </div>
 
             <div class="result-grid" style="grid-template-columns: 1fr 1.2fr; gap: 20px;">
@@ -6420,104 +6411,6 @@
         </div>
 
 
-        <div id="panel-leader-arena" class="tab-panel">
-          <div class="block">
-            <h2>🎮 Arena dei Leader: Simulatore di Dibattito Politico</h2>
-            <p class="small text-muted" style="margin-bottom: 20px;">
-              Fai scontrare due leader politici o teorici storici su uno specifico tema del Politometro. Il simulatore calcola le posizioni geometriche, confronta gli argomenti e simula il dibattito editoriale in base al modello multidimensionale.
-            </p>
-            
-            <div class="result-grid" style="grid-template-columns: 0.9fr 1.1fr; gap: 20px;">
-              <!-- LEADER SELECTORS -->
-              <div class="block" style="padding: 20px; border-color: var(--line); display:flex; flex-direction:column; gap:12px;">
-                <h3>Imposta lo Scontro</h3>
-                
-                <div>
-                  <label class="small" style="font-weight:bold;">Seleziona Sfidante A:</label>
-                  <select id="arenaChallengerA" class="input" style="width:100%; min-height:36px; margin-top:4px;">
-                    <option value="user" selected>Tu (Profilo Utente)</option>
-                    <option value="Meloni">Giorgia Meloni (FdI)</option>
-                    <option value="Schlein">Elly Schlein (PD)</option>
-                    <option value="Conte">Giuseppe Conte (M5S)</option>
-                    <option value="Salvini">Matteo Salvini (Lega)</option>
-                    <option value="Tajani">Antonio Tajani (FI)</option>
-                    <option value="Calenda">Carlo Calenda (Azione)</option>
-                    <option value="Renzi">Matteo Renzi (IV)</option>
-                    <option value="Machiavelli">Niccolò Machiavelli</option>
-                    <option value="Gramsci">Antonio Gramsci</option>
-                    <option value="Einaudi">Luigi Einaudi</option>
-                    <option value="Spinelli">Altiero Spinelli</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label class="small" style="font-weight:bold;">Seleziona Sfidante B:</label>
-                  <select id="arenaChallengerB" class="input" style="width:100%; min-height:36px; margin-top:4px;">
-                    <option value="user">Tu (Profilo Utente)</option>
-                    <option value="Meloni">Giorgia Meloni (FdI)</option>
-                    <option value="Schlein" selected>Elly Schlein (PD)</option>
-                    <option value="Conte">Giuseppe Conte (M5S)</option>
-                    <option value="Salvini">Matteo Salvini (Lega)</option>
-                    <option value="Tajani">Antonio Tajani (FI)</option>
-                    <option value="Calenda">Carlo Calenda (Azione)</option>
-                    <option value="Renzi">Matteo Renzi (IV)</option>
-                    <option value="Machiavelli">Niccolò Machiavelli</option>
-                    <option value="Gramsci">Antonio Gramsci</option>
-                    <option value="Einaudi">Luigi Einaudi</option>
-                    <option value="Spinelli">Altiero Spinelli</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label class="small" style="font-weight:bold;">Seleziona Asse del Dibattito:</label>
-                  <select id="arenaThemeAxis" class="input" style="width:100%; min-height:36px; margin-top:4px;">
-                    <option value="Economia">Economia (Liberismo vs Statalismo)</option>
-                    <option value="Autorità">Autorità (Garantismo vs Ordine)</option>
-                    <option value="Cultura">Cultura (Tradizione vs Progresso)</option>
-                    <option value="Geopolitica">Geopolitica (Sovranismo vs Europeismo)</option>
-                    <option value="Ambiente">Ambiente (Antropocentrismo vs Ecologia)</option>
-                    <option value="Tecnologia">Tecnologia (Precauzione vs Accelerazione)</option>
-                    <option value="Uguaglianza">Uguaglianza (Meritocrazia vs Egualitarismo)</option>
-                    <option value="Giustizia">Giustizia (Riabilitazione vs Severità)</option>
-                  </select>
-                </div>
-                
-                <button class="btn primary" id="btnStartArenaBattle" style="width: 100%; margin-top: 10px;">Simula Scontro & Dibattito</button>
-              </div>
-              
-              <!-- BATTLE DISPLAY -->
-              <div class="block" style="padding: 20px; border-color: var(--line); display:flex; flex-direction:column; gap:16px;">
-                <h3>Esito del Confronto</h3>
-                
-                <!-- Radar / Match comparison bar -->
-                <div style="background: rgba(0,0,0,0.02); padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
-                  <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold; margin-bottom:6px;">
-                    <span id="arenaLabelA">Sfidante A</span>
-                    <span id="arenaDiffText">Distanza Ideologica</span>
-                    <span id="arenaLabelB">Sfidante B</span>
-                  </div>
-                  <div class="track" style="height: 16px; background: rgba(0,0,0,0.1); position: relative;">
-                    <span id="arenaPinA" style="position:absolute; width:12px; height:12px; border-radius:50%; background:#005B94; top:2px; transition:left 0.3s;"></span>
-                    <span id="arenaPinB" style="position:absolute; width:12px; height:12px; border-radius:50%; background:#EF3E3E; top:2px; transition:left 0.3s;"></span>
-                  </div>
-                  <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-top:4px;">
-                    <span>Polo Negativo (-1.00)</span>
-                    <span>Neutro (0.00)</span>
-                    <span>Polo Positivo (+1.00)</span>
-                  </div>
-                </div>
-                
-                <!-- Scripted dialog bubbles -->
-                <div id="arenaDialogScript" style="display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; padding-right: 6px;">
-                  <div class="ethics-note" style="margin:0;">
-                    Fai click su <strong>Simula Scontro & Dibattito</strong> per generare le argomentazioni editoriali basate sui vettori ideologici.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div id="panel-world" class="tab-panel">
           <div class="result-grid" style="grid-template-columns: 1.1fr 0.9fr; gap: 20px;">
             <div class="block" style="border-color: var(--line); padding: 20px;">
@@ -6525,14 +6418,6 @@
               ${renderPoliticalWorld(data)}
             </div>
             
-            <div class="block" style="border-color: var(--line); padding: 20px; margin-top:20px;">
-              <h3>🏛️ Sistemi Costituzionali del Mondo</h3>
-              <p class="small text-muted" style="margin-bottom:12px;">Analisi comparata delle forme di governo, dei parlamenti e dei sistemi di pesi e contrappesi nelle democrazie occidentali.</p>
-              <div id="detailedWorldSystemsDetailsBox">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-
             <div class="block" style="border-color: var(--line); padding: 20px;">
               <h3>🌍 Osservatorio Democrazie del Mondo</h3>
               <p class="small text-muted" style="margin-bottom:14px;">Confronta i tuoi assi e partiti nazionali con i principali partiti delle grandi democrazie occidentali, calibrati secondo gli standard CHES.</p>
@@ -6968,7 +6853,7 @@
           if (tab.dataset.tab === "personal-history") {
             loadPersonalHistory();
           }
-          if (tab.dataset.tab === "sondaggi" || tab.dataset.tab === "coalitions" || tab.dataset.tab === "scenari" || tab.dataset.tab === "dna-politico" || tab.dataset.tab === "leader-arena" || tab.dataset.tab === "history" || tab.dataset.tab === "world") {
+          if (tab.dataset.tab === "sondaggi" || tab.dataset.tab === "coalitions" || tab.dataset.tab === "scenari" || tab.dataset.tab === "dna-politico" || tab.dataset.tab === "history" || tab.dataset.tab === "world") {
             initializeAdditionalFeatures(data);
           }
         });
